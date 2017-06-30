@@ -13,4 +13,4 @@ At the moment, there is no configuration except the ability to create a log file
 
 #### Changing components icons
 Create a property called **_icon_** on a Business Actor or any element from the Technology Layer. The property value must be the name of one image file from the FontAwesome folder (without the extension):
-<p align="center">![fontawesome](https://user-images.githubusercontent.com/9281982/27751630-8604ded6-5ddd-11e7-8595-b72968d956b1.png)</p>
+![fontawesome](https://user-images.githubusercontent.com/9281982/27751630-8604ded6-5ddd-11e7-8595-b72968d956b1.png)
