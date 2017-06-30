@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Icon plugin for Archimate tool
+Bundle-SymbolicName: org.archicontribs.specialization;singleton:=true
+Bundle-Version: 0.0.1
+Bundle-Vendor: Hervé Jouin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ClassPath: .,
+ lib/log4j-1.2.17.jar,
+ lib/javassist.jar,
+ lib/tools.jar
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.archicontribs.specialization.SpecializationPlugin
+Require-Bundle: org.eclipse.core.runtime,
+ com.archimatetool.editor,
+ com.archimatetool.canvas,
+ com.archimatetool.help,
+ org.eclipse.swt,
+ com.archimatetool.model,
+ org.eclipse.emf.ecore,
+ org.eclipse.help
