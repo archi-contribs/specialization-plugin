@@ -5,8 +5,8 @@
          point="org.eclipse.ui.preferencePages">
       <page
             class="org.archicontribs.specialization.preferences.PreferencePage"
-            id="org.archicontribs.icon.IconPreferencePage"
-            name="icon plugin">
+            id="org.archicontribs.specialization.preferences.PreferencePage"
+            name="specialization plugin">
       </page>
    </extension>
    <extension
