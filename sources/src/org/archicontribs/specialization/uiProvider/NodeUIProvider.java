@@ -8,6 +8,7 @@ package org.archicontribs.specialization.uiProvider;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.figure.NodeFigure;
 import org.eclipse.gef.EditPart;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
@@ -36,5 +37,15 @@ public class NodeUIProvider extends com.archimatetool.editor.ui.factory.elements
             return super.getImage();
 
         return getImageWithUserFillColor(iconName);
+    }
+    
+    @Override
+    public ImageDescriptor getImageDescriptor() {
+        String iconName = SpecializationPlugin.getIconName(instance, true);
+        
+        if ( iconName == null )
+            return super.getImageDescriptor();
+
+        return getImageDescriptorWithUserFillColor(iconName);
     }
 }
