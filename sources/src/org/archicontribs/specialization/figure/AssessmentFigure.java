@@ -9,7 +9,7 @@ import org.eclipse.swt.graphics.Image;
 import com.archimatetool.editor.ui.factory.ObjectUIFactory;
 
 /**
- * CollaborationFigure
+ * AssessmentFigure
  * 
  * @author HJOUIN
  */
