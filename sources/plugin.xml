@@ -19,6 +19,54 @@
    <extension
          point="com.archimatetool.editor.objectUIProvider">
       <uiProvider
+            class="org.archicontribs.specialization.uiProvider.ArtifactUIProvider"
+            id="org.archicontribs.specialization.uiProvider.ArtifactUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.AsssessmentUIProvider"
+            id="org.archicontribs.specialization.uiProvider.AssessmentUIProvider">
+      </uiProvider>
+      
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessCollaborationUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessCollaborationUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessEventUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessEventUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessFunctionUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessFunctionUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessInteractionUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessInteractionUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessInterfaceUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessInterfaceUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessObjectUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessObjectUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessProcessUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessProcessUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessRoleUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessRoleUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.BusinessServiceUIProvider"
+            id="org.archicontribs.specialization.uiProvider.BusinessServiceUIProvider">
+      </uiProvider>
+      
+      
+      
+      <uiProvider
             class="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider">
       </uiProvider>
