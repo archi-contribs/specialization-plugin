@@ -27,7 +27,7 @@ public class NodeUIProvider extends com.archimatetool.editor.ui.factory.elements
     }
     
     /**
-     * Gets the icon name from the properties. If not found, return the default one.
+     * Gets the icon image from the component's properties. If not found, return the default one.
      */
     @Override
     public Image getImage() {
@@ -39,6 +39,9 @@ public class NodeUIProvider extends com.archimatetool.editor.ui.factory.elements
         return getImageWithUserFillColor(iconName);
     }
     
+    /**
+     * Gets the icon image descriptor from the componnent's properties. If not found, return the default one.
+     */
     @Override
     public ImageDescriptor getImageDescriptor() {
         String iconName = SpecializationPlugin.getIconName(instance, true);
