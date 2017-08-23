@@ -63,6 +63,26 @@
             class="org.archicontribs.specialization.uiProvider.BusinessServiceUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessServiceUIProvider">
       </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.CapabilityUIProvider"
+            id="org.archicontribs.specialization.uiProvider.CapabilityUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.ConstraintUIProvider"
+            id="org.archicontribs.specialization.uiProvider.ConstraintUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.ContractUIProvider"
+            id="org.archicontribs.specialization.uiProvider.ContractUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.CourseOfActionUIProvider"
+            id="org.archicontribs.specialization.uiProvider.CourseOfActionUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.DataObjectUIProvider"
+            id="org.archicontribs.specialization.uiProvider.DataObjectUIProvider">
+      </uiProvider>
       
       
       
