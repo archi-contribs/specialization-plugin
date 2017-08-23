@@ -15,7 +15,7 @@ import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 
 
 /**
- * Node UI Provider
+ * Course Of Action UI Provider
  * 
  * @author Herve Jouin
  */

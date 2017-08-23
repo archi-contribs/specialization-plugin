@@ -15,7 +15,7 @@ import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 
 
 /**
- * Node UI Provider
+ * Business Role UI Provider
  * 
  * @author Herve Jouin
  */

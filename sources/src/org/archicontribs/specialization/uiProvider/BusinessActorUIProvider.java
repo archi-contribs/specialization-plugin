@@ -15,7 +15,7 @@ import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 
 
 /**
- * BusinessActor UI Provider
+ * Business Actor UI Provider
  * 
  * @author Herve Jouin
  */
