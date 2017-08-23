@@ -19,7 +19,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "0.0.1 alpha";
+	public static final String pluginVersion = "0.0.3 alpha";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
@@ -148,17 +148,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         
             if ( obj instanceof IProperties ) { 
                 for ( IProperty prop: ((IProperties)obj).getProperties() ) {
-                    logger.trace("   found property \""+prop.getKey()+"\" = \""+prop.getValue()+"\"");
                     if ( SpecializationPlugin.areEqual(prop.getKey(), "icon") ) {
-                        String iconName = "/img/FontAwesome/"+prop.getValue()+".png";
-                        if ( mustExist && (SpecializationPlugin.class.getResourceAsStream(iconName) == null) ) {
-                            logger.trace("      but icon \""+iconName+"\" not found");
-                        } else {
-                            logger.trace("   returning icon "+iconName);
-                            IArchiImages.ImageFactory.getImage(iconName);
+                        String iconName = "/img/"+prop.getValue();
+                        if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
+                            logger.trace("found icon \""+iconName+"\"");
                             return iconName;
                         }
-                        // we continue the loop in case there is another icon property that matches a file
+                        logger.trace("missing icon \""+iconName+"\"");
+                        // we continue the loop in case there is another "icon" property
                     }
                 }
             }
