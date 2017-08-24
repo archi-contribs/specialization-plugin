@@ -23,7 +23,7 @@
             id="org.archicontribs.specialization.uiProvider.ArtifactUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.AsssessmentUIProvider"
+            class="org.archicontribs.specialization.uiProvider.AssessmentUIProvider"
             id="org.archicontribs.specialization.uiProvider.AssessmentUIProvider">
       </uiProvider>
       
