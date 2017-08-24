@@ -30,12 +30,21 @@ public class ContractUIProvider extends com.archimatetool.editor.ui.factory.elem
      */
     @Override
     public Image getImage() {
+    	StackTraceElement[] stack = new Exception().getStackTrace();
     	String iconName = null;
 
-    	// we change the image if the shouldShowImages is set and if we are in a view
-        if ( SpecializationPlugin.shouldShowImages() && new Exception().getStackTrace()[3].getClassName().startsWith("com.archimatetool.editor") )
-        	iconName = SpecializationPlugin.getIconName(instance, true);
+    	// if we are in the model tree, we show the image only if the showImagesInTree flag is set
+        if ( stack[2].getClassName().startsWith("com.archimatetool.editor.views.tree") ) {
+        	if ( SpecializationPlugin.showImagesInTree() )
+        		iconName = SpecializationPlugin.getIconName(instance, true);
+        }
+        // if we are in a view, we show the image only if the showImagesInView flag is set
+        else if ( stack[2].getClassName().startsWith("com.archimatetool.editor.diagram") ) {
+        	if ( SpecializationPlugin.showImagesInView() )
+        		iconName = SpecializationPlugin.getIconName(instance, true);
+        }
+        // in all the other parts of Arch, we stick to the default icon
         
-        return iconName == null ? super.getImage() : getImageWithUserFillColor(iconName);
+        return iconName==null ? super.getImage() : getImageWithUserFillColor(iconName);
     }
 }
