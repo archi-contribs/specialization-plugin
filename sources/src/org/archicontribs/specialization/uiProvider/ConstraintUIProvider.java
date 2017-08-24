@@ -8,7 +8,6 @@ package org.archicontribs.specialization.uiProvider;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.figure.ConstraintFigure;
 import org.eclipse.gef.EditPart;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
@@ -37,18 +36,5 @@ public class ConstraintUIProvider extends com.archimatetool.editor.ui.factory.el
             return super.getImage();
 
         return getImageWithUserFillColor(iconName);
-    }
-    
-    /**
-     * Gets the icon image descriptor from the componnent's properties. If not found, return the default one.
-     */
-    @Override
-    public ImageDescriptor getImageDescriptor() {
-        String iconName = SpecializationPlugin.getIconName(instance, true);
-        
-        if ( iconName == null )
-            return super.getImageDescriptor();
-
-        return getImageDescriptorWithUserFillColor(iconName);
     }
 }
