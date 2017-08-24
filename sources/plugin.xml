@@ -19,6 +19,10 @@
    <extension
       point="com.archimatetool.editor.objectUIProvider">
       <uiProvider
+            class="org.archicontribs.specialization.uiProvider.ApplicationCollaborationUIProvider"
+            id="org.archicontribs.specialization.uiProvider.ApplicationCollaborationUIProvider">
+      </uiProvider>
+      <uiProvider
             class="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider">
       </uiProvider>
@@ -45,11 +49,6 @@
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.ApplicationServiceUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationServiceUIProvider">
-      </uiProvider>
-      
-      <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.ArtifactUIProvider"
@@ -160,8 +159,8 @@
             id="org.archicontribs.specialization.uiProvider.GroupingUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ImplementationUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ImplementationUIProvider">
+            class="org.archicontribs.specialization.uiProvider.ImplementationEventUIProvider"
+            id="org.archicontribs.specialization.uiProvider.ImplementationEventUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.JunctionUIProvider"
@@ -204,7 +203,7 @@
             id="org.archicontribs.specialization.uiProvider.ProductUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.RepresentationuiProvider.UIProvider"
+            class="org.archicontribs.specialization.uiProvider.RepresentationUIProvider"
             id="org.archicontribs.specialization.uiProvider.RepresentationUIProvider">
       </uiProvider>
       <uiProvider
