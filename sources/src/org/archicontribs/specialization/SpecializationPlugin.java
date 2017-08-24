@@ -15,11 +15,20 @@ import com.archimatetool.model.INameable;
 import com.archimatetool.model.IProperties;
 import com.archimatetool.model.IProperty;
 
+/**
+ * Specialization plugin for Archi, the Archimate modeler
+ * 
+ * The FormPlugin class alows to change the elements' icons in the Archi views.
+ * 
+ * @author Herve Jouin
+ *
+ * v0.1 :		24/08/2017		beta version
+ */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "0.0.3 alpha";
+	public static final String pluginVersion = "0.1";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
