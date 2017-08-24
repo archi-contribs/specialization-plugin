@@ -146,7 +146,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		fd.left = new FormAttachment(versionValue, 100);
 		checkUpdateButton.setLayoutData(fd);
 		checkUpdateButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) { /*IconPlugin.checkForUpdate(true);*/ }
+			public void widgetSelected(SelectionEvent e) { SpecializationPlugin.checkForUpdate(true); }
 			public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 		});
 		
