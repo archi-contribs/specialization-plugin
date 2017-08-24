@@ -30,11 +30,12 @@ public class TechnologyProcessUIProvider extends com.archimatetool.editor.ui.fac
      */
     @Override
     public Image getImage() {
-        String iconName = SpecializationPlugin.getIconName(instance, true);
-        
-        if ( iconName == null )
-            return super.getImage();
+    	String iconName = null;
 
-        return getImageWithUserFillColor(iconName);
+    	// we change the image if the shouldShowImages is set and if we are in a view
+        if ( SpecializationPlugin.shouldShowImages() && new Exception().getStackTrace()[3].getClassName().startsWith("com.archimatetool.editor") )
+        	iconName = SpecializationPlugin.getIconName(instance, true);
+        
+        return iconName == null ? super.getImage() : getImageWithUserFillColor(iconName);
     }
 }

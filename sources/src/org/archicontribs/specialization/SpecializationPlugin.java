@@ -54,6 +54,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 																"log4j.appender.file.layout                     = org.apache.log4j.PatternLayout\n"+
 																"log4j.appender.file.layout.ConversionPattern   = %d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-30.30C{1} %m%n");
 		preferenceStore.setDefault("iconMargin",                2);
+		preferenceStore.setDefault("shouldShowImages",          true);
 		logger = new SpecializationLogger(SpecializationPlugin.class);
 		logger.info(pluginTitle+" initialized.");
 	}
@@ -62,9 +63,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	    return preferenceStore.getInt("iconMargin");
 	}
 	
-    public static int getIconSize() {
-        return 16;
-    }
+	public static boolean shouldShowImages() {
+	    return preferenceStore.getBoolean("shouldShowImages");
+	}
 	
 	/**
 	 * Shows up an on screen popup, displaying the message (and the exception message if any) and wait for the user to click on the "OK" button
