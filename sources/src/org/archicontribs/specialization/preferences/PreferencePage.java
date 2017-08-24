@@ -176,24 +176,25 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         gd.grabExcessHorizontalSpace = true;
         grpBehaviour.setLayoutData(gd);
         
-        
-        btnShowImagesInView = new Button(grpVersion, SWT.CHECK);
+        btnShowImagesInView = new Button(grpBehaviour, SWT.CHECK);
         btnShowImagesInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnShowImagesInView.setText("Enable icons replacement in views");
+        btnShowImagesInView.setText("Enable icons replacement in views (you may need to close and re-open the views to see the effect)");
 		fd = new FormData();
 		fd.top = new FormAttachment(0, 5);
 		fd.left = new FormAttachment(0, 10);
 		btnShowImagesInView.setLayoutData(fd);
 		btnShowImagesInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
 		
-		btnShowImagesInTree = new Button(grpVersion, SWT.CHECK);
+		btnShowImagesInTree = new Button(grpBehaviour, SWT.CHECK);
 		btnShowImagesInTree.setBackground(COMPO_BACKGROUND_COLOR);
-		btnShowImagesInTree.setText("Enable icons replacement in model tree");
+		btnShowImagesInTree.setText("Enable icons replacement in model tree (you may need to close and re-open your model to see the effect)");
 		fd = new FormData();
 		fd.top = new FormAttachment(btnShowImagesInView, 5);
 		fd.left = new FormAttachment(0, 10);
 		btnShowImagesInTree.setLayoutData(fd);
 		btnShowImagesInTree.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInTree"));
+		
+		
 		Group grpHelp = new Group(behaviourComposite, SWT.NONE);
 		grpHelp.setBackground(COMPO_BACKGROUND_COLOR);
         grpHelp.setLayout(new FormLayout());
