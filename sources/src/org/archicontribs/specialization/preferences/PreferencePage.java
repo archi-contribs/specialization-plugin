@@ -64,6 +64,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	
 	private TabFolder tabFolder;
 	private Button btnCheckForUpdateAtStartupButton;
+	private Button btnShowImagesInView;
+	private Button btnShowImagesInTree;
 	private boolean mouseOverHelpButton = false;
 	private Composite loggerComposite;
 	private RadioGroupFieldEditor loggerModeRadioGroupEditor;
@@ -144,7 +146,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		fd.left = new FormAttachment(versionValue, 100);
 		checkUpdateButton.setLayoutData(fd);
 		checkUpdateButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) { /*IconPlugin.checkForUpdate(true);*/ }
+			public void widgetSelected(SelectionEvent e) { SpecializationPlugin.checkForUpdate(true); }
 			public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 		});
 		
@@ -162,6 +164,36 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = true;
 		grpVersion.setLayoutData(gd);
+		
+		Group grpBehaviour = new Group(behaviourComposite, SWT.NONE);
+		grpBehaviour.setBackground(COMPO_BACKGROUND_COLOR);
+		grpBehaviour.setLayout(new FormLayout());
+		grpBehaviour.setText("Behaviour : ");
+		
+        gd = new GridData();
+        //gd.heightHint = 40;
+        gd.horizontalAlignment = GridData.FILL;
+        gd.grabExcessHorizontalSpace = true;
+        grpBehaviour.setLayoutData(gd);
+        
+        btnShowImagesInView = new Button(grpBehaviour, SWT.CHECK);
+        btnShowImagesInView.setBackground(COMPO_BACKGROUND_COLOR);
+        btnShowImagesInView.setText("Enable icons replacement in views (you may need to close and re-open the views to see the effect)");
+		fd = new FormData();
+		fd.top = new FormAttachment(0, 5);
+		fd.left = new FormAttachment(0, 10);
+		btnShowImagesInView.setLayoutData(fd);
+		btnShowImagesInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
+		
+		btnShowImagesInTree = new Button(grpBehaviour, SWT.CHECK);
+		btnShowImagesInTree.setBackground(COMPO_BACKGROUND_COLOR);
+		btnShowImagesInTree.setText("Enable icons replacement in model tree (you may need to close and re-open your model to see the effect)");
+		fd = new FormData();
+		fd.top = new FormAttachment(btnShowImagesInView, 5);
+		fd.left = new FormAttachment(0, 10);
+		btnShowImagesInTree.setLayoutData(fd);
+		btnShowImagesInTree.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInTree"));
+		
 		
 		Group grpHelp = new Group(behaviourComposite, SWT.NONE);
 		grpHelp.setBackground(COMPO_BACKGROUND_COLOR);
@@ -298,6 +330,10 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     @Override
     public boolean performOk() {
     	if ( logger.isTraceEnabled() ) logger.trace("Saving preferences in preference store");
+    	
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("checkForUpdateAtStartup", btnCheckForUpdateAtStartupButton.getSelection());
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInView", btnShowImagesInView.getSelection());
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInTree", btnShowImagesInTree.getSelection());
     	
     	// the loggerMode is a private property, so we use reflection to access it
 		try {

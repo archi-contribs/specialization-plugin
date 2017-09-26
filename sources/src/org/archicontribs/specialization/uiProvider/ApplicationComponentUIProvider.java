@@ -8,7 +8,6 @@ package org.archicontribs.specialization.uiProvider;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.figure.ApplicationComponentFigure;
 import org.eclipse.gef.EditPart;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
@@ -31,24 +30,21 @@ public class ApplicationComponentUIProvider extends com.archimatetool.editor.ui.
      */
     @Override
     public Image getImage() {
-        String iconName = SpecializationPlugin.getIconName(instance, true);
-        
-        if ( iconName == null )
-            return super.getImage();
+    	StackTraceElement[] stack = new Exception().getStackTrace();
+    	String iconName = null;
 
-        return getImageWithUserFillColor(iconName);
-    }
-    
-    /**
-     * Gets the icon image descriptor from the componnent's properties. If not found, return the default one.
-     */
-    @Override
-    public ImageDescriptor getImageDescriptor() {
-        String iconName = SpecializationPlugin.getIconName(instance, true);
+    	// if we are in the model tree, we show the image only if the showImagesInTree flag is set
+        if ( stack[2].getClassName().startsWith("com.archimatetool.editor.views.tree") ) {
+        	if ( SpecializationPlugin.showImagesInTree() )
+        		iconName = SpecializationPlugin.getIconName(instance, true);
+        }
+        // if we are in a view, we show the image only if the showImagesInView flag is set
+        else if ( stack[2].getClassName().startsWith("com.archimatetool.editor.diagram") ) {
+        	if ( SpecializationPlugin.showImagesInView() )
+        		iconName = SpecializationPlugin.getIconName(instance, true);
+        }
+        // in all the other parts of Arch, we stick to the default icon
         
-        if ( iconName == null )
-            return super.getImageDescriptor();
-
-        return getImageDescriptorWithUserFillColor(iconName);
+        return iconName==null ? super.getImage() : getImageWithUserFillColor(iconName);
     }
 }
