@@ -308,4 +308,20 @@
             id="org.archicontribs.specialization.uiProvider.WorkPackageUIProvider">
       </uiProvider>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="true"
+            class="org.archicontribs.specialization.menu.SpecializationRefreshViewMenu"
+            locationURI="popup:ArchimateDiagramEditorContextMenuProvider?after=additions">
+      </menuContribution>
+   </extension>
+   <extension
+      point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
+            id="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
+            name="showIdCommand">
+      </command>
+   </extension>
 </plugin>
