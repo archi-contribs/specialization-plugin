@@ -65,6 +65,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	private TabFolder tabFolder;
 	private Button btnCheckForUpdateAtStartupButton;
 	private Button btnShowImagesInView;
+	private Button btnShowLabelsInView;
 	private Button btnShowImagesInTree;
 	private boolean mouseOverHelpButton = false;
 	private Composite loggerComposite;
@@ -176,23 +177,74 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         gd.grabExcessHorizontalSpace = true;
         grpBehaviour.setLayoutData(gd);
         
-        btnShowImagesInView = new Button(grpBehaviour, SWT.CHECK);
+        Label lblModelTreeIcons = new Label(grpBehaviour, SWT.NONE);
+        lblModelTreeIcons.setBackground(COMPO_BACKGROUND_COLOR);
+        lblModelTreeIcons.setText("Model tree icons:        (you may need to close and re-open your model to see the effect)");
+        fd = new FormData();
+        fd.top = new FormAttachment(btnShowImagesInView, 5);
+        fd.left = new FormAttachment(0, 10);
+        lblModelTreeIcons.setLayoutData(fd);
+        
+        btnShowImagesInTree = new Button(grpBehaviour, SWT.CHECK);
+        btnShowImagesInTree.setBackground(COMPO_BACKGROUND_COLOR);
+        btnShowImagesInTree.setText("Replace icons with \"icon\" property value");
+        fd = new FormData();
+        fd.top = new FormAttachment(lblModelTreeIcons, 5);
+        fd.left = new FormAttachment(0, 30);
+        btnShowImagesInTree.setLayoutData(fd);
+        btnShowImagesInTree.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInTree"));
+        
+        Label lblViewsIcons = new Label(grpBehaviour, SWT.NONE);
+        lblViewsIcons.setBackground(COMPO_BACKGROUND_COLOR);
+        lblViewsIcons.setText("Views icons:");
+        fd = new FormData();
+        fd.top = new FormAttachment(btnShowImagesInTree, 10);
+        fd.left = new FormAttachment(0, 10);
+        lblViewsIcons.setLayoutData(fd);
+        
+        Group viewIconsGroup = new Group(grpBehaviour, SWT.NONE);
+        viewIconsGroup.setBackground(COMPO_BACKGROUND_COLOR);
+        viewIconsGroup.setLayout(new RowLayout(SWT.VERTICAL));
+        fd = new FormData();
+        fd.top = new FormAttachment(lblViewsIcons, 5);
+        fd.left = new FormAttachment(0, 30);
+        viewIconsGroup.setLayoutData(fd);
+        
+        btnShowImagesInView = new Button(viewIconsGroup, SWT.RADIO);
         btnShowImagesInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnShowImagesInView.setText("Enable icons replacement in views (you may need to close and re-open the views to see the effect)");
-		fd = new FormData();
-		fd.top = new FormAttachment(0, 5);
-		fd.left = new FormAttachment(0, 10);
-		btnShowImagesInView.setLayoutData(fd);
+        btnShowImagesInView.setText("Always Replace icons with \"icon\" property value");
 		btnShowImagesInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
-		
-		btnShowImagesInTree = new Button(grpBehaviour, SWT.CHECK);
-		btnShowImagesInTree.setBackground(COMPO_BACKGROUND_COLOR);
-		btnShowImagesInTree.setText("Enable icons replacement in model tree (you may need to close and re-open your model to see the effect)");
-		fd = new FormData();
-		fd.top = new FormAttachment(btnShowImagesInView, 5);
-		fd.left = new FormAttachment(0, 10);
-		btnShowImagesInTree.setLayoutData(fd);
-		btnShowImagesInTree.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInTree"));
+
+        Button btnDoNotShowImagesInView = new Button(viewIconsGroup, SWT.RADIO);
+        btnDoNotShowImagesInView.setBackground(COMPO_BACKGROUND_COLOR);
+        btnDoNotShowImagesInView.setText("Replace icons with \"icon\" property value only in views that have a property \"replace icons\" = \true\"");
+        btnDoNotShowImagesInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
+        
+        Label lblViewsLabels = new Label(grpBehaviour, SWT.NONE);
+        lblViewsLabels.setBackground(COMPO_BACKGROUND_COLOR);
+        lblViewsLabels.setText("Connexions labels:");
+        fd = new FormData();
+        fd.top = new FormAttachment(viewIconsGroup, 10);
+        fd.left = new FormAttachment(0, 10);
+        lblViewsLabels.setLayoutData(fd);
+        
+        Group viewLabelsGroup = new Group(grpBehaviour, SWT.NONE);
+        viewLabelsGroup.setBackground(COMPO_BACKGROUND_COLOR);
+        viewLabelsGroup.setLayout(new RowLayout(SWT.VERTICAL));
+        fd = new FormData();
+        fd.top = new FormAttachment(lblViewsIcons, 5);
+        fd.left = new FormAttachment(0, 30);
+        viewLabelsGroup.setLayoutData(fd);
+        
+        btnShowLabelsInView = new Button(viewIconsGroup, SWT.RADIO);
+        btnShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
+        btnShowLabelsInView.setText("Always replace connections labels with \"label\" property value");
+        btnShowLabelsInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
+
+        Button btnDoNotShowLabelsInView = new Button(viewIconsGroup, SWT.RADIO);
+        btnDoNotShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
+        btnDoNotShowLabelsInView.setText("Replace connection labels with \"label\" property value only in views that have a property \"replace labels\" = \true\"");
+        btnDoNotShowLabelsInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
 		
 		
 		Group grpHelp = new Group(behaviourComposite, SWT.NONE);
@@ -333,6 +385,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     	
     	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("checkForUpdateAtStartup", btnCheckForUpdateAtStartupButton.getSelection());
     	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInView", btnShowImagesInView.getSelection());
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showLabelsInView", btnShowLabelsInView.getSelection());
     	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInTree", btnShowImagesInTree.getSelection());
     	
     	// the loggerMode is a private property, so we use reflection to access it

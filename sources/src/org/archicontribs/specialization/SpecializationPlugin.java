@@ -120,7 +120,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 																"log4j.appender.file.layout.ConversionPattern   = %d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-30.30C{1} %m%n");
 		preferenceStore.setDefault("iconMargin",                2);
 		preferenceStore.setDefault("showImagesInView",          true);
-		preferenceStore.setDefault("showImagesInTree",          true);
+	    preferenceStore.setDefault("showLabelsInView",          true);
+		preferenceStore.setDefault("showImagesInTree",          false);
 		logger = new SpecializationLogger(SpecializationPlugin.class);
 		
 		logger.info("Initialising "+pluginName+" plugin ...");
