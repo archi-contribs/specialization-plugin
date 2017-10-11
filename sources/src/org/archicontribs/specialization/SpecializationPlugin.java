@@ -51,7 +51,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.archimatetool.editor.ui.IArchiImages;
+import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
+import com.archimatetool.model.IFolder;
 import com.archimatetool.model.IIdentifier;
 import com.archimatetool.model.INameable;
 import com.archimatetool.model.IProperties;
@@ -184,6 +186,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	    return preferenceStore.getBoolean("showImagesInView");
 	}
 	
+	public static boolean showLabelsInView() {
+	    return preferenceStore.getBoolean("showLabelsInView");
+	}
+	
 	public static boolean showImagesInTree() {
 	    return preferenceStore.getBoolean("showImagesInTree");
 	}
@@ -264,32 +270,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		StringBuilder objName = new StringBuilder(getFullName(obj));
 		objName.append("("+((IIdentifier)obj).getId()+")");
 		return objName.toString();
-	}
-	
-	/**
-	 * Retrieves the icon name from the EObject properties
-	 * @param obj
-	 */
-	public static String getIconName(EObject obj, boolean mustExist) {
-	    if ( obj != null ) {
-    	    if ( obj instanceof IDiagramModelArchimateObject )
-                obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
-        
-            if ( obj instanceof IProperties ) { 
-                for ( IProperty prop: ((IProperties)obj).getProperties() ) {
-                    if ( SpecializationPlugin.areEqual(prop.getKey(), "icon") ) {
-                        String iconName = "/img/"+prop.getValue();
-                        if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
-                            logger.trace("found icon \""+iconName+"\"");
-                            return iconName;
-                        }
-                        logger.trace("missing icon \""+iconName+"\"");
-                        // we continue the loop in case there is another "icon" property
-                    }
-                }
-            }
-	    }
-        return null;
 	}
 	
 	private static Shell dialogShell = null;
@@ -666,4 +646,101 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 			};
 		}.start();
 	}
+	
+    public static String getDiagramModelsProperty(EObject obj, String propertyName) {
+        EObject container = obj;
+        while ( container!=null && !(container instanceof IDiagramModel) ) {
+            container = container.eContainer();
+        }
+        
+        if ( container != null ) {
+            for ( IProperty property:((IDiagramModel)container).getProperties() ) {
+                if ( areEqual(property.getKey(), propertyName) )
+                    return property.getValue();
+            }
+        }
+        
+        return null;
+    }
+    
+    public static boolean mustShowIcon(EObject obj) {
+        EObject container = obj;
+        while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) ) {
+            container = container.eContainer();
+        }
+        
+        if ( container == null ) {
+            // should not be here, but just in case !!!
+            return false;
+        }
+        
+        if ( container instanceof IFolder ) {
+            // if we are in the model tree, we show the image only if the showImagesInTree flag is set
+            return SpecializationPlugin.showImagesInTree();
+        }
+        
+        // if we are in a view, we show the image only if the showImagesInView flag is set
+        return showImagesInView() || areEqual(getDiagramModelsProperty(obj, "replace icons"), "true");
+    }
+    
+    /**
+     * Retrieves the icon name from the EObject properties
+     * @param obj
+     */
+    public static String getIconName(EObject obj, boolean mustExist) {
+        if ( obj != null ) {
+            if ( obj instanceof IDiagramModelArchimateObject )
+                obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
+        
+            if ( obj instanceof IProperties ) { 
+                for ( IProperty prop: ((IProperties)obj).getProperties() ) {
+                    if ( SpecializationPlugin.areEqual(prop.getKey(), "icon") ) {
+                        String iconName = "/img/"+prop.getValue();
+                        if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
+                            logger.trace("found icon \""+iconName+"\"");
+                            return iconName;
+                        }
+                        logger.trace("missing icon \""+iconName+"\"");
+                        // we continue the loop in case there is another "icon" property
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    public static boolean mustShowLabel(EObject obj) {
+        EObject container = obj;
+        while ( container!=null && !(container instanceof IDiagramModel) ) {
+            container = container.eContainer();
+        }
+        
+        if ( container == null ) {
+            // should not be here, but just in case !!!
+            return false;
+        }
+        
+        // we show the label only if the showLabelsInView flag is set
+        return showLabelsInView() || areEqual(getDiagramModelsProperty(obj, "replace labels"), "true");
+    }
+    
+    /**
+     * Retrieves the label name from the EObject properties
+     * @param obj
+     */
+    public static String getLabelName(EObject obj) {
+        if ( obj != null ) {
+            if ( obj instanceof IDiagramModelArchimateObject )
+                obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
+        
+            if ( obj instanceof IProperties ) { 
+                for ( IProperty prop: ((IProperties)obj).getProperties() ) {
+                    if ( SpecializationPlugin.areEqual(prop.getKey(), "label") ) {
+                        return prop.getValue();
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

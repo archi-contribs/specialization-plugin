@@ -17,245 +17,294 @@
       </toc>
    </extension>
    <extension
+         name="ArchiMate Relationships"
+         point="com.archimatetool.editor.objectUIProvider">
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.AccessRelationshipUIProvider"
+            id="com.archimatetool.editor.AccessRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.AggregationRelationshipUIProvider"
+            id="com.archimatetool.editor.AggregationRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.AssignmentRelationshipUIProvider"
+            id="com.archimatetool.editor.AssignmentRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.AssociationRelationshipUIProvider"
+            id="com.archimatetool.editor.AssociationRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.CompositionRelationshipUIProvider"
+            id="com.archimatetool.editor.CompositionRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.FlowRelationshipUIProvider"
+            id="com.archimatetool.editor.FlowRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.InfluenceRelationshipUIProvider"
+            id="com.archimatetool.editor.InfluenceRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.RealizationRelationshipUIProvider"
+            id="com.archimatetool.editor.RealizationRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.ServingRelationshipUIProvider"
+            id="com.archimatetool.editor.ServingRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.SpecializationRelationshipUIProvider"
+            id="com.archimatetool.editor.SpecializationRelationshipUIProvider">
+      </uiProvider>
+      <uiProvider
+            class="org.archicontribs.specialization.uiProvider.relationships.TriggeringRelationshipUIProvider"
+            id="com.archimatetool.editor.TriggeringRelationshipUIProvider">
+      </uiProvider>
+   </extension>
+   <extension
+      name="Archimate Elements"
       point="com.archimatetool.editor.objectUIProvider">
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationCollaborationUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationCollaborationUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationCollaborationUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationComponentUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationEventUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationEventUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationEventUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationFunctionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationFunctionUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationFunctionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationInteractionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationInteractionUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationInteractionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationInterfaceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationInterfaceUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationInterfaceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationProcessUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationProcessUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationProcessUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ApplicationServiceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ApplicationServiceUIProvider"
             id="org.archicontribs.specialization.uiProvider.ApplicationServiceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ArtifactUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ArtifactUIProvider"
             id="org.archicontribs.specialization.uiProvider.ArtifactUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.AssessmentUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.AssessmentUIProvider"
             id="org.archicontribs.specialization.uiProvider.AssessmentUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessActorUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessActorUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessActorUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessCollaborationUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessCollaborationUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessCollaborationUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessEventUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessEventUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessEventUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessFunctionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessFunctionUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessFunctionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessInteractionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessInteractionUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessInteractionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessInterfaceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessInterfaceUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessInterfaceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessObjectUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessObjectUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessObjectUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessProcessUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessProcessUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessProcessUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessRoleUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessRoleUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessRoleUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.BusinessServiceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.BusinessServiceUIProvider"
             id="org.archicontribs.specialization.uiProvider.BusinessServiceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.CapabilityUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.CapabilityUIProvider"
             id="org.archicontribs.specialization.uiProvider.CapabilityUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.CommunicationNetworkUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.CommunicationNetworkUIProvider"
             id="org.archicontribs.specialization.uiProvider.CommunicationNetworkUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ConstraintUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ConstraintUIProvider"
             id="org.archicontribs.specialization.uiProvider.ConstraintUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ContractUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ContractUIProvider"
             id="org.archicontribs.specialization.uiProvider.ContractUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.CourseOfActionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.CourseOfActionUIProvider"
             id="org.archicontribs.specialization.uiProvider.CourseOfActionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.DataObjectUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.DataObjectUIProvider"
             id="org.archicontribs.specialization.uiProvider.DataObjectUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.DeliverableUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.DeliverableUIProvider"
             id="org.archicontribs.specialization.uiProvider.DeliverableUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.DeviceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.DeviceUIProvider"
             id="org.archicontribs.specialization.uiProvider.DeviceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.DistributionNetworkUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.DistributionNetworkUIProvider"
             id="org.archicontribs.specialization.uiProvider.DistributionNetworkUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.DriverUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.DriverUIProvider"
             id="org.archicontribs.specialization.uiProvider.DriverUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.EquipmentUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.EquipmentUIProvider"
             id="org.archicontribs.specialization.uiProvider.EquipmentUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.FacilityUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.FacilityUIProvider"
             id="org.archicontribs.specialization.uiProvider.FacilityUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.GapUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.GapUIProvider"
             id="org.archicontribs.specialization.uiProvider.GapUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.GoalUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.GoalUIProvider"
             id="org.archicontribs.specialization.uiProvider.GoalUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.GroupingUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.GroupingUIProvider"
             id="org.archicontribs.specialization.uiProvider.GroupingUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ImplementationEventUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ImplementationEventUIProvider"
             id="org.archicontribs.specialization.uiProvider.ImplementationEventUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.JunctionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.JunctionUIProvider"
             id="org.archicontribs.specialization.uiProvider.JunctionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.LocationUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.LocationUIProvider"
             id="org.archicontribs.specialization.uiProvider.LocationUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.MaterialUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.MaterialUIProvider"
             id="org.archicontribs.specialization.uiProvider.MaterialUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.MeaningUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.MeaningUIProvider"
             id="org.archicontribs.specialization.uiProvider.MeaningUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.NodeUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.NodeUIProvider"
             id="org.archicontribs.specialization.uiProvider.NodeUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.OutcomeUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.OutcomeUIProvider"
             id="org.archicontribs.specialization.uiProvider.OutcomeUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.PathUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.PathUIProvider"
             id="org.archicontribs.specialization.uiProvider.PathUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.PlateauUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.PlateauUIProvider"
             id="org.archicontribs.specialization.uiProvider.PlateauUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.PrincipleUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.PrincipleUIProvider"
             id="org.archicontribs.specialization.uiProvider.PrincipleUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ProductUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ProductUIProvider"
             id="org.archicontribs.specialization.uiProvider.ProductUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.RepresentationUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.RepresentationUIProvider"
             id="org.archicontribs.specialization.uiProvider.RepresentationUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.RequirementUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.RequirementUIProvider"
             id="org.archicontribs.specialization.uiProvider.RequirementUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ResourceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ResourceUIProvider"
             id="org.archicontribs.specialization.uiProvider.ResourceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.StakeholderUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.StakeholderUIProvider"
             id="org.archicontribs.specialization.uiProvider.StakeholderUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.SystemSoftwareUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.SystemSoftwareUIProvider"
             id="org.archicontribs.specialization.uiProvider.SystemSoftwareUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.TechnologyCollaborationUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.TechnologyCollaborationUIProvider"
             id="org.archicontribs.specialization.uiProvider.TechnologyCollaborationUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.TechnologyEventUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.TechnologyEventUIProvider"
             id="org.archicontribs.specialization.uiProvider.TechnologyEventUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.TechnologyFunctionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.TechnologyFunctionUIProvider"
             id="org.archicontribs.specialization.uiProvider.TechnologyFunctionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.TechnologyInteractionUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.TechnologyInteractionUIProvider"
             id="org.archicontribs.specialization.uiProvider.TechnologyInteractionUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.TechnologyInterfaceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.TechnologyInterfaceUIProvider"
             id="org.archicontribs.specialization.uiProvider.TechnologyInterfaceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.TechnologyProcessUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.TechnologyProcessUIProvider"
             id="org.archicontribs.specialization.uiProvider.TechnologyProcessUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.TechnologyServiceUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.TechnologyServiceUIProvider"
             id="org.archicontribs.specialization.uiProvider.TechnologyServiceUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.ValueUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.ValueUIProvider"
             id="org.archicontribs.specialization.uiProvider.ValueUIProvider">
       </uiProvider>
       <uiProvider
-            class="org.archicontribs.specialization.uiProvider.WorkPackageUIProvider"
+            class="org.archicontribs.specialization.uiProvider.elements.WorkPackageUIProvider"
             id="org.archicontribs.specialization.uiProvider.WorkPackageUIProvider">
       </uiProvider>
    </extension>
