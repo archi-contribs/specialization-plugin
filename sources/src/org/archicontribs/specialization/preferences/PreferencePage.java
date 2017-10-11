@@ -179,7 +179,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         
         Label lblModelTreeIcons = new Label(grpBehaviour, SWT.NONE);
         lblModelTreeIcons.setBackground(COMPO_BACKGROUND_COLOR);
-        lblModelTreeIcons.setText("Model tree icons:        (you may need to close and re-open your model to see the effect)");
+        lblModelTreeIcons.setText("Model tree icons:");
         fd = new FormData();
         fd.top = new FormAttachment(btnShowImagesInView, 5);
         fd.left = new FormAttachment(0, 10);
@@ -202,12 +202,12 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         fd.left = new FormAttachment(0, 10);
         lblViewsIcons.setLayoutData(fd);
         
-        Group viewIconsGroup = new Group(grpBehaviour, SWT.NONE);
+        Composite viewIconsGroup = new Composite(grpBehaviour, SWT.NONE);
         viewIconsGroup.setBackground(COMPO_BACKGROUND_COLOR);
         viewIconsGroup.setLayout(new RowLayout(SWT.VERTICAL));
         fd = new FormData();
-        fd.top = new FormAttachment(lblViewsIcons, 5);
-        fd.left = new FormAttachment(0, 30);
+        fd.top = new FormAttachment(lblViewsIcons, 0);
+        fd.left = new FormAttachment(0, 27);
         viewIconsGroup.setLayoutData(fd);
         
         btnShowImagesInView = new Button(viewIconsGroup, SWT.RADIO);
@@ -217,7 +217,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
         Button btnDoNotShowImagesInView = new Button(viewIconsGroup, SWT.RADIO);
         btnDoNotShowImagesInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnDoNotShowImagesInView.setText("Replace icons with \"icon\" property value only in views that have a property \"replace icons\" = \true\"");
+        btnDoNotShowImagesInView.setText("Replace icons with \"icon\" property value only in views that have a property \"replace icons\" = \"true\"");
         btnDoNotShowImagesInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
         
         Label lblViewsLabels = new Label(grpBehaviour, SWT.NONE);
@@ -228,22 +228,22 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         fd.left = new FormAttachment(0, 10);
         lblViewsLabels.setLayoutData(fd);
         
-        Group viewLabelsGroup = new Group(grpBehaviour, SWT.NONE);
+        Composite viewLabelsGroup = new Composite(grpBehaviour, SWT.NONE);
         viewLabelsGroup.setBackground(COMPO_BACKGROUND_COLOR);
         viewLabelsGroup.setLayout(new RowLayout(SWT.VERTICAL));
         fd = new FormData();
-        fd.top = new FormAttachment(lblViewsIcons, 5);
-        fd.left = new FormAttachment(0, 30);
+        fd.top = new FormAttachment(lblViewsLabels, 0);
+        fd.left = new FormAttachment(0, 27);
         viewLabelsGroup.setLayoutData(fd);
         
-        btnShowLabelsInView = new Button(viewIconsGroup, SWT.RADIO);
+        btnShowLabelsInView = new Button(viewLabelsGroup, SWT.RADIO);
         btnShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
         btnShowLabelsInView.setText("Always replace connections labels with \"label\" property value");
         btnShowLabelsInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
 
-        Button btnDoNotShowLabelsInView = new Button(viewIconsGroup, SWT.RADIO);
+        Button btnDoNotShowLabelsInView = new Button(viewLabelsGroup, SWT.RADIO);
         btnDoNotShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnDoNotShowLabelsInView.setText("Replace connection labels with \"label\" property value only in views that have a property \"replace labels\" = \true\"");
+        btnDoNotShowLabelsInView.setText("Replace connection labels with \"label\" property value only in views that have a property \"replace labels\" = \"true\"");
         btnDoNotShowLabelsInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
 		
 		
