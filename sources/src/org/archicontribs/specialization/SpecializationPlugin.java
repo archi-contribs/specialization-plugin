@@ -62,13 +62,28 @@ import com.archimatetool.model.IProperty;
 /**
  * Specialization plugin for Archi, the Archimate modeler
  * 
- * The FormPlugin class alows to change the elements' icons in the Archi views.
+ * It allows to change the icons and labels in Archi views.
  * 
  * @author Herve Jouin
  *
  * v0.1 :		24/08/2017		beta version
+ *                              Icons can be changed on few technical elements using the "icon" property
  * 
- * v0.2 :       11/10/2017      Add "label" property 
+ * v0.2 :       12/10/2017      Icon change;
+ *                                  Increase the number of supported elements
+ *                                  Add an option on the preference page to use customized icons on all the views of those that have a "change icons" property set to "true"
+ *                                  Add a context menu to switch icons from Archi's standard icons to customized ones and back
+ *                              Label change:
+ *                                  Add new functionality to change label on relationships and elements
+ *                                  Add an option on the preference page to use customized icons on all the views of those that have a "change labels" property set to "true"
+ *                                  Add a context menu to switch icons from Archi's standard labels to customized ones and back
+ *                                  Add context menu "refresh view" to refresh the labels as they do not refresh automatically
+ *                                  
+ * TODO list:                   Add a file explorer window on the preference page that allow to manage the icons
+ *                              and allow drag&drop to this file exporer window
+ *                              Allow to change the icon size in the icon's property
+ *                              Automatically refresh the element/relationship when the label property is changed 
+ * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
@@ -185,11 +200,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	    return preferenceStore.getInt("iconMargin");
 	}
 	
-	public static boolean showImagesInView() {
+	public static boolean showImagesInAllViews() {
 	    return preferenceStore.getBoolean("showImagesInView");
 	}
 	
-	public static boolean showLabelsInView() {
+	public static boolean showLabelsInAllViews() {
 	    return preferenceStore.getBoolean("showLabelsInView");
 	}
 	
@@ -683,7 +698,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         }
         
         // if we are in a view, we show the image only if the showImagesInView flag is set
-        return showImagesInView() || areEqual(getDiagramModelsProperty(obj, "replace icons"), "true");
+        return showImagesInAllViews() || areEqual(getDiagramModelsProperty(obj, "replace icons"), "true");
     }
     
     /**
@@ -724,7 +739,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         }
         
         // we show the label only if the showLabelsInView flag is set
-        return showLabelsInView() || areEqual(getDiagramModelsProperty(obj, "replace labels"), "true");
+        return showLabelsInAllViews() || areEqual(getDiagramModelsProperty(obj, "replace labels"), "true");
     }
     
     /**
