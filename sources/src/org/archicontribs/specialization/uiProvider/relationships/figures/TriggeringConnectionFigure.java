@@ -1,4 +1,4 @@
-package org.archicontribs.specialization.uiProvider.relationships.connections;
+package org.archicontribs.specialization.uiProvider.relationships.figures;
 
 import org.archicontribs.specialization.SpecializationPlugin;
 

@@ -5,7 +5,7 @@
  */
 package org.archicontribs.specialization.uiProvider.relationships;
 
-import org.archicontribs.specialization.uiProvider.relationships.connections.AccessConnectionFigure;
+import org.archicontribs.specialization.uiProvider.relationships.figures.AccessConnectionFigure;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.gef.EditPart;
 

@@ -1,8 +1,8 @@
-package org.archicontribs.specialization.uiProvider.relationships.connections;
+package org.archicontribs.specialization.uiProvider.relationships.figures;
 
 import org.archicontribs.specialization.SpecializationPlugin;
 
-public class CompositionConnectionFigure extends com.archimatetool.editor.diagram.figures.connections.CompositionConnectionFigure {
+public class AssociationConnectionFigure extends com.archimatetool.editor.diagram.figures.connections.AssociationConnectionFigure {
     @Override
     protected void setConnectionText() {
         String labelName = null;

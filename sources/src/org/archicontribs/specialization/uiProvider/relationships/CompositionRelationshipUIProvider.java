@@ -5,7 +5,7 @@
  */
 package org.archicontribs.specialization.uiProvider.relationships;
 
-import org.archicontribs.specialization.uiProvider.relationships.connections.CompositionConnectionFigure;
+import org.archicontribs.specialization.uiProvider.relationships.figures.CompositionConnectionFigure;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.gef.EditPart;
 

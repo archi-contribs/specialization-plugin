@@ -5,7 +5,7 @@
  */
 package org.archicontribs.specialization.uiProvider.relationships;
 
-import org.archicontribs.specialization.uiProvider.relationships.connections.AggregationConnectionFigure;
+import org.archicontribs.specialization.uiProvider.relationships.figures.AggregationConnectionFigure;
 import org.eclipse.gef.EditPart;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateRelationshipEditPart;
