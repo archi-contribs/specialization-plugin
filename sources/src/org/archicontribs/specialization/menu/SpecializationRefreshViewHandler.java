@@ -43,6 +43,7 @@ import com.archimatetool.model.IDiagramModelContainer;
 import com.archimatetool.model.IDiagramModelObject;
 import com.archimatetool.model.IFolder;
 import com.archimatetool.model.IIdentifier;
+import com.archimatetool.model.INameable;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -93,7 +94,8 @@ public class SpecializationRefreshViewHandler extends AbstractHandler {
         return null;
     }
     
-    private void refresh(IDiagramModelObject obj) {
+    private void refresh(INameable obj) {
+        obj.setName(obj.getName());
         if ( obj instanceof IDiagramModelContainer ) {
             for ( IDiagramModelObject child: ((IDiagramModelContainer)obj).getChildren() ) {
                 refresh(child);
@@ -102,13 +104,10 @@ public class SpecializationRefreshViewHandler extends AbstractHandler {
                 }
             }
         }
-        for ( IDiagramModelConnection relation: obj.getSourceConnections() ) {
-            refresh(relation);
+        if ( obj instanceof IDiagramModelObject ) {
+            for ( IDiagramModelConnection relation: ((IDiagramModelObject)obj).getSourceConnections() ) {
+                refresh(relation);
+            }
         }
-    }
-    
-    private void refresh(IDiagramModelConnection obj) {
-       logger.trace("refreshing relationship "+obj.getName());
-       obj.setName(obj.getName());
     }
 }

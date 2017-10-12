@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.EventFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class TechnologyEventUIProvider extends com.archimatetool.editor.ui.facto
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our TechnologyEventFigure class to be called
-        return new ArchimateElementEditPart(EventFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.EventFigure.class);
     }
     
     /**

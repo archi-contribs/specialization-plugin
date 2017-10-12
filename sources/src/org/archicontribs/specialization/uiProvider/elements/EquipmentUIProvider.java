@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.EquipmentFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class EquipmentUIProvider extends com.archimatetool.editor.ui.factory.ele
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our EquipmentFigure class to be called
-        return new ArchimateElementEditPart(EquipmentFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.EquipmentFigure.class);
     }
     
     /**

@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.DistributionNetworkFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class DistributionNetworkUIProvider extends com.archimatetool.editor.ui.f
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our DistributionNetworkFigure class to be called
-        return new ArchimateElementEditPart(DistributionNetworkFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.DistributionNetworkFigure.class);
     }
     
     /**

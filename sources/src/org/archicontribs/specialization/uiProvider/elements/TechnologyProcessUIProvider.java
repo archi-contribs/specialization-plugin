@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.ProcessFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class TechnologyProcessUIProvider extends com.archimatetool.editor.ui.fac
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our TechnologyProcessFigure class to be called
-        return new ArchimateElementEditPart(ProcessFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.ProcessFigure.class);
     }
     
     /**

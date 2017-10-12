@@ -18,7 +18,7 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  * The SpecializationLogger class is a proxy for the log4j Logger class.
  * 
- * @author Herve jouin
+ * @author Herve Jouin
  */
 public class SpecializationLogger {
 	static private boolean initialised = false;

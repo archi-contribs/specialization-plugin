@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.NodeFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class NodeUIProvider extends com.archimatetool.editor.ui.factory.elements
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our NodeFigure class to be called
-        return new ArchimateElementEditPart(NodeFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.NodeFigure.class);
     }
     
     /**

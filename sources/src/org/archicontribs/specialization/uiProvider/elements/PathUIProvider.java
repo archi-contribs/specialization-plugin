@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.PathFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class PathUIProvider extends com.archimatetool.editor.ui.factory.elements
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our PathFigure class to be called
-        return new ArchimateElementEditPart(PathFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.PathFigure.class);
     }
     
     /**

@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.SystemSoftwareFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class SystemSoftwareUIProvider extends com.archimatetool.editor.ui.factor
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our SystemSoftwareFigure class to be called
-        return new ArchimateElementEditPart(SystemSoftwareFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.SystemSoftwareFigure.class);
     }
     
     /**

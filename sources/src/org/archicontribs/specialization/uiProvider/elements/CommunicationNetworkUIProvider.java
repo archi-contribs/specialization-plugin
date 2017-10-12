@@ -6,7 +6,6 @@
 package org.archicontribs.specialization.uiProvider.elements;
 
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.figure.CommunicationNetworkFigure;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,7 +21,7 @@ public class CommunicationNetworkUIProvider extends com.archimatetool.editor.ui.
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our CommunicationNetworkFigure class to be called
-        return new ArchimateElementEditPart(CommunicationNetworkFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.CommunicationNetworkFigure.class);
     }
     
     /**

@@ -67,12 +67,14 @@ import com.archimatetool.model.IProperty;
  * @author Herve Jouin
  *
  * v0.1 :		24/08/2017		beta version
+ * 
+ * v0.2 :       11/10/2017      Add "label" property 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "0.1";
+	public static final String pluginVersion = "0.2";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
