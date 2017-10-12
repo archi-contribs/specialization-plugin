@@ -14,9 +14,10 @@
 	<li><b><u>Executive summary</u></b></li>
 </ul>
 <div style="margin-left:40px">
-	The Specialization plugin extends the Archi behavior with the following functionalities :
+	The Specialization plugin extends the Archi views with the following functionalities :
 	<ul>
-	   <li>Update the diagrams components icons</li>
+	   <li>Allow to customize the elements icons</li>
+	   <li>Allow to customize the elements and relationships labels</li>
 	</ul>
 </div>
 <br>
@@ -25,9 +26,21 @@
 	<li><b><u>How it works</u></b></li>
 </ul>
 <div style="margin-left:40px">
-	At the moment, it is only possible to change the icon of technical layer components.<br>
-	Create a property called "icon" and the name of the component's icon you wish to show up<br>
-	For instance : icon / location will show up a location icon
+	<ul>
+	   <li>Customize the elements icons</li>
+	</ul>
+	Icons are image files (png, jpg, gif, ...) in Archi's editor folder. this folder is "/plugins/com.archimatetool.editor_4.x.x.xxxxxxxxxxxx/img" under Archi's installation folder (where 'x' is dependent on archi's version)."<br>
+	Please pay attention to <b><u>not</u></b> modify Archi's images. I recommand you create your own subfolders before copying your image files.<br>  
+	<br>
+	When this is done, you may create a "icon" property to your elements, the value being the path of your image file, relative to Archi's editor folder.<br>
+	For instance, specifying "/os/windows.png" will refer to the image file "Archi's installation path/plugins/com.archimatetool.editor_4.x.x.xxxxxxxxxxxx/img/os/windows.png"<br>
+	<br>
+	<br>
+	<ul>
+	   <li>Customize the elements and relationships labels</li>
+	</ul>
+	You may create a "label" property to your elements or relationships, the value being label you wish to show in the views.<br>
+	Setting or changing a label this way does not automatically update the view. To see your changes, you may right click on the view background and select "refresh view" in the contect menu that shows up.    
 </div>
 </body>
 </html>
