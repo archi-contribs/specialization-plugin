@@ -181,7 +181,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         lblModelTreeIcons.setBackground(COMPO_BACKGROUND_COLOR);
         lblModelTreeIcons.setText("Model tree icons:");
         fd = new FormData();
-        fd.top = new FormAttachment(btnShowImagesInView, 5);
+        fd.top = new FormAttachment(null, 5);
         fd.left = new FormAttachment(0, 10);
         lblModelTreeIcons.setLayoutData(fd);
         
@@ -239,12 +239,12 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         btnShowLabelsInView = new Button(viewLabelsGroup, SWT.RADIO);
         btnShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
         btnShowLabelsInView.setText("Always replace connections labels with \"label\" property value");
-        btnShowLabelsInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
+        btnShowLabelsInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showLabelsInView"));
 
         Button btnDoNotShowLabelsInView = new Button(viewLabelsGroup, SWT.RADIO);
         btnDoNotShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
         btnDoNotShowLabelsInView.setText("Replace connection labels with \"label\" property value only in views that have a property \"replace labels\" = \"true\"");
-        btnDoNotShowLabelsInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
+        btnDoNotShowLabelsInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showLabelsInView"));
 		
 		
 		Group grpHelp = new Group(behaviourComposite, SWT.NONE);
