@@ -312,7 +312,7 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="true"
-            class="org.archicontribs.specialization.menu.SpecializationRefreshViewMenu"
+            class="org.archicontribs.specialization.menu.SpecializationContextMenu"
             locationURI="popup:ArchimateDiagramEditorContextMenuProvider?after=additions">
       </menuContribution>
    </extension>
@@ -321,7 +321,17 @@
       <command
             defaultHandler="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
             id="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
-            name="showIdCommand">
+            name="SpecializationRefreshViewHandler">
+      </command>
+      <command
+            defaultHandler="org.archicontribs.specialization.menu.SpecializationSwitchIconsHandler"
+            id="org.archicontribs.specialization.menu.SpecializationSwitchIconsHandler"
+            name="SpecializationSwitchIconsHandler">
+      </command>
+      <command
+            defaultHandler="org.archicontribs.specialization.menu.SpecializationSwitchLabelsHandler"
+            id="org.archicontribs.specialization.menu.SpecializationSwitchLabelsHandler"
+            name="SpecializationSwitchLabelsHandler">
       </command>
    </extension>
 </plugin>
