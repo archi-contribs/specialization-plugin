@@ -69,7 +69,7 @@ public class SpecializationDiagramEditorContextMenu extends ExtensionContributio
                         String menuLabel;
                         
                         // we add a menu to refresh the view labels
-                        menuLabel = "Refresh view \"" + selectedView.getName() + "\"";
+                        menuLabel = "Refresh icons and labels in view \"" + selectedView.getName() + "\"";
                         
                         if ( logger.isDebugEnabled() ) logger.debug("adding menu label : "+menuLabel);
 
