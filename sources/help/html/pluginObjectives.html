@@ -30,17 +30,22 @@
 	   <li>Customize the elements icons</li>
 	</ul>
 	Icons are image files (png, jpg, gif, ...) in Archi's editor folder. this folder is "/plugins/com.archimatetool.editor_4.x.x.xxxxxxxxxxxx/img" under Archi's installation folder (where 'x' is dependent on archi's version)."<br>
-	Please pay attention to <b><u>not</u></b> modify Archi's images. I recommand you create your own subfolders before copying your image files.<br>  
+	Please pay attention to <b><u>not</u></b> modify Archi's images. <font color="blue">I highly recommand you create your own subfolders before copying your image files.</font><br>  
 	<br>
-	When this is done, you may create a "icon" property to your elements, the value being the path of your image file, relative to Archi's editor folder.<br>
+	When this is done, you may create a property to your elements that will specify the path of your image file, relative to Archi's editor folder.<br>
 	For instance, specifying "/os/windows.png" will refer to the image file "Archi's installation path/plugins/com.archimatetool.editor_4.x.x.xxxxxxxxxxxx/img/os/windows.png"<br>
 	<br>
+	By default, this property is named "icon" but your can change it, view by view, by creating a property called "replace icons property".<br>
+	For instance, specifying "image" in the view's property "replace icons property" will tell the plugin to use the "image" property on elements to customize their icon.<br>
 	<br>
 	<ul>
 	   <li>Customize the elements and relationships labels</li>
 	</ul>
-	You may create a "label" property to your elements or relationships, the value being label you wish to show in the views.<br>
-	Setting or changing a label this way does not automatically update the view. To see your changes, you may right click on the view background and select "refresh view" in the contect menu that shows up.    
+	You may create a property to your elements or relationships, the value being label you wish to show in the views.<br>
+	Setting or changing a label this way does not automatically update the view. To see your changes, you may right click on the view background and select "refresh view" in the contect menu that shows up.<br>
+	<br>
+	By default, this property is named "label" but your can change it, view by view, by creating a property called "replace labels property".<br>
+	For instance, specifying "text" in the view's property "replace labels property" will tell the plugin to use the "text" property on elements and relationships to customize their label.<br>    
 </div>
 </body>
 </html>
