@@ -95,7 +95,8 @@ public class SpecializationRefreshViewHandler extends AbstractHandler {
     }
     
     private void refresh(INameable obj) {
-        obj.setName(obj.getName());
+        // we set the object name to force the framework to redraw the corresponding object in the current view 
+    	obj.setName(obj.getName());
         if ( obj instanceof IDiagramModelContainer ) {
             for ( IDiagramModelObject child: ((IDiagramModelContainer)obj).getChildren() ) {
                 refresh(child);
