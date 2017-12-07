@@ -29,8 +29,8 @@ import com.archimatetool.model.IProperty;
 /**
  * This class is used when the user right-click on a graphical object
  */
-public class SpecializationContextMenu extends ExtensionContributionFactory {
-    private static final SpecializationLogger logger = new SpecializationLogger(SpecializationContextMenu.class);
+public class SpecializationDiagramEditorContextMenu extends ExtensionContributionFactory {
+    private static final SpecializationLogger logger = new SpecializationLogger(SpecializationDiagramEditorContextMenu.class);
 
     @Override
     public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
@@ -75,18 +75,18 @@ public class SpecializationContextMenu extends ExtensionContributionFactory {
 
                         additions.addContributionItem(new Separator(), null);
                         additions.addContributionItem(new CommandContributionItem(new CommandContributionItemParameter(
-                                PlatformUI.getWorkbench().getActiveWorkbenchWindow(),                       // serviceLocator
-                                "org.archicontribs.specialization.menu.SpecializationMenu",                 // id
-                                "org.archicontribs.specialization.menu.SpecializationRefreshViewHandler",   // commandId
-                                null,                                                                       // parameters
-                                menuIcon,                                                                   // icon
-                                null,                                                                       // disabledIcon
-                                null,                                                                       // hoverIcon
-                                menuLabel,                                                                  // label
-                                null,                                                                       // mnemonic
-                                null,                                                                       // tooltip 
-                                CommandContributionItem.STYLE_PUSH,                                         // style
-                                null,                                                                       // helpContextId
+                                PlatformUI.getWorkbench().getActiveWorkbenchWindow(),                       	      // serviceLocator
+                                "org.archicontribs.specialization.menu.SpecializationdiagramEditorContextMenu",       // id
+                                "org.archicontribs.specialization.menu.SpecializationRefreshViewHandler",  		      // commandId
+                                null,                                                                       	      // parameters
+                                menuIcon,                                                                    	      // icon
+                                null,                                                                        	      // disabledIcon
+                                null,                                                                        	      // hoverIcon
+                                menuLabel,                                                                   	      // label
+                                null,                                                                        	      // mnemonic
+                                null,                                                                        	      // tooltip 
+                                CommandContributionItem.STYLE_PUSH,                                          	      // style
+                                null,                                                                        	      // helpContextId
                                 true)), null);
                         
                         // we add a menu to refresh to switch the view between Archi's icons and customized icons
@@ -102,18 +102,18 @@ public class SpecializationContextMenu extends ExtensionContributionFactory {
                             if ( logger.isDebugEnabled() ) logger.debug("adding menu label : "+menuLabel);
     
                             additions.addContributionItem(new CommandContributionItem(new CommandContributionItemParameter(
-                                    PlatformUI.getWorkbench().getActiveWorkbenchWindow(),                       // serviceLocator
-                                    "org.archicontribs.specialization.menu.SpecializationMenu",                 // id
-                                    "org.archicontribs.specialization.menu.SpecializationSwitchIconsHandler",   // commandId
-                                    null,                                                                       // parameters
-                                    menuIcon,                                                                   // icon
-                                    null,                                                                       // disabledIcon
-                                    null,                                                                       // hoverIcon
-                                    menuLabel,                                                                  // label
-                                    null,                                                                       // mnemonic
-                                    null,                                                                       // tooltip 
-                                    CommandContributionItem.STYLE_PUSH,                                         // style
-                                    null,                                                                       // helpContextId
+                                    PlatformUI.getWorkbench().getActiveWorkbenchWindow(),                        	    // serviceLocator
+                                    "org.archicontribs.specialization.menu.SpecializationdiagramEditorContextMenu",     // id
+                                    "org.archicontribs.specialization.menu.SpecializationSwitchIconsHandler",    	    // commandId
+                                    null,                                                                        	    // parameters
+                                    menuIcon,                                                                    	    // icon
+                                    null,                                                                        	    // disabledIcon
+                                    null,                                                                        	    // hoverIcon
+                                    menuLabel,                                                                   	    // label
+                                    null,                                                                        	    // mnemonic
+                                    null,                                                                        	    // tooltip 
+                                    CommandContributionItem.STYLE_PUSH,                                          	    // style
+                                    null,                                                                        	    // helpContextId
                                     true)), null);
                         }
                         
@@ -130,18 +130,18 @@ public class SpecializationContextMenu extends ExtensionContributionFactory {
                             if ( logger.isDebugEnabled() ) logger.debug("adding menu label : "+menuLabel);
     
                             additions.addContributionItem(new CommandContributionItem(new CommandContributionItemParameter(
-                                    PlatformUI.getWorkbench().getActiveWorkbenchWindow(),                       // serviceLocator
-                                    "org.archicontribs.specialization.menu.SpecializationMenu",                 // id
-                                    "org.archicontribs.specialization.menu.SpecializationSwitchLabelsHandler",  // commandId
-                                    null,                                                                       // parameters
-                                    menuIcon,                                                                   // icon
-                                    null,                                                                       // disabledIcon
-                                    null,                                                                       // hoverIcon
-                                    menuLabel,                                                                  // label
-                                    null,                                                                       // mnemonic
-                                    null,                                                                       // tooltip 
-                                    CommandContributionItem.STYLE_PUSH,                                         // style
-                                    null,                                                                       // helpContextId
+                                    PlatformUI.getWorkbench().getActiveWorkbenchWindow(),                       	   // serviceLocator
+                                    "org.archicontribs.specialization.menu.SpecializationdiagramEditorContextMenu",    // id
+                                    "org.archicontribs.specialization.menu.SpecializationSwitchLabelsHandler",         // commandId
+                                    null,                                                                              // parameters
+                                    menuIcon,                                                                          // icon
+                                    null,                                                                              // disabledIcon
+                                    null,                                                                              // hoverIcon
+                                    menuLabel,                                                                         // label
+                                    null,                                                                              // mnemonic
+                                    null,                                                                              // tooltip 
+                                    CommandContributionItem.STYLE_PUSH,                                                // style
+                                    null,                                                                              // helpContextId
                                     true)), null);
                         }
                     }

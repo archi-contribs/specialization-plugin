@@ -58,6 +58,7 @@ import com.archimatetool.model.IIdentifier;
 import com.archimatetool.model.INameable;
 import com.archimatetool.model.IProperties;
 import com.archimatetool.model.IProperty;
+import com.archimatetool.model.impl.Path;
 
 /**
  * Specialization plugin for Archi, the Archimate modeler
@@ -78,6 +79,12 @@ import com.archimatetool.model.IProperty;
  *                                  Add an option on the preference page to use customized icons on all the views of those that have a "change labels" property set to "true"
  *                                  Add a context menu to switch icons from Archi's standard labels to customized ones and back
  *                                  Add context menu "refresh view" to refresh the labels as they do not refresh automatically
+ * v0.3 :       06/12/2017      Add the ability to change the name of the property that contains the icon filename
+ *                              Add the ability to change the name of the property that contains the label text
+ *                              ***************************************************************************************************************
+ *                              Do not replace the icon in the properties window anymore  !!!!!!!!!!!!!!!!!!! MARCHE PAS !!!!!!!!!!!!!!!!!!!!!
+ *                              ****************************************************************************************************************
+ *                              Add a context menu to refresh the model tree              !!!!!!!!!!!!!!!!!!! MARCHE PAS !!!!!!!!!!!!!!!!!!!!!
  *                                  
  * TODO list:                   Add a file explorer window on the preference page that allow to manage the icons
  *                              and allow drag&drop to this file exporer window
@@ -89,7 +96,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "0.2";
+	public static final String pluginVersion = "0.3";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
@@ -665,14 +672,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		}.start();
 	}
 	
-    public static String getDiagramModelsProperty(EObject obj, String propertyName) {
+    public static String getContainerProperty(EObject obj, String propertyName) {
         EObject container = obj;
-        while ( container!=null && !(container instanceof IDiagramModel) ) {
+        while ( container!=null && !(container instanceof IDiagramModel) && !(container instanceof IFolder) ) {
             container = container.eContainer();
         }
         
         if ( container != null ) {
-            for ( IProperty property:((IDiagramModel)container).getProperties() ) {
+            for ( IProperty property:((IProperties)container).getProperties() ) {
                 if ( areEqual(property.getKey(), propertyName) )
                     return property.getValue();
             }
@@ -683,12 +690,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     
     public static boolean mustShowIcon(EObject obj) {
         EObject container = obj;
+        logger.trace("   ====================== "+obj.getClass().getName());
         while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) ) {
             container = container.eContainer();
+            logger.trace("   ====================== "+container.getClass().getName());
         }
         
         if ( container == null ) {
-            // should not be here, but just in case !!!
             return false;
         }
         
@@ -698,7 +706,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         }
         
         // if we are in a view, we show the image only if the showImagesInView flag is set
-        return showImagesInAllViews() || areEqual(getDiagramModelsProperty(obj, "replace icons"), "true");
+        return showImagesInAllViews() || areEqual(getContainerProperty(obj, "replace icons"), "true");
     }
     
     /**
@@ -707,12 +715,17 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      */
     public static String getIconName(EObject obj, boolean mustExist) {
         if ( obj != null ) {
+        	// we get the property name that contains the icon filename
+        	String iconPropertyName = getContainerProperty(obj, "replace icons property");
+        	if ( iconPropertyName == null )
+        		iconPropertyName = "icon";
+        	
             if ( obj instanceof IDiagramModelArchimateObject )
                 obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
         
-            if ( obj instanceof IProperties ) { 
+            if ( obj instanceof IProperties ) {
                 for ( IProperty prop: ((IProperties)obj).getProperties() ) {
-                    if ( SpecializationPlugin.areEqual(prop.getKey(), "icon") ) {
+                    if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
                         String iconName = "/img/"+prop.getValue();
                         if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
                             logger.trace("found icon \""+iconName+"\"");
@@ -739,7 +752,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         }
         
         // we show the label only if the showLabelsInView flag is set
-        return showLabelsInAllViews() || areEqual(getDiagramModelsProperty(obj, "replace labels"), "true");
+        return showLabelsInAllViews() || areEqual(getContainerProperty(obj, "replace labels"), "true");
     }
     
     /**
@@ -748,12 +761,18 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      */
     public static String getLabelName(EObject obj) {
         if ( obj != null ) {
+        	// we get the property name that contains the label
+        	String labelPropertyName = getContainerProperty(obj, "replace labels property");
+        	if ( labelPropertyName == null )
+        		labelPropertyName = "label";
+        	
             if ( obj instanceof IDiagramModelArchimateObject )
                 obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
         
-            if ( obj instanceof IProperties ) { 
+            if ( obj instanceof IProperties ) {
+            	
                 for ( IProperty prop: ((IProperties)obj).getProperties() ) {
-                    if ( SpecializationPlugin.areEqual(prop.getKey(), "label") ) {
+                    if ( SpecializationPlugin.areEqual(prop.getKey(), labelPropertyName) ) {
                         return prop.getValue();
                     }
                 }
