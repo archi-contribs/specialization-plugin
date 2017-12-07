@@ -52,7 +52,7 @@ public class SpecializationTreeModelContextMenu extends ExtensionContributionFac
                     String menuLabel;
                     
                     // we add a menu to refresh the view labels
-                    menuLabel = "Refresh model tree";
+                    menuLabel = "Refresh icon of all elements in model";
                     
                     if ( logger.isDebugEnabled() ) logger.debug("adding menu label : "+menuLabel);
 
