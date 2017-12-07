@@ -81,7 +81,7 @@ public class SpecializationRefreshViewHandler extends AbstractHandler {
              // if the selected object is in a view, we refresh the relationships names to force the connections to redraw their label 
             if ( selectedObject != null ) {
                 IDiagramModel selectedView  = (IDiagramModel)selectedObject;
-                logger.trace("refreshing view "+selectedView.getName());
+                logger.trace("refreshing icons and labels in view "+selectedView.getName());
                 
                 for ( IDiagramModelObject child: selectedView.getChildren() ) {
                     refresh(child);
