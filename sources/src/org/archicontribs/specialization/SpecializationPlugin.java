@@ -58,7 +58,6 @@ import com.archimatetool.model.IIdentifier;
 import com.archimatetool.model.INameable;
 import com.archimatetool.model.IProperties;
 import com.archimatetool.model.IProperty;
-import com.archimatetool.model.impl.Path;
 
 /**
  * Specialization plugin for Archi, the Archimate modeler
@@ -79,7 +78,8 @@ import com.archimatetool.model.impl.Path;
  *                                  Add an option on the preference page to use customized icons on all the views of those that have a "change labels" property set to "true"
  *                                  Add a context menu to switch icons from Archi's standard labels to customized ones and back
  *                                  Add context menu "refresh view" to refresh the labels as they do not refresh automatically
- * v0.3 :       06/12/2017      Add the ability to change the name of the property that contains the icon filename
+ * v0.3 :       06/12/2017      Add debug and trace messages
+ *                              Add the ability to change the name of the property that contains the icon filename
  *                              Add the ability to change the name of the property that contains the label text
  *                              ***************************************************************************************************************
  *                              Do not replace the icon in the properties window anymore  !!!!!!!!!!!!!!!!!!! MARCHE PAS !!!!!!!!!!!!!!!!!!!!!
@@ -690,23 +690,37 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     
     public static boolean mustShowIcon(EObject obj) {
         EObject container = obj;
-        logger.trace("   ====================== "+obj.getClass().getName());
         while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) ) {
             container = container.eContainer();
-            logger.trace("   ====================== "+container.getClass().getName());
         }
         
         if ( container == null ) {
             return false;
         }
         
+        boolean mustShow;
+        
         if ( container instanceof IFolder ) {
             // if we are in the model tree, we show the image only if the showImagesInTree flag is set
-            return SpecializationPlugin.showImagesInTree();
+        	mustShow = SpecializationPlugin.showImagesInTree();
+            if ( logger.isTraceEnabled() ) {
+            	if ( mustShow )
+            		logger.trace(getFullName(obj) + ": must replace icon in model tree");
+            	else
+            		logger.trace(getFullName(obj) + ": must not replace icon in model tree");
+            }
+        } else {
+            // if we are in a view, we show the image only if the showImagesInView flag is set
+        	mustShow = showImagesInAllViews() || areEqual(getContainerProperty(obj, "replace icons"), "true");
+            if ( logger.isTraceEnabled() ) {
+            	if ( mustShow )
+            		logger.trace(getFullName(obj) + ": must replace icon in view");
+            	else
+            		logger.trace(getFullName(obj) + ": must not replace icon in view");
+            }
         }
         
-        // if we are in a view, we show the image only if the showImagesInView flag is set
-        return showImagesInAllViews() || areEqual(getContainerProperty(obj, "replace icons"), "true");
+        return mustShow;
     }
     
     /**
@@ -719,6 +733,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         	String iconPropertyName = getContainerProperty(obj, "replace icons property");
         	if ( iconPropertyName == null )
         		iconPropertyName = "icon";
+        	if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": getting icon from property \"" + iconPropertyName + "\"");
         	
             if ( obj instanceof IDiagramModelArchimateObject )
                 obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
@@ -726,17 +741,23 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             if ( obj instanceof IProperties ) {
                 for ( IProperty prop: ((IProperties)obj).getProperties() ) {
                     if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
+                    	if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing icon with \"" + prop.getValue() + "\"");
+                    	
                         String iconName = "/img/"+prop.getValue();
+
                         if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
-                            logger.trace("found icon \""+iconName+"\"");
+                            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon file \"" + iconName + "\" has been found");
                             return iconName;
                         }
-                        logger.trace("missing icon \""+iconName+"\"");
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon file \"" + iconName + "\" has not been found");
                         // we continue the loop in case there is another "icon" property
                     }
+                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": not replacing icon");
                 }
-            }
-        }
+            } else
+            	logger.error("getIconName(): object "+ getFullName(obj) + " does not have properties");
+        } else
+        	logger.error("getIconName(): got null object parameter");
         return null;
     }
     
@@ -752,7 +773,15 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         }
         
         // we show the label only if the showLabelsInView flag is set
-        return showLabelsInAllViews() || areEqual(getContainerProperty(obj, "replace labels"), "true");
+        boolean mustShow = showLabelsInAllViews() || areEqual(getContainerProperty(obj, "replace labels"), "true");
+        
+        if ( logger.isTraceEnabled() ) {
+        	if ( mustShow )
+        		logger.trace(getFullName(obj) + ": must replace label");
+        	else
+        		logger.trace(getFullName(obj) + ": must not replace label");
+        }
+        return mustShow;
     }
     
     /**
@@ -765,19 +794,23 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         	String labelPropertyName = getContainerProperty(obj, "replace labels property");
         	if ( labelPropertyName == null )
         		labelPropertyName = "label";
+        	if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": getting label from property \"" + labelPropertyName +"\"");
         	
             if ( obj instanceof IDiagramModelArchimateObject )
                 obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
         
             if ( obj instanceof IProperties ) {
-            	
                 for ( IProperty prop: ((IProperties)obj).getProperties() ) {
                     if ( SpecializationPlugin.areEqual(prop.getKey(), labelPropertyName) ) {
+                    	if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing label with \"" + prop.getValue() + "\"");
                         return prop.getValue();
                     }
                 }
-            }
-        }
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": property not found, not replacing label");
+            } else
+            	logger.error("getLabelName(): object "+ getFullName(obj) + " does not have properties");
+        } else
+        	logger.error("getLabelName(): got null object parameter");
         return null;
     }
 }
