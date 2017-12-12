@@ -12,6 +12,8 @@ import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -180,9 +182,14 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         gd.grabExcessHorizontalSpace = true;
         grpBehaviour.setLayoutData(gd);
         
-        Label lblReplaceIconsInModelTree = new Label(grpBehaviour, SWT.NONE);
+        StyledText lblReplaceIconsInModelTree = new StyledText(grpBehaviour, SWT.NONE);
         lblReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
         lblReplaceIconsInModelTree.setText("Replace icons in model tree:");
+        StyleRange style = new StyleRange();
+        style.start = 0;
+        style.length = lblReplaceIconsInModelTree.getText().length();
+        style.underline = true;
+        lblReplaceIconsInModelTree.setStyleRange(style);
         fd = new FormData();
         fd.top = new FormAttachment(null, 5);
         fd.left = new FormAttachment(0, 10);
@@ -213,9 +220,14 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         btnReplaceIconsInTree.setText("Use of \"icon\" property");
         btnReplaceIconsInTree.setSelection(!never && !always);
         
-        Label lblreplaceIconsInViews = new Label(grpBehaviour, SWT.NONE);
+        StyledText lblreplaceIconsInViews = new StyledText(grpBehaviour, SWT.NONE);
         lblreplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
         lblreplaceIconsInViews.setText("Replace icons in views:");
+        style = new StyleRange();
+        style.start = 0;
+        style.length = lblreplaceIconsInViews.getText().length();
+        style.underline = true;
+        lblreplaceIconsInViews.setStyleRange(style);
         fd = new FormData();
         fd.top = new FormAttachment(replaceIconsInModelTreeComposite, 5);
         fd.left = new FormAttachment(0, 10);
@@ -246,19 +258,24 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         btnReplaceIconsInViews.setText("Use of \"icon\" property");
         btnReplaceIconsInViews.setSelection(!never && !always);
         
-        Label lblViewsLabels = new Label(grpBehaviour, SWT.NONE);
-        lblViewsLabels.setBackground(COMPO_BACKGROUND_COLOR);
-        lblViewsLabels.setText("Replace labels in views:");
+        StyledText lblViewsLabelsInViews = new StyledText(grpBehaviour, SWT.NONE);
+        lblViewsLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        lblViewsLabelsInViews.setText("Replace labels in views:");
+        style = new StyleRange();
+        style.start = 0;
+        style.length = lblViewsLabelsInViews.getText().length();
+        style.underline = true;
+        lblViewsLabelsInViews.setStyleRange(style);
         fd = new FormData();
         fd.top = new FormAttachment(replaceIconsInViewsComposite, 10);
         fd.left = new FormAttachment(0, 10);
-        lblViewsLabels.setLayoutData(fd);
+        lblViewsLabelsInViews.setLayoutData(fd);
         
         Composite ReplaceLabelsInViewsComposite = new Composite(grpBehaviour, SWT.NONE);
         ReplaceLabelsInViewsComposite.setBackground(COMPO_BACKGROUND_COLOR);
         ReplaceLabelsInViewsComposite.setLayout(new RowLayout(SWT.VERTICAL));
         fd = new FormData();
-        fd.top = new FormAttachment(lblViewsLabels, 0);
+        fd.top = new FormAttachment(lblViewsLabelsInViews, 0);
         fd.left = new FormAttachment(0, 27);
         ReplaceLabelsInViewsComposite.setLayoutData(fd);
         
