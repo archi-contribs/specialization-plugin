@@ -264,6 +264,7 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
     		    CommandStack stack = (CommandStack) diagramModel.getArchimateModel().getAdapter(CommandStack.class);
     		    stack.execute(compoundCommand);
     		    logger.trace("Setting property \"must replace icons\" to "+value);
+    		    SpecializationPlugin.refreshIconsAndLabels(diagramModel);
             }
 		};
 	};
@@ -292,6 +293,7 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
     		    CommandStack stack = (CommandStack) diagramModel.getAdapter(CommandStack.class);
     		    stack.execute(compoundCommand);
     		    logger.trace("Setting property \"must replace labels\" to "+value);
+    		    SpecializationPlugin.refreshIconsAndLabels(diagramModel);
             }
 		};
 	};
