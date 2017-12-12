@@ -241,7 +241,7 @@ public class SpecializationLogger {
     		properties.setProperty("log4j.appender.stdout",								"org.apache.log4j.ConsoleAppender");
     		properties.setProperty("log4j.appender.stdout.Target",						"System.out");
     		properties.setProperty("log4j.appender.stdout.layout",						"org.apache.log4j.PatternLayout");
-    		properties.setProperty("log4j.appender.stdout.layout.ConversionPattern",	"%d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-30.30C{1} %m%n");
+    		properties.setProperty("log4j.appender.stdout.layout.ConversionPattern",	"%d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-40.40C{1} %m%n");
     		
     		properties.setProperty("log4j.appender.file",								"org.apache.log4j.FileAppender");
     		properties.setProperty("log4j.appender.file.ImmediateFlush",				"true");
@@ -249,7 +249,7 @@ public class SpecializationLogger {
     		properties.setProperty("log4j.appender.file.Encoding",						"UTF-8");
     		properties.setProperty("log4j.appender.file.File",							SpecializationPlugin.INSTANCE.getPreferenceStore().getString("loggerFilename"));
     		properties.setProperty("log4j.appender.file.layout", 						"org.apache.log4j.PatternLayout");
-    		properties.setProperty("log4j.appender.file.layout.ConversionPattern",		"%d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-30.30C{1} %m%n");
+    		properties.setProperty("log4j.appender.file.layout.ConversionPattern",		"%d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-40.40C{1} %m%n");
     		break;
     		
 		case "expert" :
