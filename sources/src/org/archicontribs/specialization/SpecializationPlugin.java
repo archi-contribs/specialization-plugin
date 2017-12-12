@@ -51,6 +51,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.archimatetool.editor.ui.IArchiImages;
+import com.archimatetool.model.IArchimateModelObject;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IFolder;
@@ -66,10 +67,10 @@ import com.archimatetool.model.IProperty;
  * 
  * @author Herve Jouin
  *
- * v0.1 :		24/08/2017		beta version
+ * v0.1:        24/08/2017		beta version
  *                              Icons can be changed on few technical elements using the "icon" property
  * 
- * v0.2 :       12/10/2017      Icon change;
+ * v0.2:        12/10/2017      Icon change;
  *                                  Increase the number of supported elements
  *                                  Add an option on the preference page to use customized icons on all the views of those that have a "change icons" property set to "true"
  *                                  Add a context menu to switch icons from Archi's standard icons to customized ones and back
@@ -78,23 +79,28 @@ import com.archimatetool.model.IProperty;
  *                                  Add an option on the preference page to use customized icons on all the views of those that have a "change labels" property set to "true"
  *                                  Add a context menu to switch icons from Archi's standard labels to customized ones and back
  *                                  Add context menu "refresh view" to refresh the labels as they do not refresh automatically
- * v0.3 :       06/12/2017      Add debug and trace messages
+ *                                  
+ * v0.3:        06/12/2017      Add debug and trace messages
  *                              Add the ability to change the name of the property that contains the icon filename
  *                              Add the ability to change the name of the property that contains the label text
  *                              Add a context menu to refresh the model tree
+ *                              
+ * v0.4:        12/12/2017      Add more debug and trace messages
+ *                              Add the ability to change the name of the property that contains the icon filename at the model, view and concept levels
+ *                              Add the ability to change the name of the property that contains the label text at the model, view and concept levels
+ *                              Fix elements shape (quare corners instead of round ones)
+ *                              fix junction shape
  *                                  
  * TODO list:                   Add a file explorer window on the preference page that allow to manage the icons
  *                              and allow drag&drop to this file exporer window
  *                              Allow to change the icon size in the icon's property
- *                              Automatically refresh the element/relationship when the label property is changed
- *                              /!\ find a way to not replace the icon in the "Properties" window
  * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "0.3";
+	public static final String pluginVersion = "0.4";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
@@ -141,9 +147,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 																"log4j.appender.file.layout                     = org.apache.log4j.PatternLayout\n"+
 																"log4j.appender.file.layout.ConversionPattern   = %d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-30.30C{1} %m%n");
 		preferenceStore.setDefault("iconMargin",                2);
-		preferenceStore.setDefault("showImagesInView",          true);
-	    preferenceStore.setDefault("showLabelsInView",          true);
-		preferenceStore.setDefault("showImagesInTree",          false);
+		preferenceStore.setDefault("mustReplaceIconsInViews",   "");
+	    preferenceStore.setDefault("mustReplaceIconsInTree",    "");
+		preferenceStore.setDefault("mustReplaceLabelsInviews",  "");
 		logger = new SpecializationLogger(SpecializationPlugin.class);
 		
 		logger.info("Initialising "+pluginName+" plugin ...");
@@ -205,16 +211,16 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	    return preferenceStore.getInt("iconMargin");
 	}
 	
-	public static boolean showImagesInAllViews() {
-	    return preferenceStore.getBoolean("showImagesInView");
+	public static String mustReplaceIconsInViews() {
+	    return preferenceStore.getString("mustReplaceIconsInViews");
 	}
 	
-	public static boolean showLabelsInAllViews() {
-	    return preferenceStore.getBoolean("showLabelsInView");
+	public static String mustReplaceIconsInTree() {
+	    return preferenceStore.getString("mustReplaceIconsInTree");
 	}
 	
-	public static boolean showImagesInTree() {
-	    return preferenceStore.getBoolean("showImagesInTree");
+	public static String mustReplaceLabelsInViews() {
+	    return preferenceStore.getString("mustReplaceLabelsInViews");
 	}
 	
 	public static boolean shouldShowImages() { return false; };
@@ -670,7 +676,18 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		}.start();
 	}
 	
-    public static String getContainerProperty(EObject obj, String propertyName) {
+    public static String getProperty(EObject obj, String propertyName) {
+        if ( obj != null && obj instanceof IProperties) {
+            for ( IProperty property:((IProperties)obj).getProperties() ) {
+                if ( areEqual(property.getKey(), propertyName) )
+                    return property.getValue();
+            }
+        }
+        
+        return null;
+    }
+	
+    public static String getContainerPropertyxxxx(EObject obj, String propertyName) {
         EObject container = obj;
         while ( container!=null && !(container instanceof IDiagramModel) && !(container instanceof IFolder) ) {
             container = container.eContainer();
@@ -686,39 +703,72 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         return null;
     }
     
-    public static boolean mustShowIcon(EObject obj) {
-        EObject container = obj;
-        while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) ) {
-            container = container.eContainer();
-        }
-        
-        if ( container == null ) {
-            return false;
-        }
-        
-        boolean mustShow;
-        
-        if ( container instanceof IFolder ) {
-            // if we are in the model tree, we show the image only if the showImagesInTree flag is set
-        	mustShow = SpecializationPlugin.showImagesInTree();
-            if ( logger.isTraceEnabled() ) {
-            	if ( mustShow )
-            		logger.trace(getFullName(obj) + ": must replace icon in model tree");
-            	else
-            		logger.trace(getFullName(obj) + ": must not replace icon in model tree");
+    public static boolean mustReplaceIcon(EObject obj) {
+        if ( obj != null ) {
+            //TODO
+            Exception e = new Exception();
+            e.printStackTrace();
+            
+            // we determine if the object is in a view or in a folder
+            EObject container = obj;
+            while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
+                container = container.eContainer();
+            if ( container == null ) {
+                // Should not happen, but just in case
+                logger.error(getFullName(obj) + " is not in a container");
+                return false; 
             }
-        } else {
-            // if we are in a view, we show the image only if the showImagesInView flag is set
-        	mustShow = showImagesInAllViews() || areEqual(getContainerProperty(obj, "replace icons"), "true");
-            if ( logger.isTraceEnabled() ) {
-            	if ( mustShow )
-            		logger.trace(getFullName(obj) + ": must replace icon in view");
-            	else
-            		logger.trace(getFullName(obj) + ": must not replace icon in view");
+            
+            String containerType = null;
+            
+            // then we check the preference in case we should ALWAYS or NEVER replace the icons
+            String mustReplaceIcons;
+            if ( container instanceof IFolder ) {
+                mustReplaceIcons = mustReplaceIconsInTree();
+                containerType = "folder";
+            } else {
+                mustReplaceIcons =  mustReplaceIconsInViews();
+                containerType = "view";
             }
-        }
+            
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+" : "+mustReplaceIcons);
+            if ( mustReplaceIcons != null ) {
+                switch ( mustReplaceIcons ) {
+                    case "always": return true;
+                    case "never":  return false;
+                }
+            }
+            
+            // the we check if the container has got a "must replace icons"
+            String propertyValue = getProperty(container, "must replace icons");
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
+            boolean mustReplace = false;
+            if ( propertyValue != null ) {
+                switch ( propertyValue.toLowerCase() ) {
+                    case "yes": mustReplace = true;
+                    case "no":  return false;
+                    default:
+                }
+            }
+                        
+            // then we check if the model has got a "must replace icons"
+            propertyValue = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "must replace icons");
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
+            if ( propertyValue != null ) {
+                switch ( propertyValue.toLowerCase() ) {
+                    case "yes": return true;
+                    case "no":  return false;
+                    default:
+                }
+            }
+            
+            return mustReplace;
+        } else
+            logger.error("got null object parameter");
         
-        return mustShow;
+        // if we're here, it means that we haven't seen any "must replace icons" property. 
+        // so by default, we do not change the icon
+        return false;
     }
     
     /**
@@ -727,58 +777,133 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      */
     public static String getIconName(EObject obj, boolean mustExist) {
         if ( obj != null ) {
-        	// we get the property name that contains the icon filename
-        	String iconPropertyName = getContainerProperty(obj, "replace icons property");
-        	if ( iconPropertyName == null )
-        		iconPropertyName = "icon";
-        	
-            if ( obj instanceof IDiagramModelArchimateObject )
-                obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
-        
-            if ( obj instanceof IProperties ) {
-                for ( IProperty prop: ((IProperties)obj).getProperties() ) {
-                    if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
-                    	if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing icon from property \"" + iconPropertyName + "\" value \"" + prop.getValue() + "\"");
-                    	
-                        String iconName = "/img/"+prop.getValue();
-
-                        if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
-                            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon file \"" + iconName + "\" has been found");
-                            return iconName;
-                        }
-                        logger.error(getFullName(obj) + ": icon file \"" + iconName + "\" has not been found");
-                        // we continue the loop in case there is another "icon" property
-                    }
-                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon not replaced");
+            EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+            if ( !(concept instanceof IProperties) ) {
+                // Should not happen, but just in case
+                logger.error(getFullName(obj) + " does not have properties");
+                return null;
+            }
+            
+            // first, we get the name of the property that will contains the name of the icon
+            
+            // we check the element, the view and the model (in that order)
+            String iconPropertyName = getProperty(concept, "replace icons property");
+            if ( iconPropertyName != null ) {
+                if ( iconPropertyName.length() == 0 ) {
+                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property is empty, we ignore it");
+                    iconPropertyName = null;
+                } else
+                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property = "+iconPropertyName);
+            }
+            if ( iconPropertyName == null ) {
+                EObject container = obj;
+                while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
+                    container = container.eContainer();
+                if ( container == null ) {
+                    // Should not happen, but just in case
+                    logger.error(getFullName(obj) + " is not in a container");
+                    return null; 
                 }
-            } else
-            	logger.error("getIconName(): object "+ getFullName(obj) + " does not have properties");
+                
+                String containerType = (container instanceof IFolder) ? "folder" : "view";
+                iconPropertyName = getProperty(container, "replace icons property");
+                if ( iconPropertyName != null ) {
+                    if ( iconPropertyName.length() == 0 ) {
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property is empty, we ignore it");
+                        iconPropertyName = null;
+                    } else {
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property = "+iconPropertyName);
+                        iconPropertyName = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "replace icons property");
+                        if ( iconPropertyName != null )
+                            if ( iconPropertyName.length() == 0 ) {
+                                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property is empty, we ignore it");
+                                iconPropertyName = null;
+                            } else
+                                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property = "+iconPropertyName);
+                    }
+                }
+            }
+            if ( iconPropertyName == null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property defaults to \"icon\"");
+                iconPropertyName = "icon";
+            }
+            
+            // Now we get the icon filename from the property
+            for ( IProperty prop: ((IProperties)obj).getProperties() ) {
+                if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
+                	if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing icon by "+ prop.getValue());
+                	
+                    String iconName = "/img/"+prop.getValue();
+
+                    if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon file \"" + iconName + "\" has been found");
+                        return iconName;
+                    }
+                    logger.error(getFullName(obj) + ": icon file \"" + iconName + "\" has not been found");
+                    // we continue the loop in case there is another "icon" property
+                }
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon not replaced");
+            }
         } else
-        	logger.error("getIconName(): got null object parameter");
+        	logger.error("got null object parameter");
         return null;
     }
     
-    public static boolean mustShowLabel(EObject obj) {
-        EObject container = obj;
-        while ( container!=null && !(container instanceof IDiagramModel) ) {
-            container = container.eContainer();
-        }
+    public static boolean mustReplaceLabel(EObject obj) {
+        if ( obj != null ) {
+            // we determine if the object is in a view or in a folder
+            EObject container = obj;
+            while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
+                container = container.eContainer();
+            if ( container == null ) {
+                // Should not happen, but just in case
+                logger.error(getFullName(obj) + " is not in a container");
+                return false; 
+            }
+            
+            // then we check the preference in case we should ALWAYS or NEVER replace the labels
+            String mustReplaceLabels;
+            if ( container instanceof IFolder ) {
+                if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": we never change the label in the model tree");
+                return false;
+            }
+            mustReplaceLabels =  mustReplaceLabelsInViews();
+            
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels : "+mustReplaceLabels);
+            if ( mustReplaceLabels != null ) {
+                switch ( mustReplaceLabels ) {
+                    case "always": return true;
+                    case "never":  return false;
+                }
+            }
+            
+            // the we check if the container has got a "must replace labels"
+            String propertyValue = getProperty(container, "must replace labels");
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": view says must replace labels = "+propertyValue);
+            if ( propertyValue != null ) {
+                switch ( propertyValue.toLowerCase() ) {
+                    case "yes": return true;
+                    case "no":  return false;
+                    default:
+                }
+            }
+                        
+            // then we check if the model has got a "must replace labels"
+            propertyValue = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "must replace labels");
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace labels = "+propertyValue);
+            if ( propertyValue != null ) {
+                switch ( propertyValue.toLowerCase() ) {
+                    case "yes": return true;
+                    case "no":  return false;
+                    default:
+                }
+            }
+        } else
+            logger.error("got null object parameter");
         
-        if ( container == null ) {
-            // should not be here, but just in case !!!
-            return false;
-        }
-        
-        // we show the label only if the showLabelsInView flag is set
-        boolean mustShow = showLabelsInAllViews() || areEqual(getContainerProperty(obj, "replace labels"), "true");
-        
-        if ( logger.isTraceEnabled() ) {
-        	if ( mustShow )
-        		logger.trace(getFullName(obj) + ": must replace label");
-        	else
-        		logger.trace(getFullName(obj) + ": must not replace label");
-        }
-        return mustShow;
+        // if we're here, it means that we haven't seen any "must replace labels" property. 
+        // so by default, we do not change the icon
+        return false;
     }
     
     /**
@@ -787,26 +912,66 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      */
     public static String getLabelName(EObject obj) {
         if ( obj != null ) {
-        	// we get the property name that contains the label
-        	String labelPropertyName = getContainerProperty(obj, "replace labels property");
-        	if ( labelPropertyName == null )
-        		labelPropertyName = "label";
-        	
-            if ( obj instanceof IDiagramModelArchimateObject )
-                obj = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
-        
-            if ( obj instanceof IProperties ) {
-                for ( IProperty prop: ((IProperties)obj).getProperties() ) {
-                    if ( SpecializationPlugin.areEqual(prop.getKey(), labelPropertyName) ) {
-                    	if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing label from property \"" + labelPropertyName + "\" value \"" + prop.getValue() + "\"");
-                        return prop.getValue();
+            EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+            if ( !(concept instanceof IProperties) ) {
+                // Should not happen, but just in case
+                logger.error(getFullName(obj) + " does not have properties");
+                return null;
+            }
+            
+            // first, we get the name of the property that will contains the name of the label
+            
+            // we check the element, the view and the model (in that order)
+            String iconPropertyName = getProperty(concept, "replace labels property");
+            if ( iconPropertyName != null ) {
+                if ( iconPropertyName.length() == 0 ) {
+                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace labels property is empty, we ignore it");
+                    iconPropertyName = null;
+                } else
+                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace labels property = "+iconPropertyName);
+            }
+            if ( iconPropertyName == null ) {
+                EObject container = obj;
+                while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
+                    container = container.eContainer();
+                if ( container == null ) {
+                    // Should not happen, but just in case
+                    logger.error(getFullName(obj) + " is not in a container");
+                    return null; 
+                }
+                
+                String containerType = (container instanceof IFolder) ? "folder" : "view";
+                iconPropertyName = getProperty(container, "replace labels property");
+                if ( iconPropertyName != null ) {
+                    if ( iconPropertyName.length() == 0 ) {
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": view's replace labels property is empty, we ignore it");
+                        iconPropertyName = null;
+                    } else {
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace labels property = "+iconPropertyName);
+                        iconPropertyName = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "replace labels property");
+                        if ( iconPropertyName != null )
+                            if ( iconPropertyName.length() == 0 ) {
+                                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace labels property is empty, we ignore it");
+                                iconPropertyName = null;
+                            } else
+                                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace labels property = "+iconPropertyName);
                     }
                 }
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": property \"" + labelPropertyName + "\" not found, label not replaced");
-            } else
-            	logger.error("getLabelName(): object "+ getFullName(obj) + " does not have properties");
+            }
+            if ( iconPropertyName == null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace labels property defaults to \"icon\"");
+                iconPropertyName = "icon";
+            }
+            
+            // Now we get the icon filename from the property
+            for ( IProperty prop: ((IProperties)obj).getProperties() ) {
+                if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
+                    if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing label by "+ prop.getValue());
+                    return prop.getValue();
+                }
+            }
         } else
-        	logger.error("getLabelName(): got null object parameter");
+            logger.error("got null object parameter");
         return null;
     }
 }
