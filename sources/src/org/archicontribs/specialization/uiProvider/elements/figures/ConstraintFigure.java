@@ -42,7 +42,7 @@ public class ConstraintFigure extends com.archimatetool.editor.diagram.figures.e
     protected void setText() {
         String labelName = null;
         
-        if ( SpecializationPlugin.mustShowLabel(getDiagramModelObject()) )
+        if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
             labelName = SpecializationPlugin.getLabelName(((IDiagramModelArchimateObject)getDiagramModelObject()).getArchimateElement());
         
         if ( labelName==null )

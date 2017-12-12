@@ -20,7 +20,7 @@ public class RepresentationFigure extends com.archimatetool.editor.diagram.figur
     protected void setText() {
         String labelName = null;
         
-        if ( SpecializationPlugin.mustShowLabel(getDiagramModelObject()) )
+        if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
             labelName = SpecializationPlugin.getLabelName(((IDiagramModelArchimateObject)getDiagramModelObject()).getArchimateElement());
         
         if ( labelName==null )
