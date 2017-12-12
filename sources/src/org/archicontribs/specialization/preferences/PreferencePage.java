@@ -64,9 +64,12 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	
 	private TabFolder tabFolder;
 	private Button btnCheckForUpdateAtStartupButton;
-	private Button btnShowImagesInView;
-	private Button btnShowLabelsInView;
-	private Button btnShowImagesInTree;
+	private Button btnAlwaysReplaceIconsInModelTree;
+	private Button btnNeverReplaceIconsInModelTree;
+	private Button btnAlwaysReplaceIconsInViews;
+	private Button btnNeverReplaceIconsInViews;
+    private Button btnAlwaysReplaceLabelsInViews;
+    private Button btnNeverReplaceLabelsInViews;
 	private boolean mouseOverHelpButton = false;
 	private Composite loggerComposite;
 	private RadioGroupFieldEditor loggerModeRadioGroupEditor;
@@ -177,74 +180,104 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         gd.grabExcessHorizontalSpace = true;
         grpBehaviour.setLayoutData(gd);
         
-        Label lblModelTreeIcons = new Label(grpBehaviour, SWT.NONE);
-        lblModelTreeIcons.setBackground(COMPO_BACKGROUND_COLOR);
-        lblModelTreeIcons.setText("Model tree icons:");
+        Label lblReplaceIconsInModelTree = new Label(grpBehaviour, SWT.NONE);
+        lblReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
+        lblReplaceIconsInModelTree.setText("Replace icons in model tree:");
         fd = new FormData();
         fd.top = new FormAttachment(null, 5);
         fd.left = new FormAttachment(0, 10);
-        lblModelTreeIcons.setLayoutData(fd);
+        lblReplaceIconsInModelTree.setLayoutData(fd);
         
-        btnShowImagesInTree = new Button(grpBehaviour, SWT.CHECK);
-        btnShowImagesInTree.setBackground(COMPO_BACKGROUND_COLOR);
-        btnShowImagesInTree.setText("Replace icons with \"icon\" property value");
+        Composite replaceIconsInModelTreeComposite = new Composite(grpBehaviour, SWT.NONE);
+        replaceIconsInModelTreeComposite.setBackground(COMPO_BACKGROUND_COLOR);
+        replaceIconsInModelTreeComposite.setLayout(new RowLayout(SWT.VERTICAL));
         fd = new FormData();
-        fd.top = new FormAttachment(lblModelTreeIcons, 5);
-        fd.left = new FormAttachment(0, 30);
-        btnShowImagesInTree.setLayoutData(fd);
-        btnShowImagesInTree.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInTree"));
-        
-        Label lblViewsIcons = new Label(grpBehaviour, SWT.NONE);
-        lblViewsIcons.setBackground(COMPO_BACKGROUND_COLOR);
-        lblViewsIcons.setText("Views icons:");
-        fd = new FormData();
-        fd.top = new FormAttachment(btnShowImagesInTree, 10);
-        fd.left = new FormAttachment(0, 10);
-        lblViewsIcons.setLayoutData(fd);
-        
-        Composite viewIconsGroup = new Composite(grpBehaviour, SWT.NONE);
-        viewIconsGroup.setBackground(COMPO_BACKGROUND_COLOR);
-        viewIconsGroup.setLayout(new RowLayout(SWT.VERTICAL));
-        fd = new FormData();
-        fd.top = new FormAttachment(lblViewsIcons, 0);
+        fd.top = new FormAttachment(lblReplaceIconsInModelTree, 0);
         fd.left = new FormAttachment(0, 27);
-        viewIconsGroup.setLayoutData(fd);
+        replaceIconsInModelTreeComposite.setLayoutData(fd);
         
-        btnShowImagesInView = new Button(viewIconsGroup, SWT.RADIO);
-        btnShowImagesInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnShowImagesInView.setText("Always Replace icons with \"icon\" property value");
-		btnShowImagesInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
+        btnAlwaysReplaceIconsInModelTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
+        btnAlwaysReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
+        btnAlwaysReplaceIconsInModelTree.setText("Always");
+        boolean always = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree"), "always");
+        btnAlwaysReplaceIconsInModelTree.setSelection(always);
 
-        Button btnDoNotShowImagesInView = new Button(viewIconsGroup, SWT.RADIO);
-        btnDoNotShowImagesInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnDoNotShowImagesInView.setText("Replace icons with \"icon\" property value only in views that have a property \"replace icons\" = \"true\"");
-        btnDoNotShowImagesInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showImagesInView"));
+        btnNeverReplaceIconsInModelTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
+        btnNeverReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
+        btnNeverReplaceIconsInModelTree.setText("Never");
+        boolean never = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree"), "never");
+        btnNeverReplaceIconsInModelTree.setSelection(never);
+        
+        Button btnReplaceIconsInTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
+        btnReplaceIconsInTree.setBackground(COMPO_BACKGROUND_COLOR);
+        btnReplaceIconsInTree.setText("Use of \"icon\" property");
+        btnReplaceIconsInTree.setSelection(!never && !always);
+        
+        Label lblreplaceIconsInViews = new Label(grpBehaviour, SWT.NONE);
+        lblreplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        lblreplaceIconsInViews.setText("Replace icons in views:");
+        fd = new FormData();
+        fd.top = new FormAttachment(replaceIconsInModelTreeComposite, 5);
+        fd.left = new FormAttachment(0, 10);
+        lblreplaceIconsInViews.setLayoutData(fd);
+        
+        Composite replaceIconsInViewsComposite = new Composite(grpBehaviour, SWT.NONE);
+        replaceIconsInViewsComposite.setBackground(COMPO_BACKGROUND_COLOR);
+        replaceIconsInViewsComposite.setLayout(new RowLayout(SWT.VERTICAL));
+        fd = new FormData();
+        fd.top = new FormAttachment(lblreplaceIconsInViews, 0);
+        fd.left = new FormAttachment(0, 27);
+        replaceIconsInViewsComposite.setLayoutData(fd);
+        
+        btnAlwaysReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
+        btnAlwaysReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnAlwaysReplaceIconsInViews.setText("Always");
+        always = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews"), "always");
+        btnAlwaysReplaceIconsInViews.setSelection(always);
+
+        btnNeverReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
+        btnNeverReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnNeverReplaceIconsInViews.setText("Never");
+        never = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews"), "never");
+        btnNeverReplaceIconsInViews.setSelection(never);
+        
+        Button btnReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
+        btnReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnReplaceIconsInViews.setText("Use of \"icon\" property");
+        btnReplaceIconsInViews.setSelection(!never && !always);
         
         Label lblViewsLabels = new Label(grpBehaviour, SWT.NONE);
         lblViewsLabels.setBackground(COMPO_BACKGROUND_COLOR);
-        lblViewsLabels.setText("Connexions labels:");
+        lblViewsLabels.setText("Replace labels in views:");
         fd = new FormData();
-        fd.top = new FormAttachment(viewIconsGroup, 10);
+        fd.top = new FormAttachment(replaceIconsInViewsComposite, 10);
         fd.left = new FormAttachment(0, 10);
         lblViewsLabels.setLayoutData(fd);
         
-        Composite viewLabelsGroup = new Composite(grpBehaviour, SWT.NONE);
-        viewLabelsGroup.setBackground(COMPO_BACKGROUND_COLOR);
-        viewLabelsGroup.setLayout(new RowLayout(SWT.VERTICAL));
+        Composite ReplaceLabelsInViewsComposite = new Composite(grpBehaviour, SWT.NONE);
+        ReplaceLabelsInViewsComposite.setBackground(COMPO_BACKGROUND_COLOR);
+        ReplaceLabelsInViewsComposite.setLayout(new RowLayout(SWT.VERTICAL));
         fd = new FormData();
         fd.top = new FormAttachment(lblViewsLabels, 0);
         fd.left = new FormAttachment(0, 27);
-        viewLabelsGroup.setLayoutData(fd);
+        ReplaceLabelsInViewsComposite.setLayoutData(fd);
         
-        btnShowLabelsInView = new Button(viewLabelsGroup, SWT.RADIO);
-        btnShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnShowLabelsInView.setText("Always replace connections labels with \"label\" property value");
-        btnShowLabelsInView.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showLabelsInView"));
+        btnAlwaysReplaceIconsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
+        btnAlwaysReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnAlwaysReplaceIconsInViews.setText("Always");
+        always = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews"), "always");
+        btnAlwaysReplaceIconsInViews.setSelection(always);
 
-        Button btnDoNotShowLabelsInView = new Button(viewLabelsGroup, SWT.RADIO);
-        btnDoNotShowLabelsInView.setBackground(COMPO_BACKGROUND_COLOR);
-        btnDoNotShowLabelsInView.setText("Replace connection labels with \"label\" property value only in views that have a property \"replace labels\" = \"true\"");
-        btnDoNotShowLabelsInView.setSelection(!SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("showLabelsInView"));
+        btnNeverReplaceIconsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
+        btnNeverReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnNeverReplaceIconsInViews.setText("Never");
+        never = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews"), "never");
+        btnNeverReplaceIconsInViews.setSelection(never);
+        
+        Button btnReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
+        btnReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnReplaceLabelsInViews.setText("Use of \"label\" property");
+        btnReplaceLabelsInViews.setSelection(!never && !always);
 		
 		
 		Group grpHelp = new Group(behaviourComposite, SWT.NONE);
@@ -383,16 +416,46 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     public boolean performOk() {
     	if ( logger.isTraceEnabled() ) logger.trace("Saving preferences in preference store");
     	
+    	if ( logger.isTraceEnabled() ) logger.trace("   setting checkForUpdateAtStartup = "+btnCheckForUpdateAtStartupButton.getSelection());
     	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("checkForUpdateAtStartup", btnCheckForUpdateAtStartupButton.getSelection());
-    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInView", btnShowImagesInView.getSelection());
-    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showLabelsInView", btnShowLabelsInView.getSelection());
-    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInTree", btnShowImagesInTree.getSelection());
+    	
+    	if ( logger.isTraceEnabled() ) logger.trace("   setting showImagesInView = "+btnAlwaysReplaceIconsInViews.getSelection());
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInView", btnAlwaysReplaceIconsInViews.getSelection());
+    	
+    	String value;
+    	if ( btnAlwaysReplaceIconsInModelTree.getSelection() )
+    	    value = "always";
+    	else if ( btnNeverReplaceIconsInModelTree.getSelection() )
+            value = "never";
+    	else 
+    	    value = "";
+    	if ( logger.isTraceEnabled() ) logger.trace("   setting mustReplaceIconsInTree = "+value);
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceIconsInTree", value);
+    	
+        if ( btnAlwaysReplaceIconsInViews.getSelection() )
+            value = "always";
+        else if ( btnNeverReplaceIconsInViews.getSelection() )
+            value = "never";
+        else 
+            value = "";
+        if ( logger.isTraceEnabled() ) logger.trace("   setting mustReplaceIconsInViews = "+value);
+        SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceIconsInViews", value);
+        
+        
+        if ( btnAlwaysReplaceLabelsInViews.getSelection() )
+            value = "always";
+        else if ( btnNeverReplaceLabelsInViews.getSelection() )
+            value = "never";
+        else 
+            value = "";
+        if ( logger.isTraceEnabled() ) logger.trace("   setting mustReplaceLabelsInViews = "+value);
+        SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceLabelsInViews", value);
     	
     	// the loggerMode is a private property, so we use reflection to access it
 		try {
 			Field field = RadioGroupFieldEditor.class.getDeclaredField("value");
 			field.setAccessible(true);
-			if ( logger.isTraceEnabled() ) logger.trace("loggerMode = "+(String)field.get(loggerModeRadioGroupEditor));
+			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerMode = "+(String)field.get(loggerModeRadioGroupEditor));
 			field.setAccessible(false);
 		} catch (Exception err) {
 			logger.error("Failed to retrieve the \"loggerMode\" value from the preference page", err);
@@ -403,7 +466,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		try {
 			Field field = RadioGroupFieldEditor.class.getDeclaredField("value");
 			field.setAccessible(true);
-			if ( logger.isTraceEnabled() ) logger.trace("loggerLevel = "+(String)field.get(loggerLevelRadioGroupEditor));
+			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerLevel = "+(String)field.get(loggerLevelRadioGroupEditor));
 			field.setAccessible(false);
 		} catch (Exception err) {
 			logger.error("Failed to retrieve the \"loggerLevel\" value from the preference page", err);
@@ -411,14 +474,14 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		loggerLevelRadioGroupEditor.store();
 		
 			//TODO : if we are in simple mode, check that is is a valid writable filename
-		if ( logger.isTraceEnabled() ) logger.trace("loggerFilename = "+filenameFileFieldEditor.getStringValue());
+		if ( logger.isTraceEnabled() ) logger.trace("setting loggerFilename = "+filenameFileFieldEditor.getStringValue());
 		filenameFileFieldEditor.store();
 		
-		if ( logger.isTraceEnabled() ) logger.trace("loggerExpert = "+expertTextFieldEditor.getStringValue());
+		if ( logger.isTraceEnabled() ) logger.trace("setting loggerExpert = "+expertTextFieldEditor.getStringValue());
 		expertTextFieldEditor.store();
 		
         try {
-        	if ( logger.isDebugEnabled() ) logger.debug("Saving the preference store to disk.");
+        	if ( logger.isDebugEnabled() ) logger.debug("setting Saving the preference store to disk.");
             ((IPersistentPreferenceStore)SpecializationPlugin.INSTANCE.getPreferenceStore()).save();
         } catch (IOException err) {
         	SpecializationPlugin.popup(Level.ERROR, "Failed to save the preference store to disk.", err);
