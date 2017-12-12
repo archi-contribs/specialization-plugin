@@ -137,7 +137,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 																"log4j.appender.stdout                          = org.apache.log4j.ConsoleAppender\n"+
 																"log4j.appender.stdout.Target                   = System.out\n"+
 																"log4j.appender.stdout.layout                   = org.apache.log4j.PatternLayout\n"+
-																"log4j.appender.stdout.layout.ConversionPattern = %d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-30.30C{1} %m%n\n"+
+																"log4j.appender.stdout.layout.ConversionPattern = %d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-40.40C{1} %m%n\n"+
 																"\n"+
 																"log4j.appender.file                            = org.apache.log4j.FileAppender\n"+
 																"log4j.appender.file.ImmediateFlush             = true\n"+
@@ -145,7 +145,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 																"log4j.appender.file.Encoding                   = UTF-8\n"+
 																"log4j.appender.file.File                       = "+(System.getProperty("user.home")+File.separator+pluginName+".log").replace("\\", "\\\\")+"\n"+
 																"log4j.appender.file.layout                     = org.apache.log4j.PatternLayout\n"+
-																"log4j.appender.file.layout.ConversionPattern   = %d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-30.30C{1} %m%n");
+																"log4j.appender.file.layout.ConversionPattern   = %d{yyyy-MM-dd HH:mm:ss} %-5p %4L:%-40.40C{1} %m%n");
 		preferenceStore.setDefault("iconMargin",                2);
 		preferenceStore.setDefault("mustReplaceIconsInViews",   "");
 	    preferenceStore.setDefault("mustReplaceIconsInTree",    "");
@@ -705,9 +705,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     
     public static boolean mustReplaceIcon(EObject obj) {
         if ( obj != null ) {
-            //TODO
-            Exception e = new Exception();
-            e.printStackTrace();
+        	// we do not change the icon of the element in the properties window
+            if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") )
+            	return false;
             
             // we determine if the object is in a view or in a folder
             EObject container = obj;
@@ -829,7 +829,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // Now we get the icon filename from the property
-            for ( IProperty prop: ((IProperties)obj).getProperties() ) {
+            for ( IProperty prop: ((IProperties)concept).getProperties() ) {
                 if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
                 	if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing icon by "+ prop.getValue());
                 	
@@ -964,7 +964,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // Now we get the icon filename from the property
-            for ( IProperty prop: ((IProperties)obj).getProperties() ) {
+            for ( IProperty prop: ((IProperties)concept).getProperties() ) {
                 if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
                     if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing label by "+ prop.getValue());
                     return prop.getValue();
