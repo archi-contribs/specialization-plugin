@@ -51,9 +51,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.archimatetool.editor.ui.IArchiImages;
+import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModelObject;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
+import com.archimatetool.model.IDiagramModelConnection;
+import com.archimatetool.model.IDiagramModelContainer;
+import com.archimatetool.model.IDiagramModelObject;
 import com.archimatetool.model.IFolder;
 import com.archimatetool.model.IIdentifier;
 import com.archimatetool.model.INameable;
@@ -89,7 +93,8 @@ import com.archimatetool.model.IProperty;
  *                              Add the ability to change the name of the property that contains the icon filename at the model, view and concept levels
  *                              Add the ability to change the name of the property that contains the label text at the model, view and concept levels
  *                              Fix elements shape (quare corners instead of round ones)
- *                              fix junction shape
+ *                              Fix junction shape
+ *                              Do not replace the icon in the properties window anymore
  *                                  
  * TODO list:                   Add a file explorer window on the preference page that allow to manage the icons
  *                              and allow drag&drop to this file exporer window
@@ -676,33 +681,57 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		}.start();
 	}
 	
-    public static String getProperty(EObject obj, String propertyName) {
+    public static String getPropertyValue(EObject obj, String propertyName) {
         if ( obj != null && obj instanceof IProperties) {
             for ( IProperty property:((IProperties)obj).getProperties() ) {
-                if ( areEqual(property.getKey(), propertyName) )
+                if ( areEqual(property.getKey(), propertyName) ) {
+                	// we return the value of the first required key
                     return property.getValue();
-            }
-        }
-        
-        return null;
-    }
-	
-    public static String getContainerPropertyxxxx(EObject obj, String propertyName) {
-        EObject container = obj;
-        while ( container!=null && !(container instanceof IDiagramModel) && !(container instanceof IFolder) ) {
-            container = container.eContainer();
-        }
-        
-        if ( container != null ) {
-            for ( IProperty property:((IProperties)container).getProperties() ) {
-                if ( areEqual(property.getKey(), propertyName) )
-                    return property.getValue();
+                }
             }
         }
         
         return null;
     }
     
+    public static void setProperty(EObject obj, String propertyName, String propertyValue) {
+    	boolean mustCreateProperty = true;
+    	
+        if ( obj != null && obj instanceof IProperties) {
+            for ( IProperty property:((IProperties)obj).getProperties() ) {
+                if ( areEqual(property.getKey(), propertyName) ) {
+                    property.setValue(propertyValue);
+                    // we change all properties that have the required key
+                    mustCreateProperty = false;
+                }
+            }
+        }
+        
+        if ( mustCreateProperty ) {
+	        IProperty property = IArchimateFactory.eINSTANCE.createProperty();
+	        property.setKey(propertyName);
+	        property.setValue(propertyValue);
+	        ((IProperties)obj).getProperties().add(property);
+        }
+    }
+    
+    public static void deleteProperty(EObject obj, String propertyName) {
+    	boolean propertyRemoved = true;
+    	
+    	while ( propertyRemoved ) {
+    		propertyRemoved = false;
+	        if ( obj != null && obj instanceof IProperties) {
+	            for ( IProperty property:((IProperties)obj).getProperties() ) {
+	                if ( areEqual(property.getKey(), propertyName) ) {
+	                	((IProperties)obj).getProperties().remove(property);
+	                	propertyRemoved = true;
+	                	break;
+	                }
+	            }
+	        }
+    	}
+    }
+	
     public static boolean mustReplaceIcon(EObject obj) {
         if ( obj != null ) {
         	// we do not change the icon of the element in the properties window
@@ -740,7 +769,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // the we check if the container has got a "must replace icons"
-            String propertyValue = getProperty(container, "must replace icons");
+            String propertyValue = getPropertyValue(container, "must replace icons");
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
             boolean mustReplace = false;
             if ( propertyValue != null ) {
@@ -752,7 +781,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
                         
             // then we check if the model has got a "must replace icons"
-            propertyValue = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "must replace icons");
+            propertyValue = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "must replace icons");
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
@@ -787,7 +816,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             // first, we get the name of the property that will contains the name of the icon
             
             // we check the element, the view and the model (in that order)
-            String iconPropertyName = getProperty(concept, "replace icons property");
+            String iconPropertyName = getPropertyValue(concept, "replace icons property");
             if ( iconPropertyName != null ) {
                 if ( iconPropertyName.length() == 0 ) {
                     if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property is empty, we ignore it");
@@ -806,14 +835,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 }
                 
                 String containerType = (container instanceof IFolder) ? "folder" : "view";
-                iconPropertyName = getProperty(container, "replace icons property");
+                iconPropertyName = getPropertyValue(container, "replace icons property");
                 if ( iconPropertyName != null ) {
                     if ( iconPropertyName.length() == 0 ) {
                         if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property is empty, we ignore it");
                         iconPropertyName = null;
                     } else {
                         if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property = "+iconPropertyName);
-                        iconPropertyName = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "replace icons property");
+                        iconPropertyName = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "replace icons property");
                         if ( iconPropertyName != null )
                             if ( iconPropertyName.length() == 0 ) {
                                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property is empty, we ignore it");
@@ -878,7 +907,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // the we check if the container has got a "must replace labels"
-            String propertyValue = getProperty(container, "must replace labels");
+            String propertyValue = getPropertyValue(container, "must replace labels");
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": view says must replace labels = "+propertyValue);
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
@@ -889,7 +918,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
                         
             // then we check if the model has got a "must replace labels"
-            propertyValue = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "must replace labels");
+            propertyValue = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "must replace labels");
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace labels = "+propertyValue);
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
@@ -922,7 +951,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             // first, we get the name of the property that will contains the name of the label
             
             // we check the element, the view and the model (in that order)
-            String iconPropertyName = getProperty(concept, "replace labels property");
+            String iconPropertyName = getPropertyValue(concept, "replace labels property");
             if ( iconPropertyName != null ) {
                 if ( iconPropertyName.length() == 0 ) {
                     if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace labels property is empty, we ignore it");
@@ -941,14 +970,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 }
                 
                 String containerType = (container instanceof IFolder) ? "folder" : "view";
-                iconPropertyName = getProperty(container, "replace labels property");
+                iconPropertyName = getPropertyValue(container, "replace labels property");
                 if ( iconPropertyName != null ) {
                     if ( iconPropertyName.length() == 0 ) {
                         if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": view's replace labels property is empty, we ignore it");
                         iconPropertyName = null;
                     } else {
                         if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace labels property = "+iconPropertyName);
-                        iconPropertyName = getProperty(((IArchimateModelObject)obj).getArchimateModel(), "replace labels property");
+                        iconPropertyName = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "replace labels property");
                         if ( iconPropertyName != null )
                             if ( iconPropertyName.length() == 0 ) {
                                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace labels property is empty, we ignore it");
@@ -973,5 +1002,23 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         } else
             logger.error("got null object parameter");
         return null;
+    }
+    
+    public static void refreshIconsAndLabels(INameable obj) {
+        // we set the object name to force the framework to redraw the corresponding object in the current view 
+    	obj.setName(obj.getName());
+        if ( obj instanceof IDiagramModelContainer ) {
+            for ( IDiagramModelObject child: ((IDiagramModelContainer)obj).getChildren() ) {
+            	refreshIconsAndLabels(child);
+                for ( IDiagramModelConnection relation: child.getSourceConnections() ) {
+                	refreshIconsAndLabels(relation);
+                }
+            }
+        }
+        if ( obj instanceof IDiagramModelObject ) {
+            for ( IDiagramModelConnection relation: ((IDiagramModelObject)obj).getSourceConnections() ) {
+            	refreshIconsAndLabels(relation);
+            }
+        }
     }
 }
