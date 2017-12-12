@@ -309,40 +309,33 @@
       </uiProvider>
    </extension>
    <extension
-         point="org.eclipse.ui.menus">
-     
-      <menuContribution
-            allPopups="true"
-            class="org.archicontribs.specialization.menu.SpecializationTreeModelContextMenu"
-            locationURI="popup:com.archimatetool.editor.treeModelView?after=additions">
-      </menuContribution>
-      <menuContribution
-            allPopups="true"
-            class="org.archicontribs.specialization.menu.SpecializationDiagramEditorContextMenu"
-            locationURI="popup:ArchimateDiagramEditorContextMenuProvider?after=additions">
-      </menuContribution>Contribution>
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="com.archimatetool.editor">
+         <propertyTab
+               afterTab="figure.tab"
+               category="appearance.category"
+               id="specialization.tab"
+               label="specialization">
+         </propertyTab>
+      </propertyTabs>
    </extension>
    <extension
-      point="org.eclipse.ui.commands">
-      <command
-            defaultHandler="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
-            id="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
-            name="SpecializationRefreshViewHandler">
-      </command>
-      <command
-            defaultHandler="org.archicontribs.specialization.menu.SpecializationSwitchIconsHandler"
-            id="org.archicontribs.specialization.menu.SpecializationSwitchIconsHandler"
-            name="SpecializationSwitchIconsHandler">
-      </command>
-      <command
-            defaultHandler="org.archicontribs.specialization.menu.SpecializationSwitchLabelsHandler"
-            id="org.archicontribs.specialization.menu.SpecializationSwitchLabelsHandler"
-            name="SpecializationSwitchLabelsHandler">
-      </command>
-      <command
-            defaultHandler="org.archicontribs.specialization.menu.SpecializationRefreshModelTreeHandler"
-            id="org.archicontribs.specialization.menu.SpecializationRefreshModelTreeHandler"
-            name="SpecializationRefreshModelTreeHandler">
-      </command>
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="com.archimatetool.editor">
+         <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection$Filter"
+               id="specializationSection"
+               tab="specialization.tab">
+         </propertySection>
+         <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationModelSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationModelSection$Filter"
+               id="specializationSection"
+               tab="specialization.tab">
+         </propertySection>
+      </propertySections>
    </extension>
 </plugin>
