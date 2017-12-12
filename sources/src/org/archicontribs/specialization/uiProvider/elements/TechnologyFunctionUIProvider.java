@@ -5,6 +5,7 @@
  */
 package org.archicontribs.specialization.uiProvider.elements;
 
+import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
@@ -18,6 +19,8 @@ import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
  * @author Herve Jouin
  */
 public class TechnologyFunctionUIProvider extends com.archimatetool.editor.ui.factory.elements.TechnologyFunctionUIProvider {
+    private static final SpecializationLogger logger = new SpecializationLogger(TechnologyFunctionUIProvider.class);
+    
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our TechnologyFunctionFigure class to be called
@@ -29,6 +32,8 @@ public class TechnologyFunctionUIProvider extends com.archimatetool.editor.ui.fa
      */
     @Override
     public Image getImage() {
+        logger.debug("Getting image");
+        
         String iconName = null;
         
         if ( SpecializationPlugin.mustShowIcon(instance) )

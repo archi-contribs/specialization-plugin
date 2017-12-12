@@ -5,6 +5,7 @@
  */
 package org.archicontribs.specialization.uiProvider.elements;
 
+import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
@@ -18,10 +19,12 @@ import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
  * @author Herve Jouin
  */
 public class RequirementUIProvider extends com.archimatetool.editor.ui.factory.elements.RequirementUIProvider {
+    private static final SpecializationLogger logger = new SpecializationLogger(RequirementUIProvider.class);
+    
     @Override
     public EditPart createEditPart() {
             // we override the standard method because we want our NodeFigure class to be called
-        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.CollaborationFigure.class);
+        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.RequirementFigure.class);
     }
     
     /**
@@ -29,6 +32,8 @@ public class RequirementUIProvider extends com.archimatetool.editor.ui.factory.e
      */
     @Override
     public Image getImage() {
+        logger.debug("Getting image");
+        
         String iconName = null;
         
         if ( SpecializationPlugin.mustShowIcon(instance) )

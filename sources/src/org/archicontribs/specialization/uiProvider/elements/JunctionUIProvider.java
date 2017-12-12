@@ -5,11 +5,9 @@
  */
 package org.archicontribs.specialization.uiProvider.elements;
 
+import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
-
-import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 
 
 /**
@@ -18,17 +16,17 @@ import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
  * @author Herve Jouin
  */
 public class JunctionUIProvider extends com.archimatetool.editor.ui.factory.elements.JunctionUIProvider {
-    @Override
-    public EditPart createEditPart() {
-            // we override the standard method because we want our NodeFigure class to be called
-        return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.CollaborationFigure.class);
-    }
+    private static final SpecializationLogger logger = new SpecializationLogger(JunctionUIProvider.class);
+    
+    // we do not override the createEditPart of the junction.
     
     /**
      * Gets the icon image from the component's properties. If not found, return the default one.
      */
     @Override
     public Image getImage() {
+        logger.debug("Getting image");
+        
         String iconName = null;
         
         if ( SpecializationPlugin.mustShowIcon(instance) )
