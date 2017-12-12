@@ -36,7 +36,7 @@ public class GoalUIProvider extends com.archimatetool.editor.ui.factory.elements
         
         String iconName = null;
         
-        if ( SpecializationPlugin.mustShowIcon(instance) )
+        if ( SpecializationPlugin.mustReplaceIcon(instance) )
             iconName = SpecializationPlugin.getIconName(instance, true);
         
         return iconName==null ? super.getImage() : getImageWithUserFillColor(iconName);
