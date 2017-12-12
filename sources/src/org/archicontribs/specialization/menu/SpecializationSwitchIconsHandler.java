@@ -86,7 +86,7 @@ public class SpecializationSwitchIconsHandler extends AbstractHandler {
                 IDiagramModel selectedView  = (IDiagramModel)selectedObject;
                 
                 for ( IProperty prop: selectedView.getProperties() ) {
-                    if ( SpecializationPlugin.areEqual(prop.getKey(), "replace icons") ) {
+                    if ( SpecializationPlugin.areEqual(prop.getKey(), "must replace icons") ) {
                         if ( SpecializationPlugin.areEqual(prop.getValue(), "true") ) {
                             logger.trace("Switching off customized icons");
                             prop.setValue("false");
