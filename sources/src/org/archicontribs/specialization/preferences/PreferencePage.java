@@ -279,17 +279,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         fd.left = new FormAttachment(0, 27);
         ReplaceLabelsInViewsComposite.setLayoutData(fd);
         
-        btnAlwaysReplaceIconsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
-        btnAlwaysReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnAlwaysReplaceIconsInViews.setText("Always");
+        btnAlwaysReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
+        btnAlwaysReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnAlwaysReplaceLabelsInViews.setText("Always");
         always = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews"), "always");
-        btnAlwaysReplaceIconsInViews.setSelection(always);
+        btnAlwaysReplaceLabelsInViews.setSelection(always);
 
-        btnNeverReplaceIconsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
-        btnNeverReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnNeverReplaceIconsInViews.setText("Never");
+        btnNeverReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
+        btnNeverReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        btnNeverReplaceLabelsInViews.setText("Never");
         never = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews"), "never");
-        btnNeverReplaceIconsInViews.setSelection(never);
+        btnNeverReplaceLabelsInViews.setSelection(never);
         
         Button btnReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
         btnReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
