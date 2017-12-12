@@ -263,6 +263,7 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
     		    CommandStack stack = (CommandStack) model.getArchimateModel().getAdapter(CommandStack.class);
     		    stack.execute(compoundCommand);
     		    logger.trace("Setting property \"must replace icons\" to "+value);
+    		    SpecializationPlugin.refreshIconsAndLabels(model);
             }
 		};
 	};
@@ -291,6 +292,7 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
     		    CommandStack stack = (CommandStack) model.getAdapter(CommandStack.class);
     		    stack.execute(compoundCommand);
     		    logger.trace("Setting property \"must replace labels\" to "+value);
+    		    SpecializationPlugin.refreshIconsAndLabels(model);
             }
 		};
 	};
