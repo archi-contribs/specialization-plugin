@@ -95,6 +95,7 @@ import com.archimatetool.model.IProperty;
  *                              Fix elements shape (quare corners instead of round ones)
  *                              Fix junction shape
  *                              Do not replace the icon in the properties window anymore
+ *                              Replace the context menus by a new tab in the properties window
  *                                  
  * TODO list:                   Add a file explorer window on the preference page that allow to manage the icons
  *                              and allow drag&drop to this file exporer window
