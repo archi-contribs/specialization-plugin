@@ -91,7 +91,7 @@ public class SpecializationDiagramEditorContextMenu extends ExtensionContributio
                         
                         // we add a menu to refresh to switch the view between Archi's icons and customized icons
                         menuLabel = "Switch on customized icons in \"" + selectedView.getName() + "\"";
-                        if ( !SpecializationPlugin.showImagesInAllViews() ) {
+                        if ( SpecializationPlugin.areEqual(SpecializationPlugin.mustReplaceIconsInViews(),"") ) {
                             for ( IProperty prop: selectedView.getProperties() ) {
                                 if ( SpecializationPlugin.areEqual(prop.getKey(), "replace icons") ) {
                                     if ( SpecializationPlugin.areEqual(prop.getValue(), "true") )
@@ -119,7 +119,7 @@ public class SpecializationDiagramEditorContextMenu extends ExtensionContributio
                         
                         // we add a menu to refresh to switch the view between Archi's labels and customized labels
                         menuLabel = "Switch on customized labels in \"" + selectedView.getName() + "\"";
-                        if ( !SpecializationPlugin.showLabelsInAllViews() ) {
+                        if ( SpecializationPlugin.areEqual(SpecializationPlugin.mustReplaceLabelsInViews(),"") ) {
                             for ( IProperty prop: selectedView.getProperties() ) {
                                 if ( SpecializationPlugin.areEqual(prop.getKey(), "replace labels") ) {
                                     if ( SpecializationPlugin.areEqual(prop.getValue(), "true") )
