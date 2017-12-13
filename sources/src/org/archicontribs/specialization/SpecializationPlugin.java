@@ -1037,4 +1037,15 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
         }
     }
+    
+    public static boolean inArray(String[] stringArray, String string) {
+    	if ( string == null )
+    		return true;
+    	
+        for (String s : stringArray) {
+            if (areEqual(s, string))
+                return true;
+        }
+        return false;
+    }
 }
