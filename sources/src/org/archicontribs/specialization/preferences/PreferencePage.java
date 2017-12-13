@@ -78,6 +78,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	private FileFieldEditor filenameFileFieldEditor;
 	private RadioGroupFieldEditor loggerLevelRadioGroupEditor;
 	private TextFieldEditor expertTextFieldEditor;
+	private FolderTableEditor folderTableEditor;
 	private Group simpleModeGroup;
 	private Group expertModeGroup;
 	
@@ -121,6 +122,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		TabItem behaviourTabItem = new TabItem(tabFolder, SWT.NONE);
         behaviourTabItem.setText("Behaviour");
         behaviourTabItem.setControl(behaviourComposite);
+        
+        /* **************************************************************************** */
         		
         Group grpVersion = new Group(behaviourComposite, SWT.NONE);
 		grpVersion.setBackground(COMPO_BACKGROUND_COLOR);
@@ -171,6 +174,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		gd.grabExcessHorizontalSpace = true;
 		grpVersion.setLayoutData(gd);
 		
+		/* **************************************************************************** */
+		
 		Group grpBehaviour = new Group(behaviourComposite, SWT.NONE);
 		grpBehaviour.setBackground(COMPO_BACKGROUND_COLOR);
 		grpBehaviour.setLayout(new FormLayout());
@@ -217,7 +222,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         
         Button btnReplaceIconsInTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
         btnReplaceIconsInTree.setBackground(COMPO_BACKGROUND_COLOR);
-        btnReplaceIconsInTree.setText("Use of \"icon\" property");
+        btnReplaceIconsInTree.setText("Use properties");
         btnReplaceIconsInTree.setSelection(!never && !always);
         
         StyledText lblreplaceIconsInViews = new StyledText(grpBehaviour, SWT.NONE);
@@ -255,7 +260,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         
         Button btnReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
         btnReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnReplaceIconsInViews.setText("Use of \"icon\" property");
+        btnReplaceIconsInViews.setText("Use properties");
         btnReplaceIconsInViews.setSelection(!never && !always);
         
         StyledText lblViewsLabelsInViews = new StyledText(grpBehaviour, SWT.NONE);
@@ -293,10 +298,16 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         
         Button btnReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
         btnReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnReplaceLabelsInViews.setText("Use of \"label\" property");
+        btnReplaceLabelsInViews.setText("Use properties");
         btnReplaceLabelsInViews.setSelection(!never && !always);
+        
+        /* **************************************************************************** */
+        
+        folderTableEditor = new FolderTableEditor("Image folders:","", behaviourComposite);
+        addField(folderTableEditor);
 		
-		
+        /* **************************************************************************** */
+        
 		Group grpHelp = new Group(behaviourComposite, SWT.NONE);
 		grpHelp.setBackground(COMPO_BACKGROUND_COLOR);
         grpHelp.setLayout(new FormLayout());
@@ -491,11 +502,13 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		loggerLevelRadioGroupEditor.store();
 		
 			//TODO : if we are in simple mode, check that is is a valid writable filename
-		if ( logger.isTraceEnabled() ) logger.trace("setting loggerFilename = "+filenameFileFieldEditor.getStringValue());
+		if ( logger.isTraceEnabled() ) logger.trace("   setting loggerFilename = "+filenameFileFieldEditor.getStringValue());
 		filenameFileFieldEditor.store();
 		
-		if ( logger.isTraceEnabled() ) logger.trace("setting loggerExpert = "+expertTextFieldEditor.getStringValue());
+		if ( logger.isTraceEnabled() ) logger.trace("   setting loggerExpert = "+expertTextFieldEditor.getStringValue());
 		expertTextFieldEditor.store();
+		
+        folderTableEditor.store();
 		
         try {
         	if ( logger.isDebugEnabled() ) logger.debug("setting Saving the preference store to disk.");
