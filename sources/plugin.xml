@@ -316,7 +316,13 @@
                afterTab="figure.tab"
                category="appearance.category"
                id="specialization.tab"
-               label="specialization">
+               label="Specialization">
+         </propertyTab>
+         <propertyTab
+               afterTab="specialization.tab"
+               category="appearance.category"
+               id="icon.tab"
+               label="Icon">
          </propertyTab>
       </propertyTabs>
    </extension>
@@ -335,6 +341,12 @@
                filter="org.archicontribs.specialization.propertysections.SpecializationModelSection$Filter"
                id="specializationSection"
                tab="specialization.tab">
+         </propertySection>
+         <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationIconSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationIconSection$Filter"
+               id="specializationSection"
+               tab="icon.tab">
          </propertySection>
       </propertySections>
    </extension>
