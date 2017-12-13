@@ -131,7 +131,7 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
 		btnIconsDefault.setBackground(parent.getBackground());
 		btnIconsDefault.setForeground(parent.getForeground());
 		btnIconsDefault.setFont(parent.getFont());
-		btnIconsDefault.setText("use views' properties");
+		btnIconsDefault.setText("use views properties");
 		btnIconsDefault.setSelection(false);
 		btnIconsDefault.setEnabled(false);
 		btnIconsDefault.addSelectionListener(replaceIconsListener);
@@ -192,7 +192,7 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
 		btnLabelsDefault.setBackground(parent.getBackground());
 		btnLabelsDefault.setForeground(parent.getForeground());
 		btnLabelsDefault.setFont(parent.getFont());
-		btnLabelsDefault.setText("use views' properties");
+		btnLabelsDefault.setText("use views properties");
 		btnLabelsDefault.setSelection(false);
 		btnLabelsDefault.setEnabled(false);
 		btnLabelsDefault.addSelectionListener(replaceLabelsListener);
