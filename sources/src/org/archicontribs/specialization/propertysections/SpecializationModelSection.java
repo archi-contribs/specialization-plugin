@@ -91,7 +91,7 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
         lblIconInfo.setLayoutData(fd);
         
         lblReplaceIcons = new Label(parent, SWT.NONE);
-		lblReplaceIcons.setText("Replace icons");
+		lblReplaceIcons.setText("Replace icons in this model:");
 		lblReplaceIcons.setForeground(parent.getForeground());
 		lblReplaceIcons.setBackground(parent.getBackground());
 		lblReplaceIcons.setFont(parent.getFont());
@@ -152,7 +152,7 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
         lblLabelInfo.setLayoutData(fd);
 
 		lblReplaceLabels = new Label(parent, SWT.NONE);
-		lblReplaceLabels.setText("Replace Labels");
+		lblReplaceLabels.setText("Replace labels in this model:");
 		lblReplaceLabels.setForeground(parent.getForeground());
 		lblReplaceLabels.setBackground(parent.getBackground());
 		lblReplaceLabels.setFont(parent.getFont());
