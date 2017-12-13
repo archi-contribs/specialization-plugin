@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Label;
 
 import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
-import com.archimatetool.editor.propertysections.ITabbedLayoutConstants;
 import com.archimatetool.model.IArchimateDiagramModel;
 import com.archimatetool.model.IArchimatePackage;
 import com.archimatetool.model.IDiagramModel;
@@ -38,11 +37,13 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 
 	private IDiagramModel diagramModel;
 
+	private Label lblIconInfo;
 	private Label lblReplaceIcons;
 	private Button btnIconsYes;
 	private Button btnIconsNo;
 	private Button btnIconsDefault;
 
+	private Label lblLabelInfo;
 	private Label lblReplaceLabels;
 	private Button btnLabelsYes;
 	private Button btnLabelsNo;
@@ -73,24 +74,39 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 	@Override
 	protected void createControls(Composite parent) {
 		parent.setLayout(new FormLayout());
+		
+	    boolean mustUseIconProperty = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews").length() == 0;
 
+		lblIconInfo = new Label(parent, SWT.NONE);
+		if ( mustUseIconProperty )
+		    lblIconInfo.setText("Icons : the preference states to use properties.");
+		else 
+		    lblIconInfo.setText("Icons : the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews")+" replace icons.");
+		lblIconInfo.setForeground(parent.getForeground());
+		lblIconInfo.setBackground(parent.getBackground());
+		lblIconInfo.setFont(parent.getFont());
+        FormData fd = new FormData();
+        fd.top = new FormAttachment(0, 5);
+        fd.left = new FormAttachment(0, 10);
+        lblIconInfo.setLayoutData(fd);
+        
 		lblReplaceIcons = new Label(parent, SWT.NONE);
-		lblReplaceIcons.setText("Replace icons");
+		lblReplaceIcons.setText("Replace icons in this view:");
 		lblReplaceIcons.setForeground(parent.getForeground());
 		lblReplaceIcons.setBackground(parent.getBackground());
 		lblReplaceIcons.setFont(parent.getFont());
 		lblReplaceIcons.setEnabled(false);
-		FormData fd = new FormData();
-		fd.top = new FormAttachment(0, 5);
-		fd.left = new FormAttachment(0, 27);
+		fd = new FormData();
+		fd.top = new FormAttachment(lblIconInfo, 5);
+		fd.left = new FormAttachment(0, 30);
 		lblReplaceIcons.setLayoutData(fd);
 
 		Composite compoReplaceIcons = new Composite(parent, SWT.NONE);
 		compoReplaceIcons.setBackground(parent.getBackground());
 		compoReplaceIcons.setLayout(new RowLayout(SWT.VERTICAL));
 		fd = new FormData();
-		fd.top = new FormAttachment(0, 5);
-		fd.left = new FormAttachment(0, ITabbedLayoutConstants.STANDARD_LABEL_WIDTH);
+		fd.top = new FormAttachment(lblReplaceIcons, 0, SWT.TOP);
+		fd.left = new FormAttachment(lblReplaceIcons, 20);
 		compoReplaceIcons.setLayoutData(fd);
 
 		btnIconsYes = new Button(compoReplaceIcons, SWT.RADIO);
@@ -115,29 +131,43 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 		btnIconsDefault.setBackground(parent.getBackground());
 		btnIconsDefault.setForeground(parent.getForeground());
 		btnIconsDefault.setFont(parent.getFont());
-		btnIconsDefault.setText("use default");
+		btnIconsDefault.setText("use model's configuration");
 		btnIconsDefault.setSelection(false);
 		btnIconsDefault.setEnabled(false);
 		btnIconsDefault.addSelectionListener(replaceIconsListener);
 
-
+        boolean mustUseLabelProperty = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews").length() == 0;
+        
+        lblLabelInfo = new Label(parent, SWT.NONE);
+        if ( mustUseLabelProperty )
+            lblLabelInfo.setText("Labels : the preference states to use properties.");
+        else 
+            lblLabelInfo.setText("Labels : the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews")+" replace labels.");
+        lblLabelInfo.setForeground(parent.getForeground());
+        lblLabelInfo.setBackground(parent.getBackground());
+        lblLabelInfo.setFont(parent.getFont());
+        fd = new FormData();
+        fd.top = new FormAttachment(compoReplaceIcons, 20);
+        fd.left = new FormAttachment(0, 10);
+        lblLabelInfo.setLayoutData(fd);
+        
 		lblReplaceLabels = new Label(parent, SWT.NONE);
-		lblReplaceLabels.setText("Replace Labels");
+		lblReplaceLabels.setText("Replace Labels in this view:");
 		lblReplaceLabels.setForeground(parent.getForeground());
 		lblReplaceLabels.setBackground(parent.getBackground());
 		lblReplaceLabels.setFont(parent.getFont());
 		lblReplaceLabels.setEnabled(false);
 		fd = new FormData();
-		fd.top = new FormAttachment(compoReplaceIcons, 5);
-		fd.left = new FormAttachment(0, 27);
+		fd.top = new FormAttachment(lblLabelInfo, 5);
+		fd.left = new FormAttachment(0, 30);
 		lblReplaceLabels.setLayoutData(fd);
 
 		Composite compoReplaceLabels = new Composite(parent, SWT.NONE);
 		compoReplaceLabels.setBackground(parent.getBackground());
 		compoReplaceLabels.setLayout(new RowLayout(SWT.VERTICAL));
 		fd = new FormData();
-		fd.top = new FormAttachment(compoReplaceIcons, 5);
-		fd.left = new FormAttachment(0, ITabbedLayoutConstants.STANDARD_LABEL_WIDTH);
+		fd.top = new FormAttachment(lblReplaceLabels, 0, SWT.TOP);
+		fd.left = new FormAttachment(compoReplaceIcons, 0, SWT.LEFT);
 		compoReplaceLabels.setLayoutData(fd);
 
 		btnLabelsYes = new Button(compoReplaceLabels, SWT.RADIO);
@@ -162,7 +192,7 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 		btnLabelsDefault.setBackground(parent.getBackground());
 		btnLabelsDefault.setForeground(parent.getForeground());
 		btnLabelsDefault.setFont(parent.getFont());
-		btnLabelsDefault.setText("use default");
+		btnLabelsDefault.setText("use model's configuration");
 		btnLabelsDefault.setSelection(false);
 		btnLabelsDefault.setEnabled(false);
 		btnLabelsDefault.addSelectionListener(replaceLabelsListener);
@@ -202,41 +232,56 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 	}
 	
 	private void refreshControls() {
-		boolean mustReplaceIconsInAllViews = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews").length() == 0;
-		boolean mustReplaceLabelsInAllViews = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews").length() == 0;
+	    boolean yes;
+	    boolean no;
+		boolean mustUseIconProperty = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews").length() == 0;
+		boolean mustUseLabelProperty = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews").length() == 0;
 
-		boolean yes;
-		boolean no;
+		if ( mustUseIconProperty ) {
+	        lblIconInfo.setText("Icons : the preference states to use properties.");
+	        String propValue = SpecializationPlugin.getPropertyValue(diagramModel, "must replace icons");
+	        if ( propValue != null )
+	            propValue = propValue.toLowerCase();
+	        yes = SpecializationPlugin.areEqual(propValue, "yes");
+	        no = SpecializationPlugin.areEqual(propValue, "no");
 
-		String propValue = SpecializationPlugin.getPropertyValue(diagramModel, "must replace icons");
-		if ( propValue != null )
-			propValue = propValue.toLowerCase();
-		yes = SpecializationPlugin.areEqual(propValue, "yes");
-		no = SpecializationPlugin.areEqual(propValue, "no");
+	        btnIconsYes.setSelection(yes);
+	        btnIconsNo.setSelection(no);
+	        btnIconsDefault.setSelection(!yes && !no);
+		} else { 
+	        lblIconInfo.setText("Icons : the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews")+" replace icons.");
+	        yes = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews").toLowerCase(), "always");
+	        btnIconsYes.setSelection(yes);
+	        btnIconsNo.setSelection(!yes);
+	        btnIconsDefault.setSelection(false);
+		}
+	    lblReplaceIcons.setEnabled(mustUseIconProperty);
+	    btnIconsYes.setEnabled(mustUseIconProperty);
+	    btnIconsNo.setEnabled(mustUseIconProperty);
+	    btnIconsDefault.setEnabled(mustUseIconProperty);
 
-		btnIconsYes.setSelection(yes);
-		btnIconsNo.setSelection(no);
-		btnIconsDefault.setSelection(!yes && !no);
+        if ( mustUseLabelProperty ) {
+            lblIconInfo.setText("Labels : the preference states to use properties.");
+            String propValue = SpecializationPlugin.getPropertyValue(diagramModel, "must replace labels");
+            if ( propValue != null )
+                propValue = propValue.toLowerCase();
+            yes = SpecializationPlugin.areEqual(propValue, "yes");
+            no = SpecializationPlugin.areEqual(propValue, "no");
 
-		lblReplaceIcons.setEnabled(!mustReplaceIconsInAllViews);
-		btnIconsYes.setEnabled(!mustReplaceIconsInAllViews);
-		btnIconsNo.setEnabled(!mustReplaceIconsInAllViews);
-		btnIconsDefault.setEnabled(!mustReplaceIconsInAllViews);
-
-		propValue = SpecializationPlugin.getPropertyValue(diagramModel, "must replace labels");
-		if ( propValue != null )
-			propValue = propValue.toLowerCase();
-		yes = SpecializationPlugin.areEqual(propValue, "yes");
-		no = SpecializationPlugin.areEqual(propValue, "no");
-
-		btnLabelsYes.setSelection(yes);
-		btnLabelsNo.setSelection(no);
-		btnLabelsDefault.setSelection(!yes && !no);
-
-		lblReplaceLabels.setEnabled(!mustReplaceLabelsInAllViews);
-		btnLabelsYes.setEnabled(!mustReplaceLabelsInAllViews);
-		btnLabelsNo.setEnabled(!mustReplaceLabelsInAllViews);
-		btnLabelsDefault.setEnabled(!mustReplaceLabelsInAllViews);
+            btnLabelsYes.setSelection(yes);
+            btnLabelsNo.setSelection(no);
+            btnLabelsDefault.setSelection(!yes && !no);
+        } else { 
+            lblLabelInfo.setText("Labels : the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews")+" replace labels.");
+            yes = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews").toLowerCase(), "always");
+            btnLabelsYes.setSelection(yes);
+            btnLabelsNo.setSelection(!yes);
+            btnLabelsDefault.setSelection(false);
+        }
+        lblReplaceLabels.setEnabled(mustUseLabelProperty);
+        btnLabelsYes.setEnabled(mustUseLabelProperty);
+        btnLabelsNo.setEnabled(mustUseLabelProperty);
+        btnLabelsDefault.setEnabled(mustUseLabelProperty);
 	}
 
 
