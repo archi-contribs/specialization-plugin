@@ -52,6 +52,7 @@ import org.json.simple.parser.JSONParser;
 
 import com.archimatetool.editor.ui.IArchiImages;
 import com.archimatetool.model.IArchimateFactory;
+import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimateModelObject;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
@@ -785,7 +786,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
                         
             // then we check if the model has got a "must replace icons"
-            propertyValue = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "must replace icons");
+            IArchimateModel model;
+            if ( obj instanceof IDiagramModelArchimateObject )
+                model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
+            else
+                return false;
+            propertyValue = getPropertyValue(model, "must replace icons");
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
@@ -922,7 +928,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
                         
             // then we check if the model has got a "must replace labels"
-            propertyValue = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "must replace labels");
+            IArchimateModel model;
+            if ( obj instanceof IDiagramModelArchimateObject )
+                model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
+            else
+                return false;
+            propertyValue = getPropertyValue(model, "must replace labels");
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace labels = "+propertyValue);
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
