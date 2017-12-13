@@ -122,6 +122,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	public    static final FontData SYSTEM_FONT       = display.getSystemFont().getFontData()[0];
     public    static final Font     TITLE_FONT        = new Font(display, SYSTEM_FONT.getName(), SYSTEM_FONT.getHeight()+2, SWT.BOLD);
     
+    public static String storeFolderPrefix            = "folder";
+    public static String storeLocationPrefix          = "location";
+    
 	/**
 	 * PreferenceStore allowing to store the plugin configuration.
 	 */
