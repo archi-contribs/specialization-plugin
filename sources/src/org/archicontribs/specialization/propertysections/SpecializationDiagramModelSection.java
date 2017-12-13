@@ -56,9 +56,9 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 		@Override
 		protected boolean isRequiredType(Object object) {
 			if ( object == null )
-				logger.trace("null -> filter : "+(object instanceof IArchimateDiagramModel));
-			else
-				logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof IArchimateDiagramModel));
+				return false;
+			
+			logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof IArchimateDiagramModel));
 			return object instanceof IArchimateDiagramModel;
 		}
 
