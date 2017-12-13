@@ -55,9 +55,9 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
 		@Override
 		protected boolean isRequiredType(Object object) {
 			if ( object == null )
-				logger.trace("null -> filter : "+(object instanceof IArchimateModel));
-			else
-				logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof IArchimateModel));
+				return false;
+			
+			logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof IArchimateModel));
 			return object instanceof IArchimateModel;
 		}
 
