@@ -255,7 +255,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 				logger.log(SpecializationPlugin.class, level, msg, e);
 		
 				if ( e != null ) {
-					if ( SpecializationPlugin.areEqual(e.getMessage(), msg)) {
+					if ( !SpecializationPlugin.areEqual(e.getMessage(), msg)) {
 						popupMessage += "\n\n" + e.getMessage();
 					} else {
 						popupMessage += "\n\n" + e.getClass().getName();
