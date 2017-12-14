@@ -181,7 +181,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(fileTree, 0, SWT.TOP);
         fd.left = new FormAttachment(fileTree, 10, SWT.RIGHT);
         btnSetIcon.setLayoutData(fd);
-        btnSetIcon.setEnabled(false);
+        btnSetIcon.setVisible(false);
         
         Label lblResize = new Label(compoIcon, SWT.NONE);
         lblResize.setText("Resize to");
@@ -191,15 +191,16 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(btnSetIcon, 10);
         fd.left = new FormAttachment(fileTree, 10, SWT.RIGHT);
         lblResize.setLayoutData(fd);
+        lblResize.setVisible(false);
         
         txtWidth = new Text(compoIcon, SWT.BORDER);
         txtWidth.setTextLimit(4);
-        txtWidth.setEditable(false);
         fd = new FormData();
         fd.top = new FormAttachment(lblResize, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblResize, 5, SWT.RIGHT);
-        fd.right = new FormAttachment(lblResize, 55, SWT.RIGHT);
+        fd.right = new FormAttachment(lblResize, 35, SWT.RIGHT);
         txtWidth.setLayoutData(fd);
+        txtWidth.setVisible(false);
         
         Label lblX = new Label(compoIcon, SWT.NONE);
         lblX.setText("x");
@@ -209,15 +210,16 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(lblResize, 0, SWT.TOP);
         fd.left = new FormAttachment(txtWidth, 5, SWT.RIGHT);
         lblX.setLayoutData(fd);
+        lblX.setVisible(false);
         
         txtHeight = new Text(compoIcon, SWT.BORDER);
         txtHeight.setTextLimit(4);
-        txtHeight.setEditable(false);
         fd = new FormData();
         fd.top = new FormAttachment(lblX, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblX, 5, SWT.RIGHT);
-        fd.right = new FormAttachment(lblX, 55, SWT.RIGHT);
+        fd.right = new FormAttachment(lblX, 35, SWT.RIGHT);
         txtHeight.setLayoutData(fd);
+        txtHeight.setVisible(false);
 
         imagePreview = new Label(compoIcon, SWT.NONE);
         imagePreview.setForeground(parent.getForeground());
@@ -226,6 +228,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(txtHeight, 10);
         fd.left = new FormAttachment(fileTree, 10, SWT.RIGHT);
         imagePreview.setLayoutData(fd);
+        imagePreview.setVisible(false);
         
         compoIcon.layout();
         
@@ -280,6 +283,13 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
                     image.dispose();
                 }
                 
+                btnSetIcon.setVisible(false);
+                lblResize.setVisible(false);
+                txtWidth.setVisible(false);
+                lblX.setVisible(false);
+                txtHeight.setVisible(false);
+                imagePreview.setVisible(false);
+                
                 TreeItem treeItem = (TreeItem) e.item;
                 if (treeItem == null)
                     return;
@@ -332,9 +342,32 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
                 } else {
                     logger.trace("Showing preview for image \""+root.getPath()+"\"");
                     
-                    image = new Image(Display.getCurrent(), new ImageData(root.getPath()));
+                    ImageData imageData = new ImageData(root.getPath());
+                    ImageData imagePreviewData;
+                    
+                    int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
+                    int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
+                    
+                    if ( width+height == 0 )
+                    	imagePreviewData = imageData;
+                    else {
+                    	float scale = 0f;
+                    	if ( width == 0 ) { scale = (float)height/imageData.height ; width = (int)(imageData.width * scale); }
+                    	if ( height == 0 ) { scale = (float)width/imageData.width ; height = (int)(imageData.height * scale); }
+                    	logger.trace("resizing image to "+width+"x"+height+" (scale factor = "+scale+")");
+                    	imagePreviewData = imageData.scaledTo(width, height);
+                    }
+                    
+                    image = new Image(Display.getCurrent(), imagePreviewData);
                     imagePreview.setImage(image);
                     imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+                    
+                    btnSetIcon.setVisible(true);
+                    lblResize.setVisible(true);
+                    txtWidth.setVisible(true);
+                    lblX.setVisible(true);
+                    txtHeight.setVisible(true);
+                    imagePreview.setVisible(true);
                 }
             }
         });
@@ -345,7 +378,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         public boolean accept(File file) {
             if ( file.isFile() && (file.getName().lastIndexOf('.') != -1) )
                 return SpecializationPlugin.inArray(validImageSuffixes, (file.getName().substring(file.getName().lastIndexOf('.')+1)).toLowerCase());
-            logger.trace("fichier refusé : "+file.getName());
+            logger.trace("fichier refusï¿½ : "+file.getName());
             return false;
         }
     };
