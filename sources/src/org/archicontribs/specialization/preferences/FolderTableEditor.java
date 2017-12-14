@@ -343,7 +343,6 @@ public class FolderTableEditor extends FieldEditor {
 	}
 	
 	private boolean createSymlink(String folder, String location) {
-    	// we create the symbolic link
         String pluginsFilename;
         String imgFolder;
         try {
@@ -355,9 +354,17 @@ public class FolderTableEditor extends FieldEditor {
         }
         
         // if the symbolic link already exists
-        if ( Files.isSymbolicLink(Paths.get(imgFolder+File.separator+folder).toAbsolutePath()) )
+        if ( Files.isSymbolicLink(Paths.get(imgFolder+File.separator+folder).toAbsolutePath()) ) {
+            logger.debug("The symbolic link \""+folder+"\" already exists");
             return true;
+        }
         //TODO: check that it points to the right location
+        
+        // we check that the location is a folder
+        if ( !Files.isDirectory(Paths.get(location)) ) {
+            logger.error("\""+location+"\" is not a folder");
+            return false;
+        }
         
         try {
             if( logger.isTraceEnabled() ) logger.trace("Creating symbolic link \""+Paths.get(imgFolder+File.separator+folder).toAbsolutePath()+"\" -> \""+Paths.get(location).toAbsolutePath()+"\"");
