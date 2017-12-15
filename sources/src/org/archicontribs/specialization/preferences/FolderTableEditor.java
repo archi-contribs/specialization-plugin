@@ -346,7 +346,7 @@ public class FolderTableEditor extends FieldEditor {
         String pluginsFilename;
         String imgFolder;
         try {
-            pluginsFilename = new File(com.archimatetool.editor.ArchiPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
+            pluginsFilename = new File(com.archimatetool.editor.ui.ImageFactory.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
             imgFolder = (new File(pluginsFilename+File.separator+".."+File.separator+"img")).getCanonicalPath();
         } catch (IOException e) {
             SpecializationPlugin.popup(Level.ERROR, "Cannot get plugin's folder !", e);
