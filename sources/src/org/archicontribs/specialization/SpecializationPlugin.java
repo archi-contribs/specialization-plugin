@@ -858,7 +858,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 return null;
             
             // Now we get the icon filename from the property
-            String iconName = getPropertyValue(obj, iconPropertyName);
+            String iconName = getPropertyValue(concept, iconPropertyName);
             logger.trace(getFullName(obj)+" : property "+iconPropertyName+" = "+iconName);
             if ( iconName == null )
                 return null;
@@ -898,7 +898,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             
             // Now we set the icon filename into the property
             logger.trace(getFullName(obj)+" : setting property "+iconPropertyName+" = "+iconName);
-            setProperty(obj, iconPropertyName, iconName);
+            setProperty(concept, iconPropertyName, iconName);
         }
     }
     
@@ -1043,12 +1043,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             // first, we get the name of the property that will contains the name of the label
             
             // we check the element, the view and the model (in that order)
-            String labelPropertyName = getLabelPropertyName(obj);
+            String labelPropertyName = getLabelPropertyName(concept);
             if ( labelPropertyName == null )
                 return null;
             
             // Now we get the icon filename from the property
-            String label = getPropertyValue(obj, labelPropertyName);
+            String label = getPropertyValue(concept, labelPropertyName);
             if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": label is "+ label);
             return label;
         } else
