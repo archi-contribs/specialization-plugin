@@ -763,8 +763,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     public static boolean mustReplaceIcon(EObject obj) {
         if ( obj != null ) {
         	// we do not change the icon of the element in the properties window
-            if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") )
+            if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") ) {
+                logger.debug("we do not replace icon in the properties section.");
             	return false;
+            }
             
             // we determine if the object is in a view or in a folder
             EObject container = obj;
@@ -788,23 +790,29 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 containerType = "view";
             }
             
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+" : "+mustReplaceIcons);
             if ( mustReplaceIcons != null ) {
                 switch ( mustReplaceIcons ) {
-                    case "always": return true;
-                    case "never":  return false;
+                    case "always":
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+" : "+mustReplaceIcons);
+                        return true;
+                    case "never":  
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+" : "+mustReplaceIcons);
+                        return false;
                 }
             }
             
             // the we check if the container has got a "must replace icons"
             String propertyValue = getPropertyValue(container, "must replace icons");
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
             boolean mustReplace = false;
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
-                    case "yes": mustReplace = true;
-                    case "no":  return false;
-                    default:
+                    case "yes":
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
+                        mustReplace = true;
+                        break;
+                    case "no":
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
+                        return false;
                 }
             }
                         
@@ -815,21 +823,21 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             else
                 return false;
             propertyValue = getPropertyValue(model, "must replace icons");
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
-                    case "yes": return true;
-                    case "no":  return false;
-                    default:
+                    case "yes":
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
+                        return true;
+                    case "no":
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
+                        return false;
                 }
             }
             
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": in final, must replace icon = "+mustReplace);
             return mustReplace;
         } else
             logger.error("got null object parameter");
-        
-        // if we're here, it means that we haven't seen any "must replace icons" property. 
-        // so by default, we do not change the icon
         return false;
     }
     
