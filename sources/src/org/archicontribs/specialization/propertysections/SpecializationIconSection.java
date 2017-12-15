@@ -23,6 +23,8 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.FormAttachment;
@@ -201,6 +203,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.right = new FormAttachment(lblResize, 35, SWT.RIGHT);
         txtWidth.setLayoutData(fd);
         txtWidth.setVisible(false);
+        txtWidth.addVerifyListener(numberOnlyVerifyListener);
         
         Label lblX = new Label(compoIcon, SWT.NONE);
         lblX.setText("x");
@@ -220,6 +223,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.right = new FormAttachment(lblX, 35, SWT.RIGHT);
         txtHeight.setLayoutData(fd);
         txtHeight.setVisible(false);
+        txtHeight.addVerifyListener(numberOnlyVerifyListener);
 
         imagePreview = new Label(compoIcon, SWT.NONE);
         imagePreview.setForeground(parent.getForeground());
@@ -341,7 +345,6 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 
                 } else {
                     logger.trace("Showing preview for image \""+root.getPath()+"\"");
-                    
                     ImageData imageData = new ImageData(root.getPath());
                     ImageData imagePreviewData;
                     
@@ -394,6 +397,18 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         @Override
         public int compare(File f1, File f2) {
             return f1.getName().compareToIgnoreCase(f2.getName());
+        }
+    };
+    
+    private VerifyListener numberOnlyVerifyListener = new VerifyListener() {
+        @Override
+        public void verifyText(VerifyEvent event) {
+            try {
+                Integer.parseInt(event.text);
+                event.doit = true;
+            } catch (NumberFormatException e) {
+                event.doit = false;
+            }
         }
     };
 
