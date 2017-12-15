@@ -688,6 +688,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	}
 	
     public static String getPropertyValue(EObject obj, String propertyName) {
+        if ( obj == null )
+            return null;
+        
+        if ( ! (obj instanceof IProperties) ) {
+            logger.error(getFullName(obj)+" has not got properties");
+            return null;
+        }
+        
         if ( obj != null && obj instanceof IProperties) {
             for ( IProperty property:((IProperties)obj).getProperties() ) {
                 if ( areEqual(property.getKey(), propertyName) ) {
@@ -701,15 +709,21 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     }
     
     public static void setProperty(EObject obj, String propertyName, String propertyValue) {
+        if ( obj == null )
+            return;
+        
+        if ( ! (obj instanceof IProperties) ) {
+            logger.error(getFullName(obj)+" has not got properties");
+            return;
+        }
+        
     	boolean mustCreateProperty = true;
     	
-        if ( obj != null && obj instanceof IProperties) {
-            for ( IProperty property:((IProperties)obj).getProperties() ) {
-                if ( areEqual(property.getKey(), propertyName) ) {
-                    property.setValue(propertyValue);
-                    // we change all properties that have the required key
-                    mustCreateProperty = false;
-                }
+        for ( IProperty property:((IProperties)obj).getProperties() ) {
+            if ( areEqual(property.getKey(), propertyName) ) {
+                property.setValue(propertyValue);
+                // we change all properties that have the required key
+                mustCreateProperty = false;
             }
         }
         
@@ -722,6 +736,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     }
     
     public static void deleteProperty(EObject obj, String propertyName) {
+        if ( obj == null )
+            return;
+        
+        if ( ! (obj instanceof IProperties) ) {
+            logger.error(getFullName(obj)+" has not got properties");
+            return;
+        }
+        
     	boolean propertyRemoved = true;
     	
     	while ( propertyRemoved ) {
