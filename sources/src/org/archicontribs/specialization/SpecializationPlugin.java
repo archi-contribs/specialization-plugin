@@ -693,6 +693,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         
         if ( ! (obj instanceof IProperties) ) {
             logger.error(getFullName(obj)+" has not got properties");
+            new Exception().printStackTrace();
             return null;
         }
         
@@ -803,15 +804,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             
             // the we check if the container has got a "must replace icons"
             String propertyValue = getPropertyValue(container, "must replace icons");
-            boolean mustReplace = false;
             if ( propertyValue != null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
                 switch ( propertyValue.toLowerCase() ) {
                     case "yes":
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
-                        mustReplace = true;
-                        break;
+                        return true;
                     case "no":
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
                         return false;
                 }
             }
@@ -824,18 +822,16 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 return false;
             propertyValue = getPropertyValue(model, "must replace icons");
             if ( propertyValue != null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
                 switch ( propertyValue.toLowerCase() ) {
                     case "yes":
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
                         return true;
                     case "no":
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace icons = "+propertyValue);
                         return false;
                 }
             }
             
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": in final, must replace icon = "+mustReplace);
-            return mustReplace;
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": we do not replace icon");
         } else
             logger.error("got null object parameter");
         return false;
@@ -856,7 +852,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // first, we get the name of the property that will contains the name of the icon
-            String iconPropertyName = getIconPropertyName(obj);
+            String iconPropertyName = getIconPropertyName(concept);
             
             if ( iconPropertyName == null ) 
                 return null;
@@ -896,7 +892,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             // first, we get the name of the property that will contains the name of the icon
             
             // we check the element, the view and the model (in that order)
-            String iconPropertyName = getIconPropertyName(obj);
+            String iconPropertyName = getIconPropertyName(concept);
             if ( iconPropertyName == null )
                 return;
             
@@ -984,22 +980,25 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             mustReplaceLabels =  mustReplaceLabelsInViews();
             
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels : "+mustReplaceLabels);
             if ( mustReplaceLabels != null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels : "+mustReplaceLabels);
                 switch ( mustReplaceLabels ) {
-                    case "always": return true;
-                    case "never":  return false;
+                    case "always":
+                        return true;
+                    case "never":
+                        return false;
                 }
             }
             
             // the we check if the container has got a "must replace labels"
             String propertyValue = getPropertyValue(container, "must replace labels");
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": view says must replace labels = "+propertyValue);
             if ( propertyValue != null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels : "+mustReplaceLabels);
                 switch ( propertyValue.toLowerCase() ) {
-                    case "yes": return true;
-                    case "no":  return false;
-                    default:
+                    case "yes":
+                        return true;
+                    case "no":
+                        return false;
                 }
             }
                         
@@ -1013,11 +1012,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace labels = "+propertyValue);
             if ( propertyValue != null ) {
                 switch ( propertyValue.toLowerCase() ) {
-                    case "yes": return true;
-                    case "no":  return false;
-                    default:
+                    case "yes": 
+                        return true;
+                    case "no":
+                        return false;
                 }
             }
+            logger.trace("getFullName(obj) + \": at the end, we do not replace label");
         } else
             logger.error("got null object parameter");
         
