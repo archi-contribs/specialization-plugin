@@ -18,11 +18,17 @@ import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Image;
@@ -31,7 +37,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -48,20 +53,25 @@ import com.archimatetool.editor.diagram.figures.IFigureDelegate;
 import com.archimatetool.editor.diagram.figures.RectangleFigureDelegate;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.*;
+import com.archimatetool.model.impl.Bounds;
 
 
 public class SpecializationIconSection extends AbstractArchimatePropertySection {
     private static final SpecializationLogger logger = new SpecializationLogger(SpecializationIconSection.class);
 
-    private ArchimateElementEditPart elementEditPart;
+    private ArchimateElementEditPart elementEditPart = null;
 
     private Composite compoIcon;
     private Composite compoNoIcon;
     private Text txtIcon;
     private Tree fileTree;
-    private Label imagePreview;
+    private Composite compoPreview;
+    private Button btnNoResize;
+    private Button btnAutoResize;
+    private Button btnCustomResize;
     private Text txtWidth;
     private Text txtHeight;
+    private Label imagePreview;
 
     static final private String[] validImageSuffixes = {"jpg", "png", "gif", "bmp"};
     static final private Image    closedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/closedFolder.png"));
@@ -102,6 +112,38 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             return ArchimateElementEditPart.class;
         }
     }
+    
+    /**
+     * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
+     */
+    private Adapter eAdapter = new AdapterImpl() {
+        @Override
+        public void notifyChanged(Notification msg) {
+            Object feature = msg.getFeature();
+            
+            // Model event (Undo/Redo and here!)
+            if(feature == IArchimatePackage.Literals.DIAGRAM_MODEL_ARCHIMATE_OBJECT__TYPE )
+                refreshControls();
+            else if ( feature == IArchimatePackage.Literals.DIAGRAM_MODEL_OBJECT__BOUNDS) {
+                Bounds bounds = (Bounds)msg.getNewValue();
+                refreshControls();
+                showPreviewImage(bounds.getWidth(), bounds.getHeight());
+            }
+        }
+    };
+    
+    @Override
+    protected void setLayout(Composite parent) {
+       parent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, shouldUseExtraSpace()));
+       
+       parent.setLayout(new FormLayout());
+    }
+    
+    
+    @Override
+    public boolean shouldUseExtraSpace() {
+        return true;
+    }
 
     /**
      * Create the controls
@@ -112,14 +154,18 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         compoNoIcon.setForeground(parent.getForeground());
         compoNoIcon.setBackground(parent.getBackground());
         compoNoIcon.setLayout(new FormLayout());
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        compoNoIcon.setLayoutData(gd);
+        FormData fd = new FormData();
+        fd.top = new FormAttachment(0);
+        fd.left = new FormAttachment(0);
+        fd.right = new FormAttachment(100);
+        fd.bottom = new FormAttachment(100);
+        compoNoIcon.setLayoutData(fd);
 
         Label lblNoIcon = new Label(compoNoIcon, SWT.NONE);
         lblNoIcon.setText("Please change the element's figure to show up the icon.");
         lblNoIcon.setForeground(parent.getForeground());
         lblNoIcon.setBackground(parent.getBackground());
-        FormData fd = new FormData();
+        fd = new FormData();
         fd.top = new FormAttachment(0, 20);
         fd.left = new FormAttachment(0, 20);
         lblNoIcon.setLayoutData(fd);
@@ -129,8 +175,12 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         compoIcon.setForeground(parent.getForeground());
         compoIcon.setBackground(parent.getBackground());
         compoIcon.setLayout(new FormLayout());
-        gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        compoIcon.setLayoutData(gd);
+        fd = new FormData();
+        fd.top = new FormAttachment(0);
+        fd.left = new FormAttachment(0);
+        fd.right = new FormAttachment(100);
+        fd.bottom = new FormAttachment(100);
+        compoIcon.setLayoutData(fd);
 
         Label lblIcon = new Label(compoIcon, SWT.NONE);
         lblIcon.setText("Icon :");
@@ -150,15 +200,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 
         fileTree = new Tree(compoIcon, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         fileTree.setBackground(parent.getBackground());
-        //fileTree.setHeaderVisible(true);
-        //fileTree.setLinesVisible(false);
-
-        //TreeColumn filesColumn = new TreeColumn(fileTree, SWT.NONE);
-        //filesColumn.setText("Files");
-
-        //TreeColumn sizeColumn = new TreeColumn(fileTree, SWT.NONE);
-        //sizeColumn.setText("Image size");
-        //sizeColumn.setWidth(80);
+        fileTree.addListener(SWT.Selection, fileTreeSelectionListener);
 
         fd = new FormData();
         fd.top = new FormAttachment(txtIcon, 10);
@@ -176,212 +218,244 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.left = new FormAttachment(fileTree, 0, SWT.CENTER);
         lblReminder.setLayoutData(fd);
         
-
-        Button btnSetIcon = new Button(compoIcon, SWT.NONE);
-        btnSetIcon.setText("Set Icon");
+        compoPreview = new Composite(compoIcon, SWT.RESIZE);
+        compoPreview.setForeground(parent.getForeground());
+        compoPreview.setBackground(parent.getBackground());
         fd = new FormData();
         fd.top = new FormAttachment(fileTree, 0, SWT.TOP);
         fd.left = new FormAttachment(fileTree, 10, SWT.RIGHT);
+        compoPreview.setLayoutData(fd);
+        compoPreview.setVisible(false);
+        compoPreview.setLayout(new FormLayout());
+                
+        Button btnSetIcon = new Button(compoPreview, SWT.NONE);
+        btnSetIcon.setText("Set Icon");
+        fd = new FormData();
+        fd.top = new FormAttachment(0);
+        fd.left = new FormAttachment(0);
         btnSetIcon.setLayoutData(fd);
-        btnSetIcon.setVisible(false);
+        btnSetIcon.addSelectionListener(setIconSelectionListener);
         
-        Label lblResize = new Label(compoIcon, SWT.NONE);
+        Label lblResize = new Label(compoPreview, SWT.NONE);
         lblResize.setText("Resize to");
         lblResize.setForeground(parent.getForeground());
         lblResize.setBackground(parent.getBackground());
         fd = new FormData();
         fd.top = new FormAttachment(btnSetIcon, 10);
-        fd.left = new FormAttachment(fileTree, 10, SWT.RIGHT);
+        fd.left = new FormAttachment(0);
         lblResize.setLayoutData(fd);
-        lblResize.setVisible(false);
-        
-        txtWidth = new Text(compoIcon, SWT.BORDER);
-        txtWidth.setTextLimit(4);
+
+        btnNoResize = new Button(compoPreview, SWT.RADIO);
+        btnNoResize.setForeground(parent.getForeground());
+        btnNoResize.setBackground(parent.getBackground());
+        btnNoResize.setText("Do not Resize");
         fd = new FormData();
         fd.top = new FormAttachment(lblResize, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblResize, 5, SWT.RIGHT);
-        fd.right = new FormAttachment(lblResize, 35, SWT.RIGHT);
-        txtWidth.setLayoutData(fd);
-        txtWidth.setVisible(false);
-        txtWidth.addVerifyListener(numberOnlyVerifyListener);
+        fd.left = new FormAttachment(lblResize, 5);
+        btnNoResize.setLayoutData(fd);
+        btnNoResize.setSelection(true);
+        btnNoResize.addSelectionListener(resizeSelectionListener);
         
-        Label lblX = new Label(compoIcon, SWT.NONE);
+        btnAutoResize = new Button(compoPreview, SWT.RADIO);
+        btnAutoResize.setForeground(parent.getForeground());
+        btnAutoResize.setBackground(parent.getBackground());
+        btnAutoResize.setText("Figure's size");
+        fd = new FormData();
+        fd.top = new FormAttachment(btnNoResize, 5);
+        fd.left = new FormAttachment(btnNoResize, 0, SWT.LEFT);
+        btnAutoResize.setLayoutData(fd);
+        btnAutoResize.addSelectionListener(resizeSelectionListener);
+        
+        btnCustomResize = new Button(compoPreview, SWT.RADIO);
+        btnCustomResize.setForeground(parent.getForeground());
+        btnCustomResize.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(btnAutoResize, 5);
+        fd.left = new FormAttachment(btnAutoResize, 0, SWT.LEFT);
+        btnCustomResize.setLayoutData(fd);
+        btnCustomResize.addSelectionListener(resizeSelectionListener);
+        
+        txtWidth = new Text(compoPreview, SWT.BORDER);
+        txtWidth.setTextLimit(4);
+        fd = new FormData();
+        fd.top = new FormAttachment(btnCustomResize, 0, SWT.CENTER);
+        fd.left = new FormAttachment(btnCustomResize, 5, SWT.RIGHT);
+        fd.right = new FormAttachment(btnCustomResize, 35, SWT.RIGHT);
+        txtWidth.setLayoutData(fd);
+        txtWidth.addVerifyListener(numberOnlyVerifyListener);
+        txtWidth.addModifyListener(resizeModifyListener);
+        txtWidth.setEnabled(false);
+        
+        Label lblX = new Label(compoPreview, SWT.NONE);
         lblX.setText("x");
         lblX.setForeground(parent.getForeground());
         lblX.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(lblResize, 0, SWT.TOP);
+        fd.top = new FormAttachment(txtWidth, 0, SWT.CENTER);
         fd.left = new FormAttachment(txtWidth, 5, SWT.RIGHT);
         lblX.setLayoutData(fd);
-        lblX.setVisible(false);
         
-        txtHeight = new Text(compoIcon, SWT.BORDER);
+        txtHeight = new Text(compoPreview, SWT.BORDER);
         txtHeight.setTextLimit(4);
         fd = new FormData();
         fd.top = new FormAttachment(lblX, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblX, 5, SWT.RIGHT);
         fd.right = new FormAttachment(lblX, 35, SWT.RIGHT);
         txtHeight.setLayoutData(fd);
-        txtHeight.setVisible(false);
         txtHeight.addVerifyListener(numberOnlyVerifyListener);
+        txtHeight.addModifyListener(resizeModifyListener);
+        txtHeight.setEnabled(false);
 
-        imagePreview = new Label(compoIcon, SWT.NONE);
+        imagePreview = new Label(compoPreview, SWT.NONE);
         imagePreview.setForeground(parent.getForeground());
         imagePreview.setBackground(parent.getBackground());
         fd = new FormData();
         fd.top = new FormAttachment(txtHeight, 10);
-        fd.left = new FormAttachment(fileTree, 10, SWT.RIGHT);
+        fd.left = new FormAttachment(0);
         imagePreview.setLayoutData(fd);
-        imagePreview.setVisible(false);
         
-        compoIcon.layout();
-        
-        parent.layout();
-
-        /* ********************************************************* */
-
-
-        File root = null;
-        try {
-            String pluginsFilename = new File(com.archimatetool.editor.ArchiPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
-            root = new File(pluginsFilename+File.separator+".."+File.separator+"img");
-            root = new File(root.getCanonicalPath());
-        } catch (IOException e) {
-            logger.error("Cannot get plugin's folder !", e);
-            return;
-        }
-
-        logger.trace("Getting images folder content \""+root.getPath()+"\"");
-        File[] files;
-        try {
-            files = root.listFiles();
-        } catch (SecurityException e) {
-            SpecializationPlugin.popup(Level.ERROR, "Cannot read folder \""+root.getPath()+"\"", e);
-            return;
-        }
-
-        if( files == null ) {
-            SpecializationPlugin.popup(Level.INFO, "No image folder has been defined.\n\nPlease define image folders on the preference page.");
-            return;
-        }
-
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            logger.trace("found folder entry : "+Paths.get(file.getName()));
-            if ( Files.isSymbolicLink(Paths.get(file.getPath())) ) {
-                logger.trace("   is a symbolic link. Adding to the file tree.");
-                TreeItem newTreeItem = new TreeItem(fileTree, SWT.NONE);
-                newTreeItem.setText(file.getName());
-                newTreeItem.setImage(closedFolderImage);
-                newTreeItem.setData(file);
-                new TreeItem(newTreeItem, SWT.NONE);        // to show the arrow in front of the folder
-            }
-        }
-
-        fileTree.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event e) {
-                Image image = imagePreview.getImage();
-                if ( image != null ) {
-                    imagePreview.setImage(null);
-                    imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-                    image.dispose();
-                }
-                
-                btnSetIcon.setVisible(false);
-                lblResize.setVisible(false);
-                txtWidth.setVisible(false);
-                lblX.setVisible(false);
-                txtHeight.setVisible(false);
-                imagePreview.setVisible(false);
-                
-                TreeItem treeItem = (TreeItem) e.item;
-                if (treeItem == null)
-                    return;
-
-                if ( treeItem.getImage() == openedFolderImage ) {
-                    treeItem.setImage(closedFolderImage);
-                    treeItem.setExpanded(false);
-                    return;
-                }
-
-                File root = (File)treeItem.getData();
-                if ( root == null )
-                    return;
-
-                if ( root.isDirectory() ) {
-                    logger.trace("Getting folder content : \""+root.getPath()+"\"");
-                    for ( TreeItem item : treeItem.getItems() ) {
-                        item.dispose();
-                    }
-
-                    treeItem.setImage(openedFolderImage);
-
-                    File[] folders = root.listFiles(foldersFilter);
-                    if (folders != null) {
-                        Arrays.sort(files, nameComparator);
-                        for (int i = 0; i < folders.length; i++) {
-                            File folder = folders[i];
-                            logger.trace("found folder : "+Paths.get(folder.getName()));
-                            TreeItem subItem = new TreeItem(treeItem, SWT.NONE);
-                            subItem.setText(folder.getName());
-                            subItem.setImage(closedFolderImage);
-                            subItem.setData(folder);
-                            new TreeItem(subItem, SWT.NONE);         // to show the arrow in front of the folder
-                        }
-                    }
-
-                    File[] files = root.listFiles(imagesFilter);
-                    if (files != null) {
-                        Arrays.sort(files, nameComparator);
-                        for (int i = 0; i < files.length; i++) {
-                            File file = files[i];
-                            logger.trace("found image : "+Paths.get(file.getName()));
-                            TreeItem subItem = new TreeItem(treeItem, SWT.NONE);
-                            subItem.setText(file.getName());
-                            subItem.setData(file);
-                        }
-                    }
-                    treeItem.setExpanded(true);
-
-                } else {
-                    logger.trace("Showing preview for image \""+root.getPath()+"\"");
-                    ImageData imageData = new ImageData(root.getPath());
-                    ImageData imagePreviewData;
-                    
-                    int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
-                    int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
-                    
-                    if ( width+height == 0 )
-                    	imagePreviewData = imageData;
-                    else {
-                    	float scale = 0f;
-                    	if ( width == 0 ) { scale = (float)height/imageData.height ; width = (int)(imageData.width * scale); }
-                    	if ( height == 0 ) { scale = (float)width/imageData.width ; height = (int)(imageData.height * scale); }
-                    	logger.trace("resizing image to "+width+"x"+height+" (scale factor = "+scale+")");
-                    	imagePreviewData = imageData.scaledTo(width, height);
-                    }
-                    
-                    image = new Image(Display.getCurrent(), imagePreviewData);
-                    imagePreview.setImage(image);
-                    imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-                    
-                    btnSetIcon.setVisible(true);
-                    lblResize.setVisible(true);
-                    txtWidth.setVisible(true);
-                    lblX.setVisible(true);
-                    txtHeight.setVisible(true);
-                    imagePreview.setVisible(true);
-                }
-            }
-        });
+        refreshControls();            
     }
+    
+    private void showPreviewImage() {
+        showPreviewImage(0, 0);
+    }
+    
+    private void showPreviewImage(int forceWidth, int forceHeight) {
+        Image image = imagePreview.getImage();
+        if ( image != null ) {
+            imagePreview.setImage(null);
+            imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            compoPreview.setSize(compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            image.dispose();
+        }
+        
+        if ( fileTree.getItemCount() == 0 || fileTree.getSelection().length == 0 )
+            return;
+        
+        String filePath = (String)fileTree.getSelection()[0].getData("filePath");
+        if ( filePath == null )
+            return;
+        
+        logger.trace("Showing preview for image \""+filePath+"\"");
+        
+        ImageData imageData;
+        try {
+            imageData = new ImageData(filePath);
+        } catch (SWTException e) {
+            logger.error("Cannot get image from file \""+filePath+"\"", e);
+            return;
+        }
+        
+        ImageData imagePreviewData;
+        
+        if ( btnNoResize.getSelection() ) {
+            imagePreviewData = imageData;
+        } else if ( btnAutoResize.getSelection() ) {
+            Rectangle rect = elementEditPart.getFigure().getBounds();
+            int width = forceWidth != 0 ? forceWidth : rect.width;
+            int height = forceHeight != 0 ? forceHeight : rect.height;
+            imagePreviewData = imageData.scaledTo(width, height);
+        } else {
+            if ( txtWidth.getText().isEmpty() && txtHeight.getText().isEmpty() )
+                imagePreviewData = imageData;
+            else {
+                int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
+                int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
+                if ( width == 0 ) {
+                    float scale = (float)height/imageData.height;
+                    width = (int)(imageData.width * scale);
+                }
+                if ( height == 0 ) {
+                    float scale = (float)width/imageData.width;
+                    height = (int)(imageData.height * scale);
+                }
+                imagePreviewData = imageData.scaledTo(width, height);
+            }
+        }
+        
+        image = new Image(Display.getCurrent(), imagePreviewData);
+        imagePreview.setImage(image);
+        imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        compoPreview.setSize(compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        
+        compoPreview.setVisible(true);
+    }
+    
+    private Listener fileTreeSelectionListener = new Listener() {
+        public void handleEvent(Event e) {
+            Image image = imagePreview.getImage();
+            if ( image != null ) {
+                imagePreview.setImage(null);
+                imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+                compoPreview.setSize(compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+                image.dispose();
+            }
+            
+            compoPreview.setVisible(false);
+            
+            TreeItem treeItem = (TreeItem) e.item;
+            if (treeItem == null)
+                return;
+
+            if ( treeItem.getImage() == openedFolderImage ) {
+                treeItem.setImage(closedFolderImage);
+                treeItem.setExpanded(false);
+                return;
+            }
+
+            String filePathString = (String)treeItem.getData("filePath");
+            if ( filePathString == null )
+                return;
+            
+            File filePath = new File(filePathString);
+
+            if ( filePath.isDirectory() ) {
+                logger.trace("Getting folder content : \""+filePath.getPath()+"\"");
+                for ( TreeItem item : treeItem.getItems() ) {
+                    item.dispose();
+                }
+
+                treeItem.setImage(openedFolderImage);
+
+                File[] folders = filePath.listFiles(foldersFilter);
+                if (folders != null) {
+                    Arrays.sort(folders, nameComparator);
+                    for (int i = 0; i < folders.length; i++) {
+                        File folder = folders[i];
+                        logger.trace("found folder : "+Paths.get(folder.getName()));
+                        TreeItem subItem = new TreeItem(treeItem, SWT.NONE);
+                        subItem.setText(folder.getName());
+                        subItem.setImage(closedFolderImage);
+                        subItem.setData("filePath", folder.getPath());
+                        new TreeItem(subItem, SWT.NONE);         // to show the arrow in front of the folder
+                    }
+                }
+
+                File[] files = filePath.listFiles(imagesFilter);
+                if (files != null) {
+                    Arrays.sort(files, nameComparator);
+                    for (int i = 0; i < files.length; i++) {
+                        File file = files[i];
+                        logger.trace("found image : "+Paths.get(file.getName()));
+                        TreeItem subItem = new TreeItem(treeItem, SWT.NONE);
+                        subItem.setText(file.getName());
+                        subItem.setData("filePath", file.getPath());
+                    }
+                }
+                treeItem.setExpanded(true);
+
+            } else {
+                showPreviewImage();
+            }
+        }
+    };
 
     private FileFilter imagesFilter = new FileFilter() {
         @Override
         public boolean accept(File file) {
             if ( file.isFile() && (file.getName().lastIndexOf('.') != -1) )
                 return SpecializationPlugin.inArray(validImageSuffixes, (file.getName().substring(file.getName().lastIndexOf('.')+1)).toLowerCase());
-            logger.trace("fichier refus� : "+file.getName());
             return false;
         }
     };
@@ -400,29 +474,69 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         }
     };
     
+    /**
+     * This listener validates that the data entered in a Text Widget is numerical
+     */
     private VerifyListener numberOnlyVerifyListener = new VerifyListener() {
         @Override
         public void verifyText(VerifyEvent event) {
+            event.doit = false;
             try {
-                Integer.parseInt(event.text);
-                event.doit = true;
-            } catch (NumberFormatException e) {
-                event.doit = false;
-            }
+                if ( (event.character == '\b') || (Integer.parseInt(event.text) != -1) )
+                    event.doit = true;
+            } catch (NumberFormatException ignore) {}
         }
     };
-
-    /*
-     * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
-     */
-    private Adapter eAdapter = new AdapterImpl() {
+    
+    private SelectionListener resizeSelectionListener = new SelectionListener() {
         @Override
-        public void notifyChanged(Notification msg) {
-            Object feature = msg.getFeature();
-            // Model event (Undo/Redo and here!)
-            if(feature == IArchimatePackage.Literals.DIAGRAM_MODEL_ARCHIMATE_OBJECT__TYPE) {
-                refreshControls();
+        public void widgetSelected(SelectionEvent event) {
+            txtWidth.setEnabled(event.widget == btnCustomResize);
+            txtHeight.setEnabled(event.widget == btnCustomResize);
+            
+            showPreviewImage();
+        }
+
+        @Override
+        public void widgetDefaultSelected(SelectionEvent event) {
+            widgetSelected(event);
+        }
+    };
+    
+    private ModifyListener resizeModifyListener = new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent event) {
+            showPreviewImage();
+        }
+    };
+    
+    private SelectionListener setIconSelectionListener = new SelectionListener() {
+        @Override
+        public void widgetSelected(SelectionEvent event) {
+            String rootPath = (String)fileTree.getData("rootPath");
+            String filePath = (String)fileTree.getSelection()[0].getData("filePath");
+            if ( !filePath.startsWith(rootPath) )
+                logger.error("**************************************");
+            else {
+                StringBuilder iconName = new StringBuilder();
+                iconName.append(filePath.substring(rootPath.length()).replace("\\","/"));
+                int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
+                int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
+                if ( width+height != 0 ) {
+                    iconName.append(":");
+                    iconName.append(width);
+                    if ( height != 0 ) {
+                        iconName.append(":");
+                        iconName.append(height);
+                    }
+                }
+                txtIcon.setText(iconName.toString());
             }
+        }
+
+        @Override
+        public void widgetDefaultSelected(SelectionEvent event) {
+            widgetSelected(event);
         }
     };
 
@@ -448,31 +562,67 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         }
 
         refreshControls();
+        //TODO: show up the image in the fileTree if it exists
     }
 
     private void refreshControls() {
+        logger.trace("Refreshing controls");
+        
+        if ( elementEditPart == null )
+            return;
+        
         IFigure figure = elementEditPart.getFigure();
         IFigureDelegate figureDelegate = ((AbstractTextControlContainerFigure)figure).getFigureDelegate();
 
-        compoNoIcon.setVisible(!(figureDelegate instanceof RectangleFigureDelegate));
-        compoIcon.setVisible(figureDelegate instanceof RectangleFigureDelegate);
-    }
-    
-    @Override
-    public boolean shouldUseExtraSpace() {
-        return true;
-    }
-    
-    @Override
-    protected void setLayout(Composite parent) {
-        GridLayout layout = new GridLayout(1, false);
-        layout.marginTop = 10;
-        layout.marginHeight = 0;
-        layout.marginLeft = 3;
-        layout.marginBottom = 2; 
-        layout.verticalSpacing = 10;
-        parent.setLayout(layout);
+        if ( figureDelegate instanceof RectangleFigureDelegate ) {
+            compoNoIcon.setVisible(false);
+            compoIcon.setVisible(true);
+        } else {
+            compoNoIcon.setVisible(true);
+            compoIcon.setVisible(false);
+        }
         
-        parent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, shouldUseExtraSpace()));
+        if ( fileTree.getItemCount() == 0 ) {
+            compoPreview.setVisible(false);
+            
+            File root = null;
+            try {
+                String pluginsFilename = new File(com.archimatetool.editor.ArchiPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
+                root = new File(pluginsFilename+File.separator+".."+File.separator+"img");
+                root = new File(root.getCanonicalPath());
+                fileTree.setData("rootPath", root.getCanonicalPath());
+            } catch (IOException e) {
+                logger.error("Cannot get plugin's folder !", e);
+                return;
+            }
+    
+            logger.trace("Getting images folder content \""+root.getPath()+"\"");
+            File[] files;
+            try {
+                files = root.listFiles();
+            } catch (SecurityException e) {
+                SpecializationPlugin.popup(Level.ERROR, "Cannot read folder \""+root.getPath()+"\"", e);
+                return;
+            }
+    
+            if( files == null ) {
+                SpecializationPlugin.popup(Level.INFO, "No image folder has been defined.\n\nPlease define image folders on the preference page.");
+                return;
+            }
+    
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
+                logger.trace("found folder entry : "+Paths.get(file.getName()));
+                if ( Files.isSymbolicLink(Paths.get(file.getPath())) ) {
+                    logger.trace("   is a symbolic link. Adding to the file tree.");
+                    TreeItem newTreeItem = new TreeItem(fileTree, SWT.NONE);
+                    newTreeItem.setText(file.getName());
+                    newTreeItem.setImage(closedFolderImage);
+                    newTreeItem.setData("filePath", file.getPath());
+                    new TreeItem(newTreeItem, SWT.NONE);        // to show the arrow in front of the folder
+                }
+            }
+        } else
+            showPreviewImage();
     }
 }
