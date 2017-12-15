@@ -197,6 +197,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.left = new FormAttachment(lblIcon, 20);
         fd.right = new FormAttachment(0, 500);
         txtIcon.setLayoutData(fd);
+        txtIcon.addModifyListener(iconModifyListener);
 
         fileTree = new Tree(compoIcon, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         fileTree.setBackground(parent.getBackground());
@@ -516,19 +517,17 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             String rootPath = (String)fileTree.getData("rootPath");
             String filePath = (String)fileTree.getSelection()[0].getData("filePath");
             if ( !filePath.startsWith(rootPath) )
-                logger.error("**************************************");
+                logger.error("The file path does not start with the root path");
             else {
-                StringBuilder iconName = new StringBuilder();
-                iconName.append(filePath.substring(rootPath.length()).replace("\\","/"));
-                int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
-                int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
-                if ( width+height != 0 ) {
+                StringBuilder iconName = new StringBuilder(filePath.substring(rootPath.length()).replace("\\","/"));
+                if ( btnAutoResize.getSelection() ) {
+                    iconName.append(":0x0");
+                }
+                if ( btnCustomResize.getSelection() ) {
                     iconName.append(":");
-                    iconName.append(width);
-                    if ( height != 0 ) {
-                        iconName.append(":");
-                        iconName.append(height);
-                    }
+                    iconName.append(txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText()));
+                    iconName.append(":");
+                    iconName.append(txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText()));
                 }
                 txtIcon.setText(iconName.toString());
             }
@@ -537,6 +536,21 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         @Override
         public void widgetDefaultSelected(SelectionEvent event) {
             widgetSelected(event);
+        }
+    };
+    
+    private ModifyListener iconModifyListener = new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent event) {
+            Text text = (Text)event.widget;
+            String value = text.getText();
+            IArchimateElement concept = elementEditPart.getModel().getArchimateConcept();
+            if ( value.isEmpty() )
+                SpecializationPlugin.deleteProperty(concept, SpecializationPlugin.getIconPropertyName(concept));
+            else
+                SpecializationPlugin.setProperty(concept, SpecializationPlugin.getIconPropertyName(concept), value);
+            // we force the icon to refresh on the graphical object
+            elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
         }
     };
 
@@ -587,7 +601,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             
             File root = null;
             try {
-                String pluginsFilename = new File(com.archimatetool.editor.ArchiPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
+                String pluginsFilename = new File(com.archimatetool.editor.ui.ImageFactory.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
                 root = new File(pluginsFilename+File.separator+".."+File.separator+"img");
                 root = new File(root.getCanonicalPath());
                 fileTree.setData("rootPath", root.getCanonicalPath());
