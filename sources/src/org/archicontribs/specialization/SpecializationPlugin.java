@@ -814,6 +814,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     /**
      * Retrieves the icon name from the EObject properties
      * @param obj
+     * @param mustExist (not used at the moment, created for future use)
      */
     public static String getIconName(EObject obj, boolean mustExist) {
         if ( obj != null ) {
@@ -825,68 +826,112 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // first, we get the name of the property that will contains the name of the icon
+            String iconPropertyName = getIconPropertyName(obj);
             
-            // we check the element, the view and the model (in that order)
-            String iconPropertyName = getPropertyValue(concept, "replace icons property");
-            if ( iconPropertyName != null ) {
-                if ( iconPropertyName.length() == 0 ) {
-                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property is empty, we ignore it");
-                    iconPropertyName = null;
-                } else
-                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property = "+iconPropertyName);
-            }
-            if ( iconPropertyName == null ) {
-                EObject container = obj;
-                while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
-                    container = container.eContainer();
-                if ( container == null ) {
-                    // Should not happen, but just in case
-                    logger.error(getFullName(obj) + " is not in a container");
-                    return null; 
-                }
-                
-                String containerType = (container instanceof IFolder) ? "folder" : "view";
-                iconPropertyName = getPropertyValue(container, "replace icons property");
-                if ( iconPropertyName != null ) {
-                    if ( iconPropertyName.length() == 0 ) {
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property is empty, we ignore it");
-                        iconPropertyName = null;
-                    } else {
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property = "+iconPropertyName);
-                        iconPropertyName = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "replace icons property");
-                        if ( iconPropertyName != null )
-                            if ( iconPropertyName.length() == 0 ) {
-                                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property is empty, we ignore it");
-                                iconPropertyName = null;
-                            } else
-                                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property = "+iconPropertyName);
-                    }
-                }
-            }
-            if ( iconPropertyName == null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property defaults to \"icon\"");
-                iconPropertyName = "icon";
-            }
+            if ( iconPropertyName == null ) 
+                return null;
             
             // Now we get the icon filename from the property
-            for ( IProperty prop: ((IProperties)concept).getProperties() ) {
-                if ( SpecializationPlugin.areEqual(prop.getKey(), iconPropertyName) ) {
-                	if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": Replacing icon by "+ prop.getValue());
-                	
-                    String iconName = "/img/"+prop.getValue();
-
-                    if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon file \"" + iconName + "\" has been found");
-                        return iconName;
-                    }
-                    logger.error(getFullName(obj) + ": icon file \"" + iconName + "\" has not been found");
-                    // we continue the loop in case there is another "icon" property
-                }
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon not replaced");
+            String iconName = getPropertyValue(obj, iconPropertyName);
+            logger.trace(getFullName(obj)+" : property "+iconPropertyName+" = "+iconName);
+            if ( iconName == null )
+                return null;
+            
+            iconName = "/img/"+iconName;
+            if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon file \"" + iconName + "\" has been found");
+                return iconName;
             }
+            logger.error(getFullName(obj) + ": icon file \"" + iconName + "\" has not been found");
         } else
         	logger.error("got null object parameter");
         return null;
+    }
+    
+    
+    /**
+     * Sets the icon name into the EObject properties
+     * @param obj
+     * @param iconName
+     */
+    public static void setIconName(EObject obj, String iconName) {
+        if ( obj != null ) {
+            EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+            if ( !(concept instanceof IProperties) ) {
+                // Should not happen, but just in case
+                logger.error(getFullName(obj) + " does not have properties");
+                return;
+            }
+            
+            // first, we get the name of the property that will contains the name of the icon
+            
+            // we check the element, the view and the model (in that order)
+            String iconPropertyName = getIconPropertyName(obj);
+            if ( iconPropertyName == null )
+                return;
+            
+            // Now we set the icon filename into the property
+            logger.trace(getFullName(obj)+" : setting property "+iconPropertyName+" = "+iconName);
+            setProperty(obj, iconPropertyName, iconName);
+        }
+    }
+    
+    /**
+     * Gets the name of the property that should contain the icon name
+     * @param obj
+     * @return
+     */
+    public static String getIconPropertyName(EObject obj) {
+        EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+        if ( !(concept instanceof IProperties) ) {
+            // Should not happen, but just in case
+            logger.error(getFullName(obj) + " does not have properties");
+            return null;
+        }
+
+        // we check the element, the view and the model (in that order)
+        String iconPropertyName = getPropertyValue(concept, "replace icons property");
+        if ( iconPropertyName != null ) {
+            if ( iconPropertyName.length() == 0 ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property is empty, we ignore it");
+                iconPropertyName = null;
+            } else
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property = "+iconPropertyName);
+        }
+        if ( iconPropertyName == null ) {
+            EObject container = obj;
+            while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
+                container = container.eContainer();
+            if ( container == null ) {
+                // Should not happen, but just in case
+                logger.error(getFullName(obj) + " is not in a container");
+                return null; 
+            }
+            
+            String containerType = (container instanceof IFolder) ? "folder" : "view";
+            iconPropertyName = getPropertyValue(container, "replace icons property");
+            if ( iconPropertyName != null ) {
+                if ( iconPropertyName.length() == 0 ) {
+                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property is empty, we ignore it");
+                    iconPropertyName = null;
+                } else {
+                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property = "+iconPropertyName);
+                    iconPropertyName = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "replace icons property");
+                    if ( iconPropertyName != null )
+                        if ( iconPropertyName.length() == 0 ) {
+                            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property is empty, we ignore it");
+                            iconPropertyName = null;
+                        } else
+                            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property = "+iconPropertyName);
+                }
+            }
+        }
+        if ( iconPropertyName == null ) {
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property defaults to \"icon\"");
+            iconPropertyName = "icon";
+        }
+        
+        return iconPropertyName;
     }
     
     public static boolean mustReplaceLabel(EObject obj) {
