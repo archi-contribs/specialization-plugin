@@ -700,7 +700,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             return null;
         }
         
-        for ( IProperty property:((IProperties)obj).getProperties() ) {
+        for ( IProperty property:((IProperties)concept).getProperties() ) {
             if ( areEqual(property.getKey(), propertyName) ) {
             	// we return the value of the first required key
                 return property.getValue();
@@ -723,7 +723,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         
     	boolean mustCreateProperty = true;
     	
-        for ( IProperty property:((IProperties)obj).getProperties() ) {
+        for ( IProperty property:((IProperties)concept).getProperties() ) {
             if ( areEqual(property.getKey(), propertyName) ) {
                 property.setValue(propertyValue);
                 // we change all properties that have the required key
@@ -735,7 +735,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	        IProperty property = IArchimateFactory.eINSTANCE.createProperty();
 	        property.setKey(propertyName);
 	        property.setValue(propertyValue);
-	        ((IProperties)obj).getProperties().add(property);
+	        ((IProperties)concept).getProperties().add(property);
         }
     }
     
@@ -862,39 +862,40 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             
             if ( mustExpand ) {
                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding the icon name");
-                // expanding the icon names means that:
-                //    1. we replace the ${xxx} variables by their corresponding values
                 try {
+                    // expanding the icon names means that:
+                    //    1. we replace the ${xxx} variables by their corresponding values
                     iconName = SpecializationVariable.expand(iconName, obj).trim();
+
+	                //    2. we get the folder name where the icon file stands from the preferences store
+	                String[] parts;
+	                String folderPart;
+	                String filenamePart;
+	                if ( iconName.startsWith("/") ) {
+	                   parts = iconName.split("/", 3);
+	                   folderPart = parts[1];
+	                   filenamePart = parts[2];
+	                } else {
+	                    parts = iconName.split("/", 2);
+	                    folderPart = parts[0];
+	                    filenamePart = parts[1];
+	                }
+	                
+	                int lines = preferenceStore.getInt(SpecializationPlugin.storeFolderPrefix+"_#");
+	                
+	                iconName = null;
+	                for (int line = 0; line <lines; line++) {
+	                    if ( folderPart.equals(preferenceStore.getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line))) ) {
+	                        iconName = preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)) + "/" + filenamePart;
+	                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding folder "+folderPart+" to "+preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)));
+	                        break;
+	                    }
+	                }
+	                if ( iconName == null && logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": folder \""+folderPart+"\" not found in preferences");
                 } catch (Exception e) {
                     logger.error(getFullName(obj) + ": Failed to expand icon name", e);
                     return null;
                 }
-                //    2. we get the folder name where the icon file stands from the preferences store
-                String[] parts;
-                String folderPart;
-                String filenamePart;
-                if ( iconName.startsWith("/") ) {
-                   parts = iconName.split("/", 3);
-                   folderPart = parts[1];
-                   filenamePart = parts[2];
-                } else {
-                    parts = iconName.split("/", 2);
-                    folderPart = parts[0];
-                    filenamePart = parts[1];
-                }
-                
-                int lines = preferenceStore.getInt(SpecializationPlugin.storeFolderPrefix+"_#");
-                
-                iconName = null;
-                for (int line = 0; line <lines; line++) {
-                    if ( folderPart.equals(preferenceStore.getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line))) ) {
-                        iconName = preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)) + "/" + filenamePart;
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding folder "+folderPart+" to "+preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)));
-                        break;
-                    }
-                }
-                if ( iconName == null && logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": folder \""+folderPart+"\" not found in preferences");
             }
             
             //TODO : permettre de spécifier la localisation de l'image (top, bottom, left, center, ...)
