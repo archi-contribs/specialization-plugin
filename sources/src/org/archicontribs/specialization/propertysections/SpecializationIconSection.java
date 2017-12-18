@@ -8,7 +8,6 @@ package org.archicontribs.specialization.propertysections;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Arrays;
@@ -65,6 +64,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private Composite compoNoIcon;
     private Text txtIconName;
     private Text txtIconSize;
+    private Text txtIconLocation;
     private Tree fileTree;
     private Composite compoPreview;
     private Button btnNoResize;
@@ -191,14 +191,6 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(0, 10);
         fd.left = new FormAttachment(0, 10);
         lblIconName.setLayoutData(fd);
-
-        txtIconName = new Text(compoIcon, SWT.BORDER);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIconName, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblIconName, 25);
-        fd.right = new FormAttachment(0, 500);
-        txtIconName.setLayoutData(fd);
-        txtIconName.addModifyListener(iconModifyListener);
         
         Label lblIconSize = new Label(compoIcon, SWT.NONE);
         lblIconSize.setText("Icon size:");
@@ -208,22 +200,49 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(lblIconName, 10);
         fd.left = new FormAttachment(0, 10);
         lblIconSize.setLayoutData(fd);
-        
+
+        Label lblIconLocation = new Label(compoIcon, SWT.NONE);
+        lblIconLocation.setText("Icon location:");
+        lblIconLocation.setForeground(parent.getForeground());
+        lblIconLocation.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIconSize, 10);
+        fd.left = new FormAttachment(0, 10);
+        lblIconLocation.setLayoutData(fd);
+
+        txtIconName = new Text(compoIcon, SWT.BORDER);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIconName, 0, SWT.CENTER);
+        fd.left = new FormAttachment(lblIconLocation, 5);
+        fd.right = new FormAttachment(0, 500);
+        txtIconName.setLayoutData(fd);
+        txtIconName.addModifyListener(iconModifyListener);
+
         txtIconSize = new Text(compoIcon, SWT.BORDER);
         fd = new FormData();
         fd.top = new FormAttachment(lblIconSize, 0, SWT.CENTER);
-        fd.left = new FormAttachment(txtIconName, 0, SWT.LEFT);
+        fd.left = new FormAttachment(lblIconLocation, 5);
         fd.right = new FormAttachment(0, 200);
         txtIconSize.setLayoutData(fd);
         txtIconSize.addModifyListener(iconSizeModifyListener);
 
+        txtIconLocation = new Text(compoIcon, SWT.BORDER);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIconLocation, 0, SWT.CENTER);
+        fd.left = new FormAttachment(lblIconLocation, 5);
+        fd.right = new FormAttachment(0, 200);
+        txtIconLocation.setLayoutData(fd);
+        txtIconLocation.addModifyListener(iconLocationModifyListener);
+
         fileTree = new Tree(compoIcon, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         fileTree.setBackground(parent.getBackground());
         fileTree.addListener(SWT.Selection, fileTreeSelectionListener);
+        fileTree.addListener(SWT.Expand, fileTreeSelectionListener);
+        fileTree.addListener(SWT.Collapse, fileTreeSelectionListener);
 
         fd = new FormData();
-        fd.top = new FormAttachment(lblIconSize, 10);
-        fd.left = new FormAttachment( 0, 10);
+        fd.top = new FormAttachment(txtIconLocation, 10);
+        fd.left = new FormAttachment(0, 10);
         fd.right = new FormAttachment(txtIconName, 0, SWT.RIGHT);
         fd.bottom = new FormAttachment(0, 220);
         fileTree.setLayoutData(fd);
@@ -352,17 +371,17 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         if ( fileTree.getItemCount() == 0 || fileTree.getSelection().length == 0 )
             return;
         
-        String filePath = (String)fileTree.getSelection()[0].getData("filePath");
-        if ( filePath == null )
+        String location = (String)fileTree.getSelection()[0].getData("location");
+        if ( location == null )
             return;
         
-        logger.trace("Showing preview for image \""+filePath+"\"");
+        logger.trace("Showing preview for image \""+location+"\"");
         
         ImageData imageData;
         try {
-            imageData = new ImageData(filePath);
+            imageData = new ImageData(location);
         } catch (SWTException e) {
-            logger.error("Cannot get image from file \""+filePath+"\"", e);
+            logger.error("Cannot get image from file \""+location+"\"", e);
             return;
         }
         
@@ -426,21 +445,21 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
                 return;
             }
 
-            String filePathString = (String)treeItem.getData("filePath");
-            if ( filePathString == null )
+            String location = (String)treeItem.getData("location");
+            if ( location == null )
                 return;
             
-            File filePath = new File(filePathString);
+            File file = new File(location);
 
-            if ( filePath.isDirectory() ) {
-                logger.trace("Getting folder content : \""+filePath.getPath()+"\"");
+            if ( file.isDirectory() ) {
+                logger.trace("Getting folder content : \""+file.getPath()+"\"");
                 for ( TreeItem item : treeItem.getItems() ) {
                     item.dispose();
                 }
 
                 treeItem.setImage(openedFolderImage);
 
-                File[] folders = filePath.listFiles(foldersFilter);
+                File[] folders = file.listFiles(foldersFilter);
                 if (folders != null) {
                     Arrays.sort(folders, nameComparator);
                     for (int i = 0; i < folders.length; i++) {
@@ -449,20 +468,20 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
                         TreeItem subItem = new TreeItem(treeItem, SWT.NONE);
                         subItem.setText(folder.getName());
                         subItem.setImage(closedFolderImage);
-                        subItem.setData("filePath", folder.getPath());
+                        subItem.setData("location", folder.getPath());
                         new TreeItem(subItem, SWT.NONE);         // to show the arrow in front of the folder
                     }
                 }
 
-                File[] files = filePath.listFiles(imagesFilter);
+                File[] files = file.listFiles(imagesFilter);
                 if (files != null) {
                     Arrays.sort(files, nameComparator);
                     for (int i = 0; i < files.length; i++) {
-                        File file = files[i];
-                        logger.trace("found image : "+Paths.get(file.getName()));
+                        File f = files[i];
+                        logger.trace("found image : "+Paths.get(f.getName()));
                         TreeItem subItem = new TreeItem(treeItem, SWT.NONE);
-                        subItem.setText(file.getName());
-                        subItem.setData("filePath", file.getPath());
+                        subItem.setText(f.getName());
+                        subItem.setData("location", f.getPath());
                     }
                 }
                 treeItem.setExpanded(true);
@@ -535,12 +554,18 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private SelectionListener setIconSelectionListener = new SelectionListener() {
         @Override
         public void widgetSelected(SelectionEvent event) {
-            String rootPath = (String)fileTree.getData("rootPath");
-            String filePath = (String)fileTree.getSelection()[0].getData("filePath");
-            if ( !filePath.startsWith(rootPath) )
-                logger.error("The file path does not start with the root path");
-            else {
-                txtIconName.setText(filePath.substring(rootPath.length()).replace("\\","/"));
+        	TreeItem selectedTreeItem = fileTree.getSelection()[0];
+        	TreeItem rootTreeItem = selectedTreeItem;
+        	while ( rootTreeItem.getParentItem() != null )
+        		rootTreeItem = rootTreeItem.getParentItem();
+            String rootLocation = (String)rootTreeItem.getData("location");
+            String location = (String)selectedTreeItem.getData("location");
+            if ( !location.startsWith(rootLocation) ) {
+                logger.error("The file location does not start with the root location");
+                logger.error("   file location = " + location);
+                logger.error("   root location = " + rootLocation);
+            } else {
+                txtIconName.setText("/"+(String)rootTreeItem.getData("folder")+"/"+location.substring(rootLocation.length()).replace("\\","/"));
                 
                 if ( btnAutoResize.getSelection() )
                     txtIconSize.setText("auto");
@@ -595,6 +620,24 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
         }
     };
+    
+    /**
+     * Called when the icon location is changed in the txtIconLocation text widget
+     */
+    private ModifyListener iconLocationModifyListener = new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent event) {
+            Text text = (Text)event.widget;
+            String value = text.getText();
+            IArchimateElement concept = elementEditPart.getModel().getArchimateConcept();
+            if ( value.isEmpty() )
+                SpecializationPlugin.deleteProperty(concept, "icon location");
+            else
+                SpecializationPlugin.setProperty(concept, "icon location", value);
+            // we force the icon to refresh on the graphical object
+            elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
+        }
+    };
 
     @Override
     protected Adapter getECoreAdapter() {
@@ -638,47 +681,43 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             compoIcon.setVisible(false);
         }
         
-        if ( fileTree.getItemCount() == 0 ) {
-            compoPreview.setVisible(false);
-            
-            File root = null;
+        txtIconName.removeModifyListener(iconModifyListener);
+        String iconName = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "icon");
+        txtIconName.setText(iconName == null ? "" : iconName);
+        txtIconName.addModifyListener(iconModifyListener);
+        
+        txtIconSize.removeModifyListener(iconSizeModifyListener);
+        String iconSize = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "icon size");
+        txtIconSize.setText(iconSize == null ? "" : iconSize);
+        txtIconSize.addModifyListener(iconSizeModifyListener);
+        
+        txtIconLocation.removeModifyListener(iconLocationModifyListener);
+        String iconLocation = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "icon location");
+        txtIconLocation.setText(iconLocation == null ? "" : iconLocation);
+        txtIconLocation.addModifyListener(iconLocationModifyListener);
+        
+        fileTree.removeAll();
+        
+        int lines = SpecializationPlugin.INSTANCE.getPreferenceStore().getInt(SpecializationPlugin.storeFolderPrefix+"_#");
+        
+        if( lines == 0 ) {
+            SpecializationPlugin.popup(Level.INFO, "No image folder has been defined.\n\nPlease define image folders on the preference page.");
+            return;
+        }
+        
+        for (int line = 0; line <lines; line++) {
+        	String folder = SpecializationPlugin.INSTANCE.getPreferenceStore().getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line));
+        	String location = SpecializationPlugin.INSTANCE.getPreferenceStore().getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line));
+            TreeItem rootItem = new TreeItem(fileTree, SWT.NONE);
+            rootItem.setText(folder);
+            rootItem.setImage(closedFolderImage);
             try {
-                String pluginsFilename = new File(com.archimatetool.editor.ui.ImageFactory.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
-                root = new File(pluginsFilename+File.separator+".."+File.separator+"img");
-                root = new File(root.getCanonicalPath());
-                fileTree.setData("rootPath", root.getCanonicalPath());
-            } catch (IOException e) {
-                logger.error("Cannot get plugin's folder !", e);
-                return;
-            }
-    
-            logger.trace("Getting images folder content \""+root.getPath()+"\"");
-            File[] files;
-            try {
-                files = root.listFiles();
-            } catch (SecurityException e) {
-                SpecializationPlugin.popup(Level.ERROR, "Cannot read folder \""+root.getPath()+"\"", e);
-                return;
-            }
-    
-            if( files == null ) {
-                SpecializationPlugin.popup(Level.INFO, "No image folder has been defined.\n\nPlease define image folders on the preference page.");
-                return;
-            }
-    
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
-                logger.trace("found folder entry : "+Paths.get(file.getName()));
-                if ( Files.isSymbolicLink(Paths.get(file.getPath())) ) {
-                    logger.trace("   is a symbolic link. Adding to the file tree.");
-                    TreeItem newTreeItem = new TreeItem(fileTree, SWT.NONE);
-                    newTreeItem.setText(file.getName());
-                    newTreeItem.setImage(closedFolderImage);
-                    newTreeItem.setData("filePath", file.getPath());
-                    new TreeItem(newTreeItem, SWT.NONE);        // to show the arrow in front of the folder
-                }
-            }
-        } else
-            showPreviewImage();
+				rootItem.setData("location", new File(location).getCanonicalPath());
+				rootItem.setData("folder", folder);
+			} catch (IOException e) {
+				logger.error("Cannot access folder "+location);
+				rootItem.dispose();
+			}
+        }    
     }
 }
