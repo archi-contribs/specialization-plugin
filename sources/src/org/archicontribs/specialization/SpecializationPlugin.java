@@ -897,11 +897,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 if ( iconName == null && logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": folder \""+folderPart+"\" not found in preferences");
             }
             
-            //TODO : stocker l'image dans un cache pour ne pas avoir à le recalculer tout le temps
-            //TODO : utiliser les méthodes d'Archi pour redimentionner l'image (vraiment mieux de passer par un GC ???)
-            //TODO : permettre de spécifier la marge (10 par défaut !!!)
-            //TODO : permettre de spécifier la localisation de l'image (top, bottom, left, center, ...)
-            //TODO : remplacer runtimeException
+            //TODO : permettre de spÃ©cifier la localisation de l'image (top, bottom, left, center, ...)
             
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon name = \"" + iconName + "\"");
             return iconName;
@@ -956,7 +952,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 //    we replace the ${xxx} variables by their corresponding values
                 try {
                     iconSize = SpecializationVariable.expand(iconSize, obj).trim();
-                } catch (RuntimeException e) {
+                } catch (Exception e) {
                     logger.error(getFullName(obj) + ": Failed to expand icon size", e);
                     return null;
                 }
@@ -996,11 +992,16 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     }
     
     /**
+     * 
+     */
+    private static Map<String, Image>imagesCache = new HashMap<String, Image>();
+    
+    /**
      * Gets the Image from the icon name and icon size from the EObject properties
      * @param obj
      * @return
      */
-    public static Image getImage(Display display, EObject obj) {
+    public static Image getImage(EObject obj) {
         if ( !(obj instanceof IDiagramModelArchimateObject) ) {
             logger.error(getFullName(obj)+": Object is not an IDiagramModelArchimateObject");
             return null;
@@ -1011,48 +1012,70 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             return null;
         
         ImageData sourceImageData;
+        Image image = null;
+        int width;
+        int height;
+        
+        String imageSize = getIconSize(obj, true);
+        if ( imageSize == null || imageSize.isEmpty() ) {
+        	if ( imagesCache.containsKey(imageFilename) )
+        		return imagesCache.get(imageFilename);
+        }
+
         try {
             sourceImageData = new ImageData(imageFilename);
         } catch (SWTException e) {
-            logger.error(getFullName(obj)+": Cannot get image from file \""+imageFilename+"\"", e);
+            logger.error(getFullName(obj)+": Cannot get image data from file \""+imageFilename+"\"", e);
             return null;
         }
         
-        String imageSize = getIconSize(obj, true);
-        if ( imageSize == null || imageSize.isEmpty() )
-            return new Image(display, sourceImageData);
-        
-        int width;
-        int height;
-        if ( imageSize.equalsIgnoreCase("auto") ) {
-            width = ((IDiagramModelArchimateObject)obj).getBounds().getWidth();
-            height = ((IDiagramModelArchimateObject)obj).getBounds().getHeight();
-        } else {
-            try {
-                String[] parts = imageSize.split("x");
-                width = Integer.parseInt(parts[0]);
-                height = Integer.parseInt(parts[1]);
-            } catch ( Exception ign ) {
-                width = 0;
-                height = 0;
-            };
+        try {
+        	image = new Image(display, sourceImageData);
+        	imagesCache.put(imageFilename, image);
+        } catch (Exception e) {
+            logger.error(getFullName(obj)+": Cannot create image from file \""+imageFilename+"\"", e);
+            return null;
         }
         
-        if ( width <= 0 && height <= 0 )  // in case of error on the size, we return the image unresized
-            return new Image(display, sourceImageData);
-        
-        if ( width != 0 & width < 10 ) width = 10;
-        if ( height!= 0 & height < 10 ) height = 10;
-                
-        if ( width == 0 ) {
-            float scale = (float)height/sourceImageData.height;
-            width = (int)(sourceImageData.width * scale);
-        } if ( height == 0 ) {
-            float scale = (float)width/sourceImageData.width;
-            height = (int)(sourceImageData.height * scale);
+        if ( imageSize != null && !imageSize.isEmpty() ) {
+	        if ( imageSize.equalsIgnoreCase("auto") ) {
+	            width = ((IDiagramModelArchimateObject)obj).getBounds().getWidth();
+	            height = ((IDiagramModelArchimateObject)obj).getBounds().getHeight();
+	        } else {
+	            try {
+	                String[] parts = imageSize.split("x");
+	                width = Integer.parseInt(parts[0]);
+	                height = Integer.parseInt(parts[1]);
+	            } catch ( Exception ign ) {
+	                width = 0;
+	                height = 0;
+	            };
+	        }
+	        
+	        if ( width <= 0 && height <= 0 )  // in case of error on the size, we return the image unresized
+	            return new Image(display, sourceImageData);
+	        
+	        if ( width != 0 & width < 10 ) width = 10;
+	        if ( height!= 0 & height < 10 ) height = 10;
+	                
+	        if ( width == 0 ) {
+	            float scale = (float)height/sourceImageData.height;
+	            width = (int)(sourceImageData.width * scale);
+	        } if ( height == 0 ) {
+	            float scale = (float)width/sourceImageData.width;
+	            height = (int)(sourceImageData.height * scale);
+	        }
+	
+	        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj)+": resizing image to "+width+" x "+height);
+	        
+	    	if ( imagesCache.containsKey(imageFilename+":"+width+"x"+height) )
+	    		image = imagesCache.get(imageFilename+":"+width+"x"+height);
+	    	else {
+	    		image = new Image(display, sourceImageData.scaledTo(width, height));		// TODO : use GC for better quality
+	    		imagesCache.put(imageFilename+":"+width+"x"+height, image);
+	    	}
         }
-        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj)+": resizing image to "+width+" x "+height);
-        return new Image(display, sourceImageData.scaledTo(width, height));
+        return image;
     }
     
     public static boolean mustReplaceLabel(EObject obj) {
