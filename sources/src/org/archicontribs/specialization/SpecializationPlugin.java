@@ -50,10 +50,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.archimatetool.editor.ui.IArchiImages;
 import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimateModelObject;
+import com.archimatetool.model.IBounds;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IDiagramModelConnection;
@@ -840,9 +840,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     /**
      * Retrieves the icon name from the EObject properties
      * @param obj
-     * @param mustExist (not used at the moment, created for future use)
+     * @param mustExpand set to true to expand the variables and convert theicon name to an image filename from the folders set in the preferences page
      */
-    public static String getIconName(EObject obj, boolean mustExist) {
+    public static String getIconName(EObject obj, boolean mustExpand) {
         if ( obj != null ) {
             EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
             if ( !(concept instanceof IProperties) ) {
@@ -851,29 +851,49 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 return null;
             }
             
-            // first, we get the name of the property that will contains the name of the icon
-            String iconPropertyName = getIconPropertyName(concept);
-            
-            if ( iconPropertyName == null ) 
-                return null;
-            
-            // Now we get the icon filename from the property
-            String iconName = getPropertyValue(concept, iconPropertyName);
-            logger.trace(getFullName(obj)+" : property "+iconPropertyName+" = "+iconName);
+            // we get the icon filename from the property
+            String iconName = getPropertyValue(concept, "icon");
+            logger.trace(getFullName(obj)+" : property icon = "+iconName);
             if ( iconName == null )
                 return null;
             
-            iconName = "/img/"+iconName;
-            if ( IArchiImages.ImageFactory.getImage(iconName) != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon file is \"" + iconName + "\"");
-                return iconName;
+            if ( mustExpand ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding the icon name");
+                // expanding the icon names means that:
+                //    1. we replace the ${xxx} variables by their corresponding values
+                iconName = SpecializationVariable.expand(iconName, obj).trim();
+                
+                //    2. we get the folder name where the icon file stands from the preferences store
+                String[] parts;
+                String folderPart;
+                String filenamePart;
+                if ( iconName.startsWith("/") ) {
+                   parts = iconName.split("/", 3);
+                   folderPart = parts[1];
+                   filenamePart = parts[2];
+                } else {
+                    parts = iconName.split("/", 2);
+                    folderPart = parts[0];
+                    filenamePart = parts[1];
+                }
+                
+                int lines = preferenceStore.getInt(SpecializationPlugin.storeFolderPrefix+"_#");
+                
+                iconName = null;
+                for (int line = 0; line <lines; line++) {
+                    if ( folderPart.equals(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line)) ) {
+                        iconName = preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)) + "/" + filenamePart;
+                        break;
+                    }
+                }
             }
-            logger.error(getFullName(obj) + ": icon file \"" + iconName + "\" has not been found");
+            
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon name = \"" + iconName + "\"");
+            return iconName;
         } else
         	logger.error("got null object parameter");
         return null;
     }
-    
     
     /**
      * Sets the icon name into the EObject properties
@@ -889,75 +909,70 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 return;
             }
             
-            // first, we get the name of the property that will contains the name of the icon
-            
-            // we check the element, the view and the model (in that order)
-            String iconPropertyName = getIconPropertyName(concept);
-            if ( iconPropertyName == null )
-                return;
-            
-            // Now we set the icon filename into the property
-            logger.trace(getFullName(obj)+" : setting property "+iconPropertyName+" = "+iconName);
-            setProperty(concept, iconPropertyName, iconName);
+            // we set the icon name into the property
+            logger.trace(getFullName(obj)+" : setting property icon = "+iconName);
+            setProperty(concept, "icon", iconName);
         }
     }
     
     /**
-     * Gets the name of the property that should contain the icon name
+     * Retrieves the icon size from the EObject properties
      * @param obj
-     * @return
+     * @param mustExpand set to true to expand the variables and convert theicon name to an image filename from the folders set in the preferences page
      */
-    public static String getIconPropertyName(EObject obj) {
-        EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
-        if ( !(concept instanceof IProperties) ) {
-            // Should not happen, but just in case
-            logger.error(getFullName(obj) + " does not have properties");
-            return null;
-        }
-
-        // we check the element, the view and the model (in that order)
-        String iconPropertyName = getPropertyValue(concept, "replace icons property");
-        if ( iconPropertyName != null ) {
-            if ( iconPropertyName.length() == 0 ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property is empty, we ignore it");
-                iconPropertyName = null;
-            } else
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property = "+iconPropertyName);
-        }
-        if ( iconPropertyName == null ) {
-            EObject container = obj;
-            while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
-                container = container.eContainer();
-            if ( container == null ) {
+    public static String getIconSize(EObject obj, boolean mustExpand) {
+        if ( obj != null ) {
+            EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+            if ( !(concept instanceof IProperties) ) {
                 // Should not happen, but just in case
-                logger.error(getFullName(obj) + " is not in a container");
-                return null; 
+                logger.error(getFullName(obj) + " does not have properties");
+                return null;
+            }
+
+            // we get the icon size from the property
+            String iconSize = getPropertyValue(concept, "icon size");
+            logger.trace(getFullName(obj)+" : property icon size = "+iconSize);
+            if ( iconSize == null )
+                return null;
+            
+            if ( mustExpand ) {
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding the icon size");
+                // expanding the icon names means that:
+                //    we replace the ${xxx} variables by their corresponding values
+                iconSize = SpecializationVariable.expand(iconSize, obj).trim();
             }
             
-            String containerType = (container instanceof IFolder) ? "folder" : "view";
-            iconPropertyName = getPropertyValue(container, "replace icons property");
-            if ( iconPropertyName != null ) {
-                if ( iconPropertyName.length() == 0 ) {
-                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property is empty, we ignore it");
-                    iconPropertyName = null;
-                } else {
-                    if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+"'s replace icons property = "+iconPropertyName);
-                    iconPropertyName = getPropertyValue(((IArchimateModelObject)obj).getArchimateModel(), "replace icons property");
-                    if ( iconPropertyName != null )
-                        if ( iconPropertyName.length() == 0 ) {
-                            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property is empty, we ignore it");
-                            iconPropertyName = null;
-                        } else
-                            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model's replace icons property = "+iconPropertyName);
+            if ( iconSize.equalsIgnoreCase("auto") ) {
+                if ( obj instanceof IDiagramModelArchimateObject ) {
+                    IBounds bounds = ((IDiagramModelArchimateObject)obj).getBounds();
+                    iconSize = String.valueOf(bounds.getWidth())+"x"+String.valueOf(bounds.getHeight());
+                    logger.trace(getFullName(obj)+" : icon size calculated to "+iconSize);
                 }
             }
+            return iconSize;
+        } else
+            logger.error("got null object parameter");
+        return null;
+    }
+    
+    /**
+     * Sets the icon size into the EObject properties
+     * @param obj
+     * @param iconSize
+     */
+    public static void setIconSize(EObject obj, String iconSize) {
+        if ( obj != null ) {
+            EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+            if ( !(concept instanceof IProperties) ) {
+                // Should not happen, but just in case
+                logger.error(getFullName(obj) + " does not have properties");
+                return;
+            }
+            
+            // we set the icon size into the property
+            logger.trace(getFullName(obj)+" : setting property icon size = "+iconSize);
+            setProperty(concept, "icon size", iconSize);
         }
-        if ( iconPropertyName == null ) {
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": replace icons property defaults to \"icon\"");
-            iconPropertyName = "icon";
-        }
-        
-        return iconPropertyName;
     }
     
     public static boolean mustReplaceLabel(EObject obj) {
