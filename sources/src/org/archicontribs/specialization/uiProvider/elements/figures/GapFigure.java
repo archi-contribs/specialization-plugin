@@ -32,8 +32,40 @@ public class GapFigure extends com.archimatetool.editor.diagram.figures.elements
         if ( image == null )
             logger.error("Image not found");
         else {
-            int x = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
-            int y = bounds.y + SpecializationPlugin.getIconMargin();
+        	String iconLocation = SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon location");
+            
+        	int defaultX = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
+            int defaultY = bounds.y + SpecializationPlugin.getIconMargin();
+			int x;
+			int y;
+			
+        	if ( iconLocation != null && !iconLocation.isEmpty() ) {
+        		if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(getDiagramModelObject())+": found icon location = "+iconLocation);
+        		String[] parts = iconLocation.split(",");
+        		try {
+        			if ( parts[0].equals("center") )
+        				x = bounds.x+(bounds.width-image.getBounds().width)/2;
+        			else if ( Integer.parseInt(parts[0]) >= 0 )
+        				x = bounds.x + Integer.parseInt(parts[0]);
+        			else
+        				x = bounds.x + bounds.width - image.getBounds().width + Integer.parseInt(parts[0]);
+        			
+        			if ( parts[1].equals("center") )
+        				y = bounds.y+(bounds.height-image.getBounds().height)/2;
+        			else if ( Integer.parseInt(parts[1]) >= 0 )
+        				y = bounds.y + Integer.parseInt(parts[1]);
+        			else
+        				y = bounds.y + bounds.height - image.getBounds().height + Integer.parseInt(parts[1]);
+        		} catch ( Exception e) {
+        			logger.error("Malformed location. Shoule be under the form \"x,y\"");
+        			x=defaultX;
+        			y=defaultY;
+        		}
+        	} else {
+    			x=defaultX;
+    			y=defaultY;
+        	}
+			if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(getDiagramModelObject())+": setting image location to "+(x-bounds.x)+","+(y-bounds.y));
             graphics.drawImage(image, new Point(x, y));
         }
     }
