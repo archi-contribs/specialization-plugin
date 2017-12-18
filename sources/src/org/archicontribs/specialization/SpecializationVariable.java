@@ -4,8 +4,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.emf.ecore.EObject;
 import com.archimatetool.model.IArchimateModel;
@@ -20,6 +18,8 @@ import com.archimatetool.model.IIdentifier;
 import com.archimatetool.model.INameable;
 import com.archimatetool.model.IProperties;
 import com.archimatetool.model.IProperty;
+import com.florianingerl.util.regex.Matcher;
+import com.florianingerl.util.regex.Pattern;
 
 public class SpecializationVariable {
     private static final SpecializationLogger logger = new SpecializationLogger(SpecializationVariable.class);
