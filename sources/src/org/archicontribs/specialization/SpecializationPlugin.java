@@ -693,18 +693,17 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         if ( obj == null )
             return null;
         
-        if ( ! (obj instanceof IProperties) ) {
-            logger.error(getFullName(obj)+" has not got properties");
-            new Exception().printStackTrace();
+        EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+        if ( !(concept instanceof IProperties) ) {
+            // Should not happen, but just in case
+            logger.error(getFullName(obj) + " does not have properties");
             return null;
         }
         
-        if ( obj != null && obj instanceof IProperties) {
-            for ( IProperty property:((IProperties)obj).getProperties() ) {
-                if ( areEqual(property.getKey(), propertyName) ) {
-                	// we return the value of the first required key
-                    return property.getValue();
-                }
+        for ( IProperty property:((IProperties)obj).getProperties() ) {
+            if ( areEqual(property.getKey(), propertyName) ) {
+            	// we return the value of the first required key
+                return property.getValue();
             }
         }
         
@@ -715,8 +714,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         if ( obj == null )
             return;
         
-        if ( ! (obj instanceof IProperties) ) {
-            logger.error(getFullName(obj)+" has not got properties");
+        EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+        if ( !(concept instanceof IProperties) ) {
+            // Should not happen, but just in case
+            logger.error(getFullName(obj) + " does not have properties");
             return;
         }
         
