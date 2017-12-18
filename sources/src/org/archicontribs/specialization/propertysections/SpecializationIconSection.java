@@ -63,7 +63,8 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 
     private Composite compoIcon;
     private Composite compoNoIcon;
-    private Text txtIcon;
+    private Text txtIconName;
+    private Text txtIconSize;
     private Tree fileTree;
     private Composite compoPreview;
     private Button btnNoResize;
@@ -182,31 +183,48 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.bottom = new FormAttachment(100);
         compoIcon.setLayoutData(fd);
 
-        Label lblIcon = new Label(compoIcon, SWT.NONE);
-        lblIcon.setText("Icon :");
-        lblIcon.setForeground(parent.getForeground());
-        lblIcon.setBackground(parent.getBackground());
+        Label lblIconName = new Label(compoIcon, SWT.NONE);
+        lblIconName.setText("Icon :");
+        lblIconName.setForeground(parent.getForeground());
+        lblIconName.setBackground(parent.getBackground());
         fd = new FormData();
         fd.top = new FormAttachment(0, 10);
         fd.left = new FormAttachment(0, 10);
-        lblIcon.setLayoutData(fd);
+        lblIconName.setLayoutData(fd);
 
-        txtIcon = new Text(compoIcon, SWT.BORDER);
+        txtIconName = new Text(compoIcon, SWT.BORDER);
         fd = new FormData();
-        fd.top = new FormAttachment(lblIcon, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblIcon, 20);
+        fd.top = new FormAttachment(lblIconName, 0, SWT.CENTER);
+        fd.left = new FormAttachment(lblIconName, 25);
         fd.right = new FormAttachment(0, 500);
-        txtIcon.setLayoutData(fd);
-        txtIcon.addModifyListener(iconModifyListener);
+        txtIconName.setLayoutData(fd);
+        txtIconName.addModifyListener(iconModifyListener);
+        
+        Label lblIconSize = new Label(compoIcon, SWT.NONE);
+        lblIconSize.setText("Icon size:");
+        lblIconSize.setForeground(parent.getForeground());
+        lblIconSize.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIconName, 10);
+        fd.left = new FormAttachment(0, 10);
+        lblIconSize.setLayoutData(fd);
+        
+        txtIconSize = new Text(compoIcon, SWT.BORDER);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIconSize, 0, SWT.CENTER);
+        fd.left = new FormAttachment(txtIconName, 0, SWT.LEFT);
+        fd.right = new FormAttachment(0, 200);
+        txtIconSize.setLayoutData(fd);
+        txtIconSize.addModifyListener(iconSizeModifyListener);
 
         fileTree = new Tree(compoIcon, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         fileTree.setBackground(parent.getBackground());
         fileTree.addListener(SWT.Selection, fileTreeSelectionListener);
 
         fd = new FormData();
-        fd.top = new FormAttachment(txtIcon, 10);
-        fd.left = new FormAttachment(txtIcon, 0, SWT.LEFT);
-        fd.right = new FormAttachment(txtIcon, 0, SWT.RIGHT);
+        fd.top = new FormAttachment(lblIconSize, 10);
+        fd.left = new FormAttachment( 0, 10);
+        fd.right = new FormAttachment(txtIconName, 0, SWT.RIGHT);
         fd.bottom = new FormAttachment(0, 220);
         fileTree.setLayoutData(fd);
 
@@ -358,16 +376,19 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             int height = forceHeight != 0 ? forceHeight : rect.height;
             imagePreviewData = imageData.scaledTo(width, height);
         } else {
-            if ( txtWidth.getText().isEmpty() && txtHeight.getText().isEmpty() )
+            int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
+            int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
+            
+            if ( width == 0 && height == 0 )
                 imagePreviewData = imageData;
             else {
-                int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
-                int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
+                if ( width > 0 & width < 10 ) width = 10;
+                if ( height > 0 & height < 10 ) height = 10;
+                
                 if ( width == 0 ) {
                     float scale = (float)height/imageData.height;
                     width = (int)(imageData.width * scale);
-                }
-                if ( height == 0 ) {
+                } if ( height == 0 ) {
                     float scale = (float)width/imageData.width;
                     height = (int)(imageData.height * scale);
                 }
@@ -519,17 +540,17 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             if ( !filePath.startsWith(rootPath) )
                 logger.error("The file path does not start with the root path");
             else {
-                StringBuilder iconName = new StringBuilder(filePath.substring(rootPath.length()).replace("\\","/"));
-                if ( btnAutoResize.getSelection() ) {
-                    iconName.append(":0x0");
-                }
-                if ( btnCustomResize.getSelection() ) {
-                    iconName.append(":");
-                    iconName.append(txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText()));
-                    iconName.append(":");
-                    iconName.append(txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText()));
-                }
-                txtIcon.setText(iconName.toString());
+                txtIconName.setText(filePath.substring(rootPath.length()).replace("\\","/"));
+                
+                if ( btnAutoResize.getSelection() )
+                    txtIconSize.setText("auto");
+                else if ( btnCustomResize.getSelection() )
+                    if ( txtWidth.getText().isEmpty() && txtHeight.getText().isEmpty() )
+                        txtIconSize.setText("");
+                    else
+                        txtIconSize.setText( (txtWidth.getText().isEmpty() ? "0" : txtWidth.getText()) + "x" + (txtHeight.getText().isEmpty() ? "0" : txtHeight.getText()) );
+                else
+                    txtIconSize.setText("");
             }
         }
 
@@ -539,6 +560,9 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         }
     };
     
+    /**
+     * Called when the icon name is changed in the txtIconName text widget
+     */
     private ModifyListener iconModifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent event) {
@@ -546,9 +570,27 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             String value = text.getText();
             IArchimateElement concept = elementEditPart.getModel().getArchimateConcept();
             if ( value.isEmpty() )
-                SpecializationPlugin.deleteProperty(concept, SpecializationPlugin.getIconPropertyName(concept));
+                SpecializationPlugin.deleteProperty(concept, "icon");
             else
-                SpecializationPlugin.setProperty(concept, SpecializationPlugin.getIconPropertyName(concept), value);
+                SpecializationPlugin.setProperty(concept, "icon", value);
+            // we force the icon to refresh on the graphical object
+            elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
+        }
+    };
+    
+    /**
+     * Called when the icon size is changed in the txtIconSize text widget
+     */
+    private ModifyListener iconSizeModifyListener = new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent event) {
+            Text text = (Text)event.widget;
+            String value = text.getText();
+            IArchimateElement concept = elementEditPart.getModel().getArchimateConcept();
+            if ( value.isEmpty() )
+                SpecializationPlugin.deleteProperty(concept, "icon size");
+            else
+                SpecializationPlugin.setProperty(concept, "icon size", value);
             // we force the icon to refresh on the graphical object
             elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
         }
