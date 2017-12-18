@@ -893,7 +893,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	                }
 	                if ( iconName == null && logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": folder \""+folderPart+"\" not found in preferences");
                 } catch (Exception e) {
-                    logger.error(getFullName(obj) + ": Failed to expand icon name", e);
+                    logger.error(getFullName(obj) + ": Failed to expand icon name ("+e.getMessage()+")");
                     return null;
                 }
             }
@@ -954,7 +954,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 try {
                     iconSize = SpecializationVariable.expand(iconSize, obj).trim();
                 } catch (Exception e) {
-                    logger.error(getFullName(obj) + ": Failed to expand icon size", e);
+                    logger.error(getFullName(obj) + ": Failed to expand icon size ("+e.getMessage()+")");
                     return null;
                 }
             }
