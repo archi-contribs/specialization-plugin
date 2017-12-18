@@ -32,10 +32,13 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
@@ -861,8 +864,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding the icon name");
                 // expanding the icon names means that:
                 //    1. we replace the ${xxx} variables by their corresponding values
-                iconName = SpecializationVariable.expand(iconName, obj).trim();
-                
+                try {
+                    iconName = SpecializationVariable.expand(iconName, obj).trim();
+                } catch (Exception e) {
+                    logger.error(getFullName(obj) + ": Failed to expand icon name", e);
+                    return null;
+                }
                 //    2. we get the folder name where the icon file stands from the preferences store
                 String[] parts;
                 String folderPart;
@@ -881,7 +888,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 
                 iconName = null;
                 for (int line = 0; line <lines; line++) {
-                    if ( folderPart.equals(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line)) ) {
+                    if ( folderPart.equals(preferenceStore.getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line))) ) {
                         iconName = preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)) + "/" + filenamePart;
                         if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding folder "+folderPart+" to "+preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)));
                         break;
@@ -889,6 +896,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 }
                 if ( iconName == null && logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": folder \""+folderPart+"\" not found in preferences");
             }
+            
+            //TODO : stocker l'image dans un cache pour ne pas avoir à le recalculer tout le temps
+            //TODO : utiliser les méthodes d'Archi pour redimentionner l'image (vraiment mieux de passer par un GC ???)
+            //TODO : permettre de spécifier la marge (10 par défaut !!!)
+            //TODO : permettre de spécifier la localisation de l'image (top, bottom, left, center, ...)
+            //TODO : remplacer runtimeException
             
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon name = \"" + iconName + "\"");
             return iconName;
@@ -941,7 +954,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding the icon size");
                 // expanding the icon names means that:
                 //    we replace the ${xxx} variables by their corresponding values
-                iconSize = SpecializationVariable.expand(iconSize, obj).trim();
+                try {
+                    iconSize = SpecializationVariable.expand(iconSize, obj).trim();
+                } catch (RuntimeException e) {
+                    logger.error(getFullName(obj) + ": Failed to expand icon size", e);
+                    return null;
+                }
             }
             
             if ( iconSize.equalsIgnoreCase("auto") ) {
@@ -975,6 +993,66 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             logger.trace(getFullName(obj)+": setting property icon size = "+iconSize);
             setProperty(concept, "icon size", iconSize);
         }
+    }
+    
+    /**
+     * Gets the Image from the icon name and icon size from the EObject properties
+     * @param obj
+     * @return
+     */
+    public static Image getImage(Display display, EObject obj) {
+        if ( !(obj instanceof IDiagramModelArchimateObject) ) {
+            logger.error(getFullName(obj)+": Object is not an IDiagramModelArchimateObject");
+            return null;
+        }
+        
+        String imageFilename = getIconName(obj, true);
+        if ( imageFilename == null )
+            return null;
+        
+        ImageData sourceImageData;
+        try {
+            sourceImageData = new ImageData(imageFilename);
+        } catch (SWTException e) {
+            logger.error(getFullName(obj)+": Cannot get image from file \""+imageFilename+"\"", e);
+            return null;
+        }
+        
+        String imageSize = getIconSize(obj, true);
+        if ( imageSize == null || imageSize.isEmpty() )
+            return new Image(display, sourceImageData);
+        
+        int width;
+        int height;
+        if ( imageSize.equalsIgnoreCase("auto") ) {
+            width = ((IDiagramModelArchimateObject)obj).getBounds().getWidth();
+            height = ((IDiagramModelArchimateObject)obj).getBounds().getHeight();
+        } else {
+            try {
+                String[] parts = imageSize.split("x");
+                width = Integer.parseInt(parts[0]);
+                height = Integer.parseInt(parts[1]);
+            } catch ( Exception ign ) {
+                width = 0;
+                height = 0;
+            };
+        }
+        
+        if ( width <= 0 && height <= 0 )  // in case of error on the size, we return the image unresized
+            return new Image(display, sourceImageData);
+        
+        if ( width != 0 & width < 10 ) width = 10;
+        if ( height!= 0 & height < 10 ) height = 10;
+                
+        if ( width == 0 ) {
+            float scale = (float)height/sourceImageData.height;
+            width = (int)(sourceImageData.width * scale);
+        } if ( height == 0 ) {
+            float scale = (float)width/sourceImageData.width;
+            height = (int)(sourceImageData.height * scale);
+        }
+        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj)+": resizing image to "+width+" x "+height);
+        return new Image(display, sourceImageData.scaledTo(width, height));
     }
     
     public static boolean mustReplaceLabel(EObject obj) {
