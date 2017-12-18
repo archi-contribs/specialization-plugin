@@ -34,7 +34,7 @@ public class SpecializationVariable {
      * Expands an expression containing variables<br>
      * It may return an empty string, but never a null value
      */
-    public static String expand(String expression, EObject eObject) {
+    public static String expand(String expression, EObject eObject) throws RuntimeException {
         if ( expression == null )
             return "";
 
