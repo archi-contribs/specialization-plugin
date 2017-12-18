@@ -6,7 +6,6 @@
 
 package org.archicontribs.specialization.preferences;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -283,11 +282,9 @@ public class FolderTableEditor extends FieldEditor {
 		int lines = store.getInt(SpecializationPlugin.storeFolderPrefix+"_#");
 		
 		for (int line = 0; line <lines; line++) {
-		    if ( createSymlink(store.getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line)), store.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line))) ) {
-    			TableItem tableItem = new TableItem(tblFolders, SWT.NONE);
-    			tableItem.setText(0, store.getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line)));
-    			tableItem.setText(1, store.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)));
-		    }
+   			TableItem tableItem = new TableItem(tblFolders, SWT.NONE);
+   			tableItem.setText(0, store.getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line)));
+   			tableItem.setText(1, store.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)));
 		}
 			
 		if ( tblFolders.getItemCount() != 0 ) {
@@ -342,40 +339,6 @@ public class FolderTableEditor extends FieldEditor {
 		discardCallback(true);
 	}
 	
-	private boolean createSymlink(String folder, String location) {
-        String pluginsFilename;
-        String imgFolder;
-        try {
-            pluginsFilename = new File(com.archimatetool.editor.ui.ImageFactory.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getCanonicalPath();
-            imgFolder = (new File(pluginsFilename+File.separator+".."+File.separator+"img")).getCanonicalPath();
-        } catch (IOException e) {
-            SpecializationPlugin.popup(Level.ERROR, "Cannot get plugin's folder !", e);
-            return false;
-        }
-        
-        // if the symbolic link already exists
-        if ( Files.isSymbolicLink(Paths.get(imgFolder+File.separator+folder).toAbsolutePath()) ) {
-            logger.debug("The symbolic link \""+folder+"\" already exists");
-            return true;
-        }
-        //TODO: check that it points to the right location
-        
-        // we check that the location is a folder
-        if ( !Files.isDirectory(Paths.get(location)) ) {
-            logger.error("\""+location+"\" is not a folder");
-            return false;
-        }
-        
-        try {
-            if( logger.isTraceEnabled() ) logger.trace("Creating symbolic link \""+Paths.get(imgFolder+File.separator+folder).toAbsolutePath()+"\" -> \""+Paths.get(location).toAbsolutePath()+"\"");
-            Files.createSymbolicLink(Paths.get(imgFolder+File.separator+folder).toAbsolutePath(), Paths.get(location).toAbsolutePath());
-        } catch (IOException e) {
-            SpecializationPlugin.popup(Level.ERROR, "Cannot create the symbolic link !", e);
-            return false;
-        }
-        return true;
-	}
-
 	/**
 	 * Called when the "save" button has been pressed
 	 */
@@ -397,22 +360,20 @@ public class FolderTableEditor extends FieldEditor {
 		
 
 
-		if ( createSymlink(txtFolder.getText(), txtLocation.getText()) ) {
-		    TableItem tableItem;
-    		try {
-    		    tableItem = new TableItem(tblFolders, SWT.NONE);
-    		} catch (Exception e) {
-    		    SpecializationPlugin.popup(Level.ERROR, "Cannot create new tableItem !", e);
-                return;
-            }
-    		tableItem.setText(0, txtFolder.getText());
-    		tableItem.setText(1, txtLocation.getText());
+	    TableItem tableItem;
+   		try {
+   		    tableItem = new TableItem(tblFolders, SWT.NONE);
+   		} catch (Exception e) {
+   		    SpecializationPlugin.popup(Level.ERROR, "Cannot create new tableItem !", e);
+            return;
+        }
+   		tableItem.setText(0, txtFolder.getText());
+   		tableItem.setText(1, txtLocation.getText());
     
-    		discardCallback(false);
-    
-    		tblFolders.setSelection(tableItem);
-    		tblFolders.notifyListeners(SWT.Selection, new Event());
-		}
+   		discardCallback(false);
+  
+ 		tblFolders.setSelection(tableItem);
+   		tblFolders.notifyListeners(SWT.Selection, new Event());
 	}
 
 	private void discardCallback(boolean editMode) {
