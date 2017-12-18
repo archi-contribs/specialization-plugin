@@ -9,6 +9,7 @@ import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 
@@ -32,13 +33,15 @@ public class ApplicationCollaborationUIProvider extends com.archimatetool.editor
      */
     @Override
     public Image getImage() {
-        logger.debug("Getting image");
-        
-    	String iconName = null;
+    	if ( SpecializationPlugin.mustReplaceIcon(instance) ) {
+    	    Image image = SpecializationPlugin.getImage(Display.getCurrent(), instance);
+            if ( image != null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(instance)+": Displaying custom icon");
+                return image;
+            }
+    	}
     	
-    	if ( SpecializationPlugin.mustReplaceIcon(instance) )
-        	iconName = SpecializationPlugin.getIconName(instance, true);
-        
-        return iconName==null ? super.getImage() : getImageWithUserFillColor(iconName);
+        logger.trace(SpecializationPlugin.getFullName(instance)+": Displaying default icon");        	
+    	return super.getImage();
     }
 }
