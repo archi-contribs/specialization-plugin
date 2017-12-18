@@ -7,7 +7,8 @@ Bundle-Vendor: Hervé Jouin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/log4j-1.2.17.jar,
- lib/json-simple-1.1.1.jar
+ lib/json-simple-1.1.1.jar,
+ lib/regex-1.0.3.jar
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.archicontribs.specialization.SpecializationPlugin
 Require-Bundle: org.eclipse.core.runtime,
