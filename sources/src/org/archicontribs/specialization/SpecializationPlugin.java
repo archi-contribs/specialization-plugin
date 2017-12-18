@@ -263,14 +263,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 				}
 				
 				switch ( level.toInt() ) {
-					case Level.FATAL_INT :
-					case Level.ERROR_INT :
+					case Level.FATAL_INT:
+					case Level.ERROR_INT:
 						MessageDialog.openError(null, SpecializationPlugin.pluginTitle, popupMessage);
 						break;
-					case Level.WARN_INT :
+					case Level.WARN_INT:
 						MessageDialog.openWarning(null, SpecializationPlugin.pluginTitle, popupMessage);
 						break;
-					default :
+					default:
 						MessageDialog.openInformation(null, SpecializationPlugin.pluginTitle, popupMessage);
 						break;
 				}
@@ -404,7 +404,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	 * The exception stacktrace is also printed on the standard error stream
 	 */
 	public static int question(String msg, String[] buttonLabels) {
-		if ( logger.isDebugEnabled() ) logger.debug("question : "+msg);
+		if ( logger.isDebugEnabled() ) logger.debug("question: "+msg);
 		
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
@@ -415,7 +415,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 			}
 		});
 
-		if ( logger.isDebugEnabled() ) logger.debug("answer : "+buttonLabels[questionResult]);
+		if ( logger.isDebugEnabled() ) logger.debug("answer: "+buttonLabels[questionResult]);
 		return questionResult;
 	}
 	
@@ -496,11 +496,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 								if ( logger.isDebugEnabled() ) {
 								    logger.debug("proxy request from "+getRequestingHost()+":"+getRequestingPort());
 								    logger.debug("proxy configuration:");
-								    logger.debug("   prot : "+prot);
-								    logger.debug("   host : "+host);
-								    logger.debug("   port : "+port);
-								    logger.debug("   user : "+user);
-								    logger.debug("   pass : xxxxx");
+								    logger.debug("   prot: "+prot);
+								    logger.debug("   host: "+host);
+								    logger.debug("   port: "+port);
+								    logger.debug("   user: "+user);
+								    logger.debug("   pass: xxxxx");
 								}
 
 								// we check if the request comes from the proxy, else we do not send the password (for security reason)
@@ -574,9 +574,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 
 					if ( pluginVersion.compareTo((String)entry.getKey()) >= 0 ) {
 						if ( verbose )
-							popup(Level.INFO, "You already have got the latest version : "+pluginVersion);
+							popup(Level.INFO, "You already have got the latest version: "+pluginVersion);
 						else
-							logger.info("You already have got the latest version : "+pluginVersion);
+							logger.info("You already have got the latest version: "+pluginVersion);
 						return;
 					}
 					
@@ -591,11 +591,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 					boolean ask = true;
 					while ( ask ) {
 					    switch ( question("A new version of the specialization plugin is available:\n     actual version: "+pluginVersion+"\n     new version: "+(String)entry.getKey()+"\n\nDo you wish to download and install it ?", new String[] {"Yes", "No", "Check release note"}) ) {
-					        case 0 : ask = false ; break;  // Yes
-					        case 1 : return ;              // No
-					        case 2 : ask = true ;          // release note
-        					         Program.launch(RELEASENOTE_URL);
-        					         break;
+					        case 0: ask = false ; break;  // Yes
+					        case 1: return ;              // No
+					        case 2: ask = true ;          // release note
+        					        Program.launch(RELEASENOTE_URL);
+        					        break;
 					    }
 					}
 
@@ -609,11 +609,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 					tmpFilename = newPluginFilename+".tmp";
 
 					if ( logger.isTraceEnabled() ) {
-						logger.trace("   File URL : " + entry.getValue());
-						logger.trace("   File type : " + FileType);
-						logger.trace("   File length : "+fileLength);
-						logger.trace("   Tmp download file path : " + tmpFilename);
-						logger.trace("   New Plugin file path : " + newPluginFilename);
+						logger.trace("   File URL: " + entry.getValue());
+						logger.trace("   File type: " + FileType);
+						logger.trace("   File length: "+fileLength);
+						logger.trace("   Tmp download file path: " + tmpFilename);
+						logger.trace("   New Plugin file path: " + newPluginFilename);
 					}
 
 					if (fileLength == -1)
@@ -794,10 +794,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             if ( mustReplaceIcons != null ) {
                 switch ( mustReplaceIcons ) {
                     case "always":
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+" : "+mustReplaceIcons);
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+": "+mustReplaceIcons);
                         return true;
                     case "never":  
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+" : "+mustReplaceIcons);
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+": "+mustReplaceIcons);
                         return false;
                 }
             }
@@ -853,7 +853,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             
             // we get the icon filename from the property
             String iconName = getPropertyValue(concept, "icon");
-            logger.trace(getFullName(obj)+" : property icon = "+iconName);
+            logger.trace(getFullName(obj)+": property icon = "+iconName);
             if ( iconName == null )
                 return null;
             
@@ -883,9 +883,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 for (int line = 0; line <lines; line++) {
                     if ( folderPart.equals(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line)) ) {
                         iconName = preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)) + "/" + filenamePart;
+                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": expanding folder "+folderPart+" to "+preferenceStore.getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line)));
                         break;
                     }
                 }
+                if ( iconName == null && logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": folder \""+folderPart+"\" not found in preferences");
             }
             
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon name = \"" + iconName + "\"");
@@ -910,7 +912,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // we set the icon name into the property
-            logger.trace(getFullName(obj)+" : setting property icon = "+iconName);
+            logger.trace(getFullName(obj)+": setting property icon = "+iconName);
             setProperty(concept, "icon", iconName);
         }
     }
@@ -931,7 +933,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 
             // we get the icon size from the property
             String iconSize = getPropertyValue(concept, "icon size");
-            logger.trace(getFullName(obj)+" : property icon size = "+iconSize);
+            logger.trace(getFullName(obj)+": property icon size = "+iconSize);
             if ( iconSize == null )
                 return null;
             
@@ -946,7 +948,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 if ( obj instanceof IDiagramModelArchimateObject ) {
                     IBounds bounds = ((IDiagramModelArchimateObject)obj).getBounds();
                     iconSize = String.valueOf(bounds.getWidth())+"x"+String.valueOf(bounds.getHeight());
-                    logger.trace(getFullName(obj)+" : icon size calculated to "+iconSize);
+                    logger.trace(getFullName(obj)+": icon size calculated to "+iconSize);
                 }
             }
             return iconSize;
@@ -970,7 +972,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // we set the icon size into the property
-            logger.trace(getFullName(obj)+" : setting property icon size = "+iconSize);
+            logger.trace(getFullName(obj)+": setting property icon size = "+iconSize);
             setProperty(concept, "icon size", iconSize);
         }
     }
@@ -996,7 +998,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             mustReplaceLabels =  mustReplaceLabelsInViews();
             
             if ( mustReplaceLabels != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels : "+mustReplaceLabels);
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels: "+mustReplaceLabels);
                 switch ( mustReplaceLabels ) {
                     case "always":
                         return true;
@@ -1008,7 +1010,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             // the we check if the container has got a "must replace labels"
             String propertyValue = getPropertyValue(container, "must replace labels");
             if ( propertyValue != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels : "+mustReplaceLabels);
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels: "+mustReplaceLabels);
                 switch ( propertyValue.toLowerCase() ) {
                     case "yes":
                         return true;
