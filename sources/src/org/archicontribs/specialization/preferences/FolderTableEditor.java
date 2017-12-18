@@ -6,8 +6,6 @@
 
 package org.archicontribs.specialization.preferences;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.log4j.Level;
@@ -410,24 +408,7 @@ public class FolderTableEditor extends FieldEditor {
         if ( index == -1 )
             return;
         
-        
-        String location = tblFolders.getItem(index).getText(1);
-        
-        // we check if the location is a symbolic link
-        if ( !Files.isSymbolicLink(Paths.get(location).toAbsolutePath()) ) {
-            SpecializationPlugin.popup(Level.ERROR, "\""+location+"\" is not a symbolic link.");
-            return;
-        }
-        
-        // we delete the symbolic link
-        try {
-            Files.delete(Paths.get(location).toAbsolutePath());
-        } catch (IOException e) {
-            SpecializationPlugin.popup(Level.ERROR, "Cannot delete \""+location+"\"", e);
-            return;
-        }
-
-		tblFolders.remove(index);
+  		tblFolders.remove(index);
 
 		if ( tblFolders.getItemCount() > 0 ) {
 			if ( index < tblFolders.getItemCount() )
