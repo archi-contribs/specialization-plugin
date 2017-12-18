@@ -9,7 +9,6 @@ import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.gef.EditPart;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 
@@ -34,7 +33,7 @@ public class ApplicationCollaborationUIProvider extends com.archimatetool.editor
     @Override
     public Image getImage() {
     	if ( SpecializationPlugin.mustReplaceIcon(instance) ) {
-    	    Image image = SpecializationPlugin.getImage(Display.getCurrent(), instance);
+    	    Image image = SpecializationPlugin.getImage(instance);
             if ( image != null ) {
                 if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(instance)+": Displaying custom icon");
                 return image;

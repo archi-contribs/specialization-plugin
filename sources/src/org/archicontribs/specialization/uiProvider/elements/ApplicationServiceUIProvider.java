@@ -32,13 +32,15 @@ public class ApplicationServiceUIProvider extends com.archimatetool.editor.ui.fa
      */
     @Override
     public Image getImage() {
-        logger.debug("Getting image");
-        
-        String iconName = null;
-        
-        if ( SpecializationPlugin.mustReplaceIcon(instance) )
-            iconName = SpecializationPlugin.getIconName(instance, true);
-        
-        return iconName==null ? super.getImage() : getImageWithUserFillColor(iconName);
+    	if ( SpecializationPlugin.mustReplaceIcon(instance) ) {
+    	    Image image = SpecializationPlugin.getImage(instance);
+            if ( image != null ) {
+                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(instance)+": Displaying custom icon");
+                return image;
+            }
+    	}
+    	
+        logger.trace(SpecializationPlugin.getFullName(instance)+": Displaying default icon");        	
+    	return super.getImage();
     }
 }
