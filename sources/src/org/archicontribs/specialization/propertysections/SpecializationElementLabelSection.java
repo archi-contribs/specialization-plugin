@@ -86,18 +86,18 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 		parent.setLayout(new FormLayout());
 
 		Label lblLabelName = new Label(parent, SWT.NONE);
-		lblLabelName.setText("Icon :");
+		lblLabelName.setText("Label :");
 		lblLabelName.setForeground(parent.getForeground());
 		lblLabelName.setBackground(parent.getBackground());
         FormData fd = new FormData();
-        fd.top = new FormAttachment(0, 10);
-        fd.left = new FormAttachment(0, 10);
+        fd.top = new FormAttachment(0, 20);
+        fd.left = new FormAttachment(0, 20);
         lblLabelName.setLayoutData(fd);
         
         txtLabelName = new Text(parent, SWT.BORDER);
         fd = new FormData();
         fd.top = new FormAttachment(lblLabelName, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblLabelName, 5);
+        fd.left = new FormAttachment(lblLabelName, 35);
         fd.right = new FormAttachment(0, 500);
         txtLabelName.setLayoutData(fd);
         txtLabelName.addModifyListener(labelModifyListener);
