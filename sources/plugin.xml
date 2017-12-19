@@ -324,6 +324,12 @@
                id="icon.tab"
                label="Icon">
          </propertyTab>
+         <propertyTab
+               afterTab="specialization.tab"
+               category="appearance.category"
+               id="label.tab"
+               label="Label">
+         </propertyTab>
       </propertyTabs>
    </extension>
    <extension
@@ -347,6 +353,18 @@
                filter="org.archicontribs.specialization.propertysections.SpecializationIconSection$Filter"
                id="specializationSection"
                tab="icon.tab">
+         </propertySection>
+         <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection$Filter"
+               id="specializationSection"
+               tab="label.tab">
+         </propertySection>
+         <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection$Filter"
+               id="specializationSection"
+               tab="label.tab">
          </propertySection>
       </propertySections>
    </extension>
