@@ -128,7 +128,6 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         @Override
         public void notifyChanged(Notification msg) {
             Object feature = msg.getFeature();
-            
             // Model event (Undo/Redo and here!)
             if(feature == IArchimatePackage.Literals.DIAGRAM_MODEL_ARCHIMATE_OBJECT__TYPE 
                     || feature == IArchimatePackage.Literals.PROPERTIES__PROPERTIES) 
@@ -741,6 +740,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         if ( !SpecializationPlugin.mustReplaceIcon(elementEditPart.getModel()) ) {
             compoNoIcon.setVisible(true);
             compoIcon.setVisible(false);
+            logger.trace("You must configure the view or the model to allow icons replacement.");
             lblNoIcon.setText("You must configure the view or the model to allow icons replacement.");
             return;
         }
@@ -750,6 +750,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 
         if ( figureDelegate instanceof RectangleFigureDelegate ) {
             compoNoIcon.setVisible(false);
+            logger.trace("Please change the element's figure to show up the icon.");
             lblNoIcon.setText("Please change the element's figure to show up the icon.");
             compoIcon.setVisible(true);
         } else {
