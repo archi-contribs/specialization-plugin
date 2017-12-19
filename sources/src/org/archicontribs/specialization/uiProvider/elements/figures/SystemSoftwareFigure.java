@@ -31,7 +31,7 @@ private static SpecializationLogger logger = new SpecializationLogger(SystemSoft
         
         if ( image == null )
             logger.error("Image not found");
-        else if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) ) {
+        else {
             String iconLocation = SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon location");
             
             int defaultX = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
@@ -39,7 +39,7 @@ private static SpecializationLogger logger = new SpecializationLogger(SystemSoft
             int x;
             int y;
             
-            if ( iconLocation != null && !iconLocation.isEmpty() ) {
+            if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) && iconLocation != null && !iconLocation.isEmpty() ) {
                 if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(getDiagramModelObject())+": found icon location = "+iconLocation);
                 String[] parts = iconLocation.split(",");
                 try {
@@ -57,15 +57,15 @@ private static SpecializationLogger logger = new SpecializationLogger(SystemSoft
                     else
                         y = bounds.y + Integer.parseInt(parts[1]);
                 } catch ( Exception e) {
-                    logger.error("Malformed location. Shoule be under the form \"x,y\"");
+                    logger.error("Malformed location. Should be under the form \"x,y\"");
                     x=defaultX;
                     y=defaultY;
                 }
+                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(getDiagramModelObject())+": setting image location to "+(x-bounds.x)+","+(y-bounds.y));
             } else {
                 x=defaultX;
                 y=defaultY;
             }
-            if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(getDiagramModelObject())+": setting image location to "+(x-bounds.x)+","+(y-bounds.y));
             graphics.drawImage(image, new Point(x, y));
         }
     }
