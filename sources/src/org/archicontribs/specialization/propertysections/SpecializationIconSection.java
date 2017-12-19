@@ -74,7 +74,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private Text txtHeight;
     private Label imagePreview;
 
-    static final private String[] validImageSuffixes = {"jpg", "png", "gif", "bmp"};
+    static final private String[] validImageSuffixes = {"jpg", "png", "gif", "bmp", "ico"};
     static final private Image    closedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/closedFolder.png"));
     static final private Image    openedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/openedFolder.png"));
 
