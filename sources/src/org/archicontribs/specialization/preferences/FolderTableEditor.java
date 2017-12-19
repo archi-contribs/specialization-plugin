@@ -51,10 +51,11 @@ public class FolderTableEditor extends FieldEditor {
 	
 	private Button btnUp;
 	private Button btnNew;
+    private Button btnModify;
 	private Button btnRemove;
 	private Button btnDown;
 	private Button btnDiscard;
-	private Button btnCreate;
+	private Button btnSet;
 	
 	private static final IPreferenceStore store = SpecializationPlugin.INSTANCE.getPreferenceStore();
 	
@@ -120,13 +121,26 @@ public class FolderTableEditor extends FieldEditor {
 			public void widgetSelected(SelectionEvent e) { newCallback(); }
 			public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 		});
+		
+        btnModify = new Button(grpImageFolders, SWT.NONE);
+        btnModify.setText("Modify");
+        fd = new FormData();
+        fd.top = new FormAttachment(btnNew, 5);
+        fd.left = new FormAttachment(btnNew, 0, SWT.LEFT);
+        fd.right = new FormAttachment(btnNew, 0, SWT.RIGHT);
+        btnModify.setLayoutData(fd);
+        btnModify.addSelectionListener(new SelectionListener() {
+            public void widgetSelected(SelectionEvent e) { modifyCallback(); }
+            public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
+        });
+        btnModify.setEnabled(false);
 
 		btnRemove = new Button(grpImageFolders, SWT.NONE);
 		btnRemove.setText("Remove");
 		fd = new FormData();
-		fd.top = new FormAttachment(btnNew, 5);
-		fd.left = new FormAttachment(btnNew, 0, SWT.LEFT);
-		fd.right = new FormAttachment(btnNew, 0, SWT.RIGHT);
+		fd.top = new FormAttachment(btnModify, 5);
+		fd.left = new FormAttachment(btnModify, 0, SWT.LEFT);
+		fd.right = new FormAttachment(btnModify, 0, SWT.RIGHT);
 		btnRemove.setLayoutData(fd);
 		btnRemove.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) { removeCallback(); }
@@ -219,25 +233,25 @@ public class FolderTableEditor extends FieldEditor {
         fd.right = new FormAttachment(btnBrowse, -10);
         txtLocation.setLayoutData(fd);
 
-		btnCreate = new Button(grpImageFolders, SWT.NONE);
-		btnCreate.setText("Create");
+		btnSet = new Button(grpImageFolders, SWT.NONE);
+		btnSet.setText("Set");
 		fd = new FormData();
 		fd.left = new FormAttachment(btnNew, 0, SWT.LEFT);
 		fd.right = new FormAttachment(btnNew, 0, SWT.RIGHT);
 		fd.bottom = new FormAttachment(100, -7);
-		btnCreate.setLayoutData(fd);
-		btnCreate.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) { createCallback(); }
+		btnSet.setLayoutData(fd);
+		btnSet.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) { setCallback(); }
 			public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 		});
-		btnCreate.setVisible(false);
+		btnSet.setVisible(false);
 
 		btnDiscard = new Button(grpImageFolders, SWT.NONE);
 		btnDiscard.setText("Discard");
 		fd = new FormData();
 		fd.left = new FormAttachment(btnNew, 0, SWT.LEFT);
 		fd.right = new FormAttachment(btnNew, 0, SWT.RIGHT);
-		fd.bottom = new FormAttachment(btnCreate, -5, SWT.TOP);
+		fd.bottom = new FormAttachment(btnSet, -5, SWT.TOP);
 		btnDiscard.setLayoutData(fd);
 		btnDiscard.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) { discardCallback(false); }
@@ -246,7 +260,7 @@ public class FolderTableEditor extends FieldEditor {
 		btnDiscard.setVisible(false);
 
 
-		grpImageFolders.setTabList(new Control[] {txtFolder, txtLocation, btnBrowse, btnDiscard, btnCreate});
+		grpImageFolders.setTabList(new Control[] {txtFolder, txtLocation, btnBrowse, btnDiscard, btnSet});
 
 		grpImageFolders.layout();
 
@@ -338,9 +352,22 @@ public class FolderTableEditor extends FieldEditor {
 	}
 	
 	/**
-	 * Called when the "save" button has been pressed
+     * Called when the "modify" button has been pressed
+     */
+    private void modifyCallback() {
+        if ( logger.isTraceEnabled() ) logger.trace("updateCallback()");
+        
+        // we show up the edition widgets
+        discardCallback(true);
+        
+        txtFolder.setText(tblFolders.getSelection()[0].getText(0));
+        txtLocation.setText(tblFolders.getSelection()[0].getText(1));
+    }
+	
+	/**
+	 * Called when the "set" button has been pressed
 	 */
-	private void createCallback() {
+	private void setCallback() {
 		if ( logger.isTraceEnabled() ) logger.trace("saveCallback()");
 
 		if ( txtFolder.getText().isEmpty() || txtLocation.getText().isEmpty() ) {
@@ -348,23 +375,29 @@ public class FolderTableEditor extends FieldEditor {
 		    return;		    
 		}
 		
+	    TableItem tableItem = null;
+	    
+        // we check if a line is selected in tha table (i.e. modification mode)
+        if ( tblFolders.getSelection().length != 0 && tblFolders.getSelection()[0] != null )
+            tableItem = tblFolders.getSelection()[0];
+	    
 		// We check if the folder already exists in the table
 		for (int line = 0; line < tblFolders.getItemCount(); ++line) {
-            if ( Paths.get(txtFolder.getText()).equals(Paths.get(tblFolders.getItem(line).getText(0))) ) {
-                 SpecializationPlugin.popup(Level.ERROR, "The folder is already defined, please choose another one.");
-                 return;
+            if ( !tblFolders.getItem(line).equals(tableItem) ) {
+                if ( Paths.get(txtFolder.getText()).equals(Paths.get(tblFolders.getItem(line).getText(0))) ) {
+                    if ( tableItem != null ) {
+                        SpecializationPlugin.popup(Level.ERROR, "A folder \""+txtFolder.getText()+"\" already exists in the table.");
+                        return;
+                    }
+                    tableItem = tblFolders.getItem(line);
+                    break;
+                }
 		    }
 		}
-		
 
-
-	    TableItem tableItem;
-   		try {
-   		    tableItem = new TableItem(tblFolders, SWT.NONE);
-   		} catch (Exception e) {
-   		    SpecializationPlugin.popup(Level.ERROR, "Cannot create new tableItem !", e);
-            return;
-        }
+   		if ( tableItem == null ) {
+            tableItem = new TableItem(tblFolders, SWT.NONE);
+   		}
    		tableItem.setText(0, txtFolder.getText());
    		tableItem.setText(1, txtLocation.getText());
     
@@ -388,10 +421,11 @@ public class FolderTableEditor extends FieldEditor {
 	    lblLocation.setVisible(editMode);
 	    txtLocation.setVisible(editMode);               txtLocation.setText(location);
 		btnBrowse.setVisible(editMode);
-		btnCreate.setVisible(editMode);
+		btnSet.setVisible(editMode);
 		btnDiscard.setVisible(editMode);
 
 		btnNew.setEnabled(!editMode);
+		btnModify.setEnabled(!editMode && (tblFolders.getSelection()!=null) && (tblFolders.getSelection().length!=0));
 		btnRemove.setEnabled(!editMode && (tblFolders.getSelection()!=null) && (tblFolders.getSelection().length!=0));
 		btnUp.setEnabled(!editMode && (tblFolders.getSelectionIndex() > 0));
 		btnDown.setEnabled(!editMode && (tblFolders.getSelectionIndex() < tblFolders.getItemCount()-1));
@@ -425,10 +459,11 @@ public class FolderTableEditor extends FieldEditor {
             txtLocation.setVisible(false);
 			btnBrowse.setVisible(false);
 
-			btnCreate.setVisible(false);
+			btnSet.setVisible(false);
 			btnDiscard.setVisible(false);
 
 			btnNew.setEnabled(true);
+			btnModify.setEnabled(false);;
 			btnRemove.setEnabled(false);
 			btnUp.setEnabled(false);
 			btnDown.setEnabled(false);
@@ -481,7 +516,7 @@ public class FolderTableEditor extends FieldEditor {
 	public void close() {
 		if ( txtFolder.isVisible() && txtFolder.isEnabled() ) {
 			if ( SpecializationPlugin.question("Do you wish to save or discard your currents updates ?", new String[] {"save", "discard"}) == 0 ) {
-				createCallback();
+				setCallback();
 			}			
 		}
 	}
