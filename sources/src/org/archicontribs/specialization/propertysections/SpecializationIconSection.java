@@ -130,6 +130,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             Object feature = msg.getFeature();
             // Model event (Undo/Redo and here!)
             if(feature == IArchimatePackage.Literals.DIAGRAM_MODEL_ARCHIMATE_OBJECT__TYPE 
+                    || feature == IArchimatePackage.Literals.DIAGRAM_MODEL_IMAGE_PROVIDER__IMAGE_PATH
                     || feature == IArchimatePackage.Literals.PROPERTIES__PROPERTIES) 
                 refreshControls();
             else if ( feature == IArchimatePackage.Literals.DIAGRAM_MODEL_OBJECT__BOUNDS) {
