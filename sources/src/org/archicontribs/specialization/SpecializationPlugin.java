@@ -53,6 +53,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.archimatetool.model.IArchimateElement;
 import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IBounds;
@@ -1002,8 +1003,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      * @return
      */
     public static Image getImage(EObject obj) {
-        if ( !(obj instanceof IDiagramModelArchimateObject) ) {
-            logger.error(getFullName(obj)+": Object is not an IDiagramModelArchimateObject");
+        if ( !(obj instanceof IDiagramModelArchimateObject) && !(obj instanceof IArchimateElement) ) {
+            logger.error(getFullName(obj)+": Object is not an IDiagramModelArchimateObject not an IArchimateElement");
             return null;
         }
         
@@ -1016,7 +1017,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         int width;
         int height;
         
-        String imageSize = getIconSize(obj, true);
+        String imageSize;
+        if ( obj instanceof IArchimateElement )     // we fix the size of icons in modelTree to 25 x 25
+            imageSize = "25x25";
+        else
+            imageSize = getIconSize(obj, true);
         if ( imageSize == null || imageSize.isEmpty() ) {
         	if ( imagesCache.containsKey(imageFilename) )
         		return imagesCache.get(imageFilename);
