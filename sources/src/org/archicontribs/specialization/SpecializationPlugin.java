@@ -806,6 +806,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             }
             
             // the we check if the container has got a "must replace icons"
+            // At the moment, the check is not recursive, but I do not see why it may not be recursive in the future
             String propertyValue = getPropertyValue(container, "must replace icons");
             if ( propertyValue != null ) {
                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
@@ -817,15 +818,18 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 }
             }
                         
-            // then we check if the model has got a "must replace icons"
+            // then we check if the model has got a "must replace icons in views" or "must replace icons in tree" 
             IArchimateModel model;
-            if ( obj instanceof IDiagramModelArchimateObject )
+            if ( obj instanceof IDiagramModelArchimateObject ) {
                 model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
-            else
-                return false;
-            propertyValue = getPropertyValue(model, "must replace icons");
+                propertyValue = getPropertyValue(model, "must replace icons in views");
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons in views = "+propertyValue);
+            } else {
+                model = ((IFolder)obj).getArchimateModel();
+                propertyValue = getPropertyValue(model, "must replace icons in tree");
+                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons in tree = "+propertyValue);
+            }
             if ( propertyValue != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
                 switch ( propertyValue.toLowerCase() ) {
                     case "yes":
                         return true;
@@ -834,7 +838,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 }
             }
             
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": we do not replace icon");
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": defaulting to not replacing the icon");
         } else
             logger.error("got null object parameter");
         return false;
@@ -897,8 +901,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                     return null;
                 }
             }
-            
-            //TODO : permettre de spécifier la localisation de l'image (top, bottom, left, center, ...)
             
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon name = \"" + iconName + "\"");
             return iconName;
@@ -1141,7 +1143,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                         return false;
                 }
             }
-            logger.trace("getFullName(obj) + \": at the end, we do not replace label");
+            
+            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": defaulting to not replacing the label");
         } else
             logger.error("got null object parameter");
         
