@@ -261,7 +261,7 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 	    btnIconsDefault.setEnabled(mustUseIconProperty);
 
         if ( mustUseLabelProperty ) {
-            lblIconInfo.setText("Labels : the preference states to use properties.");
+            lblLabelInfo.setText("Labels : the preference states to use properties.");
             String propValue = SpecializationPlugin.getPropertyValue(diagramModel, "must replace labels");
             if ( propValue != null )
                 propValue = propValue.toLowerCase();
