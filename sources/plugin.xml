@@ -382,7 +382,7 @@
                class="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection$Filter"
                id="specializationSection"
-               tab="ReplaceLabel.tab">
+               tab="replaceLabel.tab">
          </propertySection>
       </propertySections>
    </extension>
