@@ -14,13 +14,20 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
@@ -35,6 +42,10 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
     private Composite compoLabel;
     private Composite compoNoLabel;
 	private Text txtLabelName;
+	
+    private boolean mouseOverHelpButton = false;
+    
+    static final private Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 	
 	/**
 	 * Filter to show or reject this section depending on input value
@@ -104,6 +115,36 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         fd.top = new FormAttachment(0, 20);
         fd.left = new FormAttachment(0, 20);
         lblNoLabel.setLayoutData(fd);
+        
+        Label btnHelp = new Label(compoNoLabel, SWT.NONE);
+        btnHelp.setForeground(parent.getForeground());
+        btnHelp.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(lblNoLabel, 25);
+        fd.bottom = new FormAttachment(lblNoLabel, 55, SWT.BOTTOM);
+        fd.left = new FormAttachment(0, 20);
+        fd.right = new FormAttachment(0, 50);
+        btnHelp.setLayoutData(fd);
+        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp.redraw(); } });
+        btnHelp.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e)
+            {
+                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 e.gc.drawImage(HELP_ICON, 2, 2);
+            }
+        });
+        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });
+        
+        Label helpLbl = new Label(compoNoLabel, SWT.NONE);
+        helpLbl.setText("Click here to show up online help.");
+        helpLbl.setForeground(parent.getForeground());
+        helpLbl.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(btnHelp, 0, SWT.CENTER);
+        fd.left = new FormAttachment(btnHelp, 5);
+        helpLbl.setLayoutData(fd);
 
         /* ********************************************************* */
         compoLabel = new Composite(parent, SWT.NONE);
@@ -133,6 +174,36 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         fd.right = new FormAttachment(0, 500);
         txtLabelName.setLayoutData(fd);
         txtLabelName.addModifyListener(labelModifyListener);
+        
+        Label btnHelp2 = new Label(compoLabel, SWT.NONE);
+        btnHelp2.setForeground(parent.getForeground());
+        btnHelp2.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(lblLabelName, 10);
+        fd.bottom = new FormAttachment(lblLabelName, 40, SWT.BOTTOM);
+        fd.left = new FormAttachment(0, 10);
+        fd.right = new FormAttachment(0, 40);
+        btnHelp2.setLayoutData(fd);
+        btnHelp2.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp2.redraw(); } });
+        btnHelp2.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp2.redraw(); } });
+        btnHelp2.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e)
+            {
+                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 e.gc.drawImage(HELP_ICON, 2, 2);
+            }
+        });
+        btnHelp2.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });
+        
+        helpLbl = new Label(compoLabel, SWT.NONE);
+        helpLbl.setText("Click here to show up online help.");
+        helpLbl.setForeground(parent.getForeground());
+        helpLbl.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(btnHelp2, 0, SWT.CENTER);
+        fd.left = new FormAttachment(btnHelp2, 5);
+        helpLbl.setLayoutData(fd);
 	}
 	
     /**

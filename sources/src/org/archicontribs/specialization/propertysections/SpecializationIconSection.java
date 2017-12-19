@@ -26,6 +26,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
@@ -45,6 +47,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 import com.archimatetool.editor.diagram.figures.AbstractTextControlContainerFigure;
@@ -74,10 +77,13 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private Text txtWidth;
     private Text txtHeight;
     private Label imagePreview;
+    
+    private boolean mouseOverHelpButton = false;
 
     static final private String[] validImageSuffixes = {"jpg", "png", "gif", "bmp", "ico"};
     static final private Image    closedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/closedFolder.png"));
     static final private Image    openedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/openedFolder.png"));
+    static final private Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 
     /**
      * Filter to show or reject this section depending on input value
@@ -172,6 +178,36 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(0, 20);
         fd.left = new FormAttachment(0, 20);
         lblNoIcon.setLayoutData(fd);
+        
+        Label btnHelp = new Label(compoNoIcon, SWT.NONE);
+        btnHelp.setForeground(parent.getForeground());
+        btnHelp.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(lblNoIcon, 25);
+        fd.bottom = new FormAttachment(lblNoIcon, 55, SWT.BOTTOM);
+        fd.left = new FormAttachment(0, 20);
+        fd.right = new FormAttachment(0, 50);
+        btnHelp.setLayoutData(fd);
+        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp.redraw(); } });
+        btnHelp.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e)
+            {
+                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 e.gc.drawImage(HELP_ICON, 2, 2);
+            }
+        });
+        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); } });
+        
+        Label helpLbl = new Label(compoNoIcon, SWT.NONE);
+        helpLbl.setText("Click here to show up online help.");
+        helpLbl.setForeground(parent.getForeground());
+        helpLbl.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(btnHelp, 0, SWT.CENTER);
+        fd.left = new FormAttachment(btnHelp, 5);
+        helpLbl.setLayoutData(fd);
 
         /* ********************************************************* */
         compoIcon = new Composite(parent, SWT.NONE);
@@ -353,6 +389,36 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.top = new FormAttachment(txtHeight, 10);
         fd.left = new FormAttachment(0);
         imagePreview.setLayoutData(fd);
+        
+        Label btnHelp2 = new Label(compoIcon, SWT.NONE);
+        btnHelp2.setForeground(parent.getForeground());
+        btnHelp2.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(lblReminder, 10);
+        fd.bottom = new FormAttachment(lblReminder, 40, SWT.BOTTOM);
+        fd.left = new FormAttachment(0, 10);
+        fd.right = new FormAttachment(0, 40);
+        btnHelp2.setLayoutData(fd);
+        btnHelp2.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp2.redraw(); } });
+        btnHelp2.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp2.redraw(); } });
+        btnHelp2.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e)
+            {
+                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 e.gc.drawImage(HELP_ICON, 2, 2);
+            }
+        });
+        btnHelp2.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); } });
+        
+        helpLbl = new Label(compoIcon, SWT.NONE);
+        helpLbl.setText("Click here to show up online help.");
+        helpLbl.setForeground(parent.getForeground());
+        helpLbl.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(btnHelp2, 0, SWT.CENTER);
+        fd.left = new FormAttachment(btnHelp2, 5);
+        helpLbl.setLayoutData(fd);
         
         refreshControls();            
     }

@@ -343,6 +343,12 @@
                tab="specialization.tab">
          </propertySection>
          <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationFolderSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationFolderSection$Filter"
+               id="specializationSection"
+               tab="specialization.tab">
+         </propertySection>
+         <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationModelSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationModelSection$Filter"
                id="specializationSection"
