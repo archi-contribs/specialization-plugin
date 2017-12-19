@@ -30,7 +30,7 @@ public class ApplicationComponentFigure extends com.archimatetool.editor.diagram
         
         if ( image == null )
             logger.error("Image not found");
-        else {
+        else if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) ) {
             String iconLocation = SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon location");
             
             int defaultX = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
