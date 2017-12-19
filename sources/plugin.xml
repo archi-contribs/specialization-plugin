@@ -315,20 +315,32 @@
          <propertyTab
                afterTab="figure.tab"
                category="appearance.category"
-               id="specialization.tab"
-               label="Specialization">
+               id="specializeModel.tab"
+               label="Specialize model">
+         </propertyTab>
+         <propertyTab
+               afterTab="figure.tab"
+               category="appearance.category"
+               id="specializeFolder.tab"
+               label="Specialize folder">
+         </propertyTab>
+         <propertyTab
+               afterTab="figure.tab"
+               category="appearance.category"
+               id="specializeView.tab"
+               label="Specialize view">
          </propertyTab>
          <propertyTab
                afterTab="specialization.tab"
                category="appearance.category"
-               id="icon.tab"
-               label="Icon">
+               id="replaceIcon.tab"
+               label="Replace icon">
          </propertyTab>
          <propertyTab
                afterTab="specialization.tab"
                category="appearance.category"
-               id="label.tab"
-               label="Label">
+               id="replaceLabel.tab"
+               label="Replace label">
          </propertyTab>
       </propertyTabs>
    </extension>
@@ -337,40 +349,40 @@
       <propertySections
             contributorId="com.archimatetool.editor">
          <propertySection
-               class="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection"
-               filter="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection$Filter"
+               class="org.archicontribs.specialization.propertysections.SpecializationModelSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationModelSection$Filter"
                id="specializationSection"
-               tab="specialization.tab">
+               tab="specializeModel.tab">
          </propertySection>
          <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationFolderSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationFolderSection$Filter"
                id="specializationSection"
-               tab="specialization.tab">
+               tab="specializeFolder.tab">
          </propertySection>
          <propertySection
-               class="org.archicontribs.specialization.propertysections.SpecializationModelSection"
-               filter="org.archicontribs.specialization.propertysections.SpecializationModelSection$Filter"
+               class="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection$Filter"
                id="specializationSection"
-               tab="specialization.tab">
+               tab="specializeView.tab">
          </propertySection>
          <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationIconSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationIconSection$Filter"
                id="specializationSection"
-               tab="icon.tab">
+               tab="replaceIcon.tab">
          </propertySection>
          <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection$Filter"
                id="specializationSection"
-               tab="label.tab">
+               tab="replaceLabel.tab">
          </propertySection>
          <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection$Filter"
                id="specializationSection"
-               tab="label.tab">
+               tab="ReplaceLabel.tab">
          </propertySection>
       </propertySections>
    </extension>
