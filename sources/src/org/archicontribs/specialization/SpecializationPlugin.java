@@ -92,25 +92,23 @@ import com.archimatetool.model.IProperty;
  *                              Add the ability to change the name of the property that contains the label text
  *                              Add a context menu to refresh the model tree
  *                              
- * v0.4:        12/12/2017      Add more debug and trace messages
- *                              Add the ability to change the name of the property that contains the icon filename at the model, view and concept levels
- *                              Add the ability to change the name of the property that contains the label text at the model, view and concept levels
- *                              Fix elements shape (quare corners instead of round ones)
- *                              Fix junction shape
- *                              Do not replace the icon in the properties window anymore
- *                              Replace the context menus by a new tab in the properties window
- *                              Add the creation of symbolic links in the preference page
- *                                  
- * TODO list:                   Add a file explorer window on the preference page that allow to manage the icons
- *                              and allow drag&drop to this file exporer window
- *                              Allow to change the icon size in the icon's property
+ * v1.0:        19/12/2017      Better integration into archi
+ *                              The image files can now be located outside Archi's editor folder
+ *                              The icon and label names can now contain variables (i.e. references to other properties)
+ *                              Add the ability to change the images size
+ *                              Add the ability to change the image location into the elements' rectangles 
+ *                              Rewrite debug and trace messages
+ *                              various Fixes:
+ *                                  Fix elements shape (square corners instead of round ones)
+ *                                  Fix junction shape
+ *                                  Do not replace the icon in the properties window anymore
  * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "0.4";
+	public static final String pluginVersion = "1.0";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
