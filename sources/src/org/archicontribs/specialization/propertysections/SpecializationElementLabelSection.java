@@ -108,7 +108,7 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         compoNoLabel.setLayoutData(fd);
 
         Label lblNoLabel = new Label(compoNoLabel, SWT.NONE);
-        lblNoLabel.setText("You must configure the view to allow labels replacement.");
+        lblNoLabel.setText("You must configure the view or the model to allow labels replacement.");
         lblNoLabel.setForeground(parent.getForeground());
         lblNoLabel.setBackground(parent.getBackground());
         fd = new FormData();

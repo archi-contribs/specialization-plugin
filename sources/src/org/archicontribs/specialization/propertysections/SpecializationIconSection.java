@@ -741,7 +741,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         if ( !SpecializationPlugin.mustReplaceIcon(elementEditPart.getModel()) ) {
             compoNoIcon.setVisible(true);
             compoIcon.setVisible(false);
-            lblNoIcon.setText("You must configure the view to allow icons replacement.");
+            lblNoIcon.setText("You must configure the view or the model to allow icons replacement.");
             return;
         }
         
