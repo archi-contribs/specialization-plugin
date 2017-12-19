@@ -85,9 +85,9 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
 
         lblIconInfo = new Label(parent, SWT.NONE);
         if ( mustUseIconProperty )
-            lblIconInfo.setText("Icons : the preference states to use properties.");
+            lblIconInfo.setText("Icons in model tree: the preference states to use properties.");
         else 
-            lblIconInfo.setText("Icons : the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
+            lblIconInfo.setText("Icons in model tree: the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
         lblIconInfo.setForeground(parent.getForeground());
         lblIconInfo.setBackground(parent.getBackground());
         lblIconInfo.setFont(parent.getFont());
@@ -212,7 +212,7 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
         boolean mustUseIconProperty = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree").length() == 0;
 
         if ( mustUseIconProperty ) {
-            lblIconInfo.setText("Icons : the preference states to use properties.");
+            lblIconInfo.setText("Icons in model tree: the preference states to use properties.");
             String propValue = SpecializationPlugin.getPropertyValue(folder, "must replace icons");
             if ( propValue != null )
                 propValue = propValue.toLowerCase();
@@ -223,7 +223,7 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
             btnIconsNo.setSelection(no);
             btnIconsDefault.setSelection(!yes && !no);
         } else { 
-            lblIconInfo.setText("Icons : the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
+            lblIconInfo.setText("Icons in model tree: the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
             yes = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree").toLowerCase(), "always");
             btnIconsYes.setSelection(yes);
             btnIconsNo.setSelection(!yes);
