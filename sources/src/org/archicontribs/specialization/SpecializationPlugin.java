@@ -98,6 +98,7 @@ import com.archimatetool.model.IProperty;
  *                              Add the ability to change the images size
  *                              Add the ability to change the image location into the elements' rectangles 
  *                              Rewrite debug and trace messages
+ *                              Update inline help pages
  *                              various Fixes:
  *                                  Fix elements shape (square corners instead of round ones)
  *                                  Fix junction shape
