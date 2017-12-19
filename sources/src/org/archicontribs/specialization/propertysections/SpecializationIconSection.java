@@ -62,6 +62,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 
     private Composite compoIcon;
     private Composite compoNoIcon;
+    private Label lblNoIcon;
     private Text txtIconName;
     private Text txtIconSize;
     private Text txtIconLocation;
@@ -163,7 +164,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.bottom = new FormAttachment(100);
         compoNoIcon.setLayoutData(fd);
 
-        Label lblNoIcon = new Label(compoNoIcon, SWT.NONE);
+        lblNoIcon = new Label(compoNoIcon, SWT.NONE);
         lblNoIcon.setText("Please change the element's figure to show up the icon.");
         lblNoIcon.setForeground(parent.getForeground());
         lblNoIcon.setBackground(parent.getBackground());
@@ -671,15 +672,24 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         if ( elementEditPart == null )
             return;
         
+        if ( !SpecializationPlugin.mustReplaceIcon(elementEditPart.getModel()) ) {
+            compoNoIcon.setVisible(true);
+            compoIcon.setVisible(false);
+            lblNoIcon.setText("You must configure the view to allow icons replacement.");
+            return;
+        }
+        
         IFigure figure = elementEditPart.getFigure();
         IFigureDelegate figureDelegate = ((AbstractTextControlContainerFigure)figure).getFigureDelegate();
 
         if ( figureDelegate instanceof RectangleFigureDelegate ) {
             compoNoIcon.setVisible(false);
+            lblNoIcon.setText("Please change the element's figure to show up the icon.");
             compoIcon.setVisible(true);
         } else {
             compoNoIcon.setVisible(true);
             compoIcon.setVisible(false);
+            return;
         }
         
         txtIconName.removeModifyListener(iconModifyListener);
@@ -719,6 +729,6 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 				logger.error("Cannot access folder "+location);
 				rootItem.dispose();
 			}
-        }    
+        }
     }
 }

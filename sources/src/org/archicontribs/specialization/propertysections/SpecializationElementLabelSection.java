@@ -32,6 +32,9 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 
 	private ArchimateElementEditPart elementEditPart = null;
 
+    private Composite compoIcon;
+    private Composite compoNoIcon;
+    private Label lblNoIcon;
 	private Text txtLabelName;
 	
 	/**
@@ -83,18 +86,48 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 	 */
 	@Override
 	protected void createControls(Composite parent) {
-		parent.setLayout(new FormLayout());
-
-		Label lblLabelName = new Label(parent, SWT.NONE);
-		lblLabelName.setText("Label :");
-		lblLabelName.setForeground(parent.getForeground());
-		lblLabelName.setBackground(parent.getBackground());
+	    compoNoIcon = new Composite(parent, SWT.NONE);
+        compoNoIcon.setForeground(parent.getForeground());
+        compoNoIcon.setBackground(parent.getBackground());
+        compoNoIcon.setLayout(new FormLayout());
         FormData fd = new FormData();
+        fd.top = new FormAttachment(0);
+        fd.left = new FormAttachment(0);
+        fd.right = new FormAttachment(100);
+        fd.bottom = new FormAttachment(100);
+        compoNoIcon.setLayoutData(fd);
+
+        lblNoIcon = new Label(compoNoIcon, SWT.NONE);
+        lblNoIcon.setText("You must configure the view to allow labels replacement.");
+        lblNoIcon.setForeground(parent.getForeground());
+        lblNoIcon.setBackground(parent.getBackground());
+        fd = new FormData();
+        fd.top = new FormAttachment(0, 20);
+        fd.left = new FormAttachment(0, 20);
+        lblNoIcon.setLayoutData(fd);
+
+        /* ********************************************************* */
+        compoIcon = new Composite(parent, SWT.NONE);
+        compoIcon.setForeground(parent.getForeground());
+        compoIcon.setBackground(parent.getBackground());
+        compoIcon.setLayout(new FormLayout());
+        fd = new FormData();
+        fd.top = new FormAttachment(0);
+        fd.left = new FormAttachment(0);
+        fd.right = new FormAttachment(100);
+        fd.bottom = new FormAttachment(100);
+        compoIcon.setLayoutData(fd);
+
+		Label lblLabelName = new Label(compoIcon, SWT.NONE);
+		lblLabelName.setText("Label :");
+		lblLabelName.setForeground(compoIcon.getForeground());
+		lblLabelName.setBackground(compoIcon.getBackground());
+        fd = new FormData();
         fd.top = new FormAttachment(0, 20);
         fd.left = new FormAttachment(0, 20);
         lblLabelName.setLayoutData(fd);
         
-        txtLabelName = new Text(parent, SWT.BORDER);
+        txtLabelName = new Text(compoIcon, SWT.BORDER);
         fd = new FormData();
         fd.top = new FormAttachment(lblLabelName, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblLabelName, 35);
@@ -150,6 +183,15 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         
         if ( elementEditPart == null )
             return;
+        
+        if ( !SpecializationPlugin.mustReplaceIcon(elementEditPart.getModel()) ) {
+            compoNoIcon.setVisible(true);
+            compoIcon.setVisible(false);
+            return;
+        }
+        
+        compoNoIcon.setVisible(false);
+        compoIcon.setVisible(true);
         
         txtLabelName.removeModifyListener(labelModifyListener);
         String labelName = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "label");
