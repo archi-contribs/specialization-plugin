@@ -181,7 +181,7 @@ public class FolderTableEditor extends FieldEditor {
             @Override
             public void verifyText(VerifyEvent e) {
                 for (int i = 0; i < e.text.length(); i++) {
-                    if ( !Character.isLetterOrDigit(e.text.charAt(i)) ) {
+                    if ( !Character.isLetterOrDigit(e.text.charAt(i)) && (e.text.charAt(i) != '-') && (e.text.charAt(i) != '_') ) {
                         e.doit = false;
                         return;
                     }
