@@ -824,7 +824,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
                 propertyValue = getPropertyValue(model, "must replace icons in views");
                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons in views = "+propertyValue);
-            } else {
+            } else if ( obj instanceof IFolder ) {
                 model = ((IFolder)obj).getArchimateModel();
                 propertyValue = getPropertyValue(model, "must replace icons in tree");
                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons in tree = "+propertyValue);
