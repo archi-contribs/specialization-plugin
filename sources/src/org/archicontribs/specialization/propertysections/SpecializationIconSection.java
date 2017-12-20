@@ -16,7 +16,6 @@ import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
@@ -50,9 +49,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
-import com.archimatetool.editor.diagram.figures.AbstractTextControlContainerFigure;
-import com.archimatetool.editor.diagram.figures.IFigureDelegate;
-import com.archimatetool.editor.diagram.figures.RectangleFigureDelegate;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.*;
 import com.archimatetool.model.impl.Bounds;
@@ -746,19 +742,19 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             return;
         }
         
-        IFigure figure = elementEditPart.getFigure();
-        IFigureDelegate figureDelegate = ((AbstractTextControlContainerFigure)figure).getFigureDelegate();
-
-        if ( figureDelegate instanceof RectangleFigureDelegate ) {
-            compoNoIcon.setVisible(false);
-            logger.trace("Please change the element's figure to show up the icon.");
-            lblNoIcon.setText("Please change the element's figure to show up the icon.");
-            compoIcon.setVisible(true);
-        } else {
-            compoNoIcon.setVisible(true);
-            compoIcon.setVisible(false);
-            return;
-        }
+        //TODO: find a better (and working) way to calculate if the icon is shown
+        //IFigure figure = elementEditPart.getFigure();
+        //IFigureDelegate figureDelegate = ((AbstractTextControlContainerFigure)figure).getFigureDelegate();
+        //if ( figureDelegate instanceof RectangleFigureDelegate ) {
+        compoNoIcon.setVisible(false);
+        compoIcon.setVisible(true);
+        //} else {
+        //    logger.trace("Please change the element's figure to show up the icon.");
+        //    lblNoIcon.setText("Please change the element's figure to show up the icon.");
+        //    compoNoIcon.setVisible(true);
+        //    compoIcon.setVisible(false);
+        //    return;
+        //}
         
         txtIconName.removeModifyListener(iconModifyListener);
         String iconName = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "icon");
