@@ -1,5 +1,5 @@
 * v1.0 (19/12/2017)
-  * Better integration into archi
+  * Better integration into Archi
   * The image files can now be located outside Archi's editor folder
   * The icon and label names can now contain variables (i.e. references to other properties)
   * Add the ability to change the images size
