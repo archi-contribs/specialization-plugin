@@ -252,7 +252,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd = new FormData();
         fd.top = new FormAttachment(lblIconName, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblIconLocation, 5);
-        fd.right = new FormAttachment(0, 500);
+        fd.right = new FormAttachment(0, 400);
         txtIconName.setLayoutData(fd);
         txtIconName.addModifyListener(iconModifyListener);
 
@@ -260,7 +260,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd = new FormData();
         fd.top = new FormAttachment(lblIconSize, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblIconLocation, 5);
-        fd.right = new FormAttachment(0, 200);
+        fd.right = new FormAttachment(0, 150);
         txtIconSize.setLayoutData(fd);
         txtIconSize.addModifyListener(iconSizeModifyListener);
 
@@ -268,7 +268,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd = new FormData();
         fd.top = new FormAttachment(lblIconLocation, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblIconLocation, 5);
-        fd.right = new FormAttachment(0, 200);
+        fd.right = new FormAttachment(0, 150);
         txtIconLocation.setLayoutData(fd);
         txtIconLocation.addModifyListener(iconLocationModifyListener);
 
