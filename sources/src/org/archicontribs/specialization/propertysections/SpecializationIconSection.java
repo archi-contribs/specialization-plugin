@@ -629,7 +629,8 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
                 logger.error("   file location = " + location);
                 logger.error("   root location = " + rootLocation);
             } else {
-                txtIconName.setText("/"+(String)rootTreeItem.getData("folder")+"/"+location.substring(rootLocation.length()+1).replace("\\","/"));
+            	String locationName = location.substring(rootLocation.length()).replace("\\","/");
+                txtIconName.setText("/"+(String)rootTreeItem.getData("folder")+(locationName.startsWith("/")?"":"/")+locationName);
                 
                 if ( btnAutoResize.getSelection() )
                     txtIconSize.setText("auto");
