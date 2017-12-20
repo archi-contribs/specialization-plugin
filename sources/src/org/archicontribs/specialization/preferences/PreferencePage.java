@@ -330,7 +330,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
-        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/configurePlugin.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/configurePlugin.html"); } });
+        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/preferencePageBehaviour.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/preferencePageBehaviour.html"); } });
         fd = new FormData(30,30);
         fd.top = new FormAttachment(0, 11);
         fd.left = new FormAttachment(0, 10);
