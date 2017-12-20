@@ -11,11 +11,31 @@
 <h2>Release notes</h2>
 
 <ul>
-    <li>v0.1 (24/08/2017)
+    <li>v1.0 (19/12/2017)
     <ul>
-        <li>First beta version</li>
-        <li>Icons can be changed on few technical elements using the "icon" property</li>
+        <li>Better integration into Archi</li>
+        <li>The image files can now be located outside Archi's editor folder</li>
+        <li>The icon and label names can now contain variables (i.e. references to other properties)</li>
+        <li>Add the ability to change the images size</li>
+        <li>Add the ability to change the image location into the elements' rectangles</li>
+        <li>Rewrite debug and trace messages</li>
+        <li>Update inline help</li>
+        <li>Various fixes:
+        <ul>
+             <li>Fix elements shape (square corners instead of round ones)</li>
+             <li>Fix junction shape</li>
+             <li>Do not replace the icon in the properties window anymore</li>
+        </ul></li>
     </ul></li>
+    
+    <li>v0.3 (06/12/2017)
+    <ul>
+        <li>Add the ability to change the name of the property that contains the icon filename</li>
+        <li>Add the ability to change the name of the property that contains the label text</li>
+        <li>Add debug and trace messages</li>
+        <li>Add a context menu to refresh the icon of all the elements of the model</li>
+    </ul></li>
+    
     <li>v0.2 (12/10/2017)
     <ul>
         <li>Icon replacement:
@@ -24,7 +44,7 @@
            <li>Add an option on the preference page to use customized icons on all the views of those that have a "change icons" property set to "true"</li>
            <li>Add a context menu to switch icons from Archi's standard icons to customized ones and back</li>
         </ul></li>
-        <li>Icon replacement:
+        <li>Label replacement:
         <ul>
            <li>Add new functionality to change label on relationships and elements</li>
            <li>Add an option on the preference page to use customized icons on all the views of those that have a "change labels" property set to "true"</li>
@@ -32,12 +52,11 @@
            <li>Add context menu "refresh view" to refresh the labels as they do not refresh automatically</li>
         </ul></li>
     </ul>
-    <li>v0.3 (06/12/2017)
+
+    <li>v0.1 (24/08/2017)
     <ul>
-        <li>Add the ability to change the name of the property that contains the icon filename</li>
-        <li>Add the ability to change the name of the property that contains the label text</li>
-        <li>Add debug and trace messages</li>
-        <li>Add a context menu to refresh the icon of all the elements of the model</li>
+        <li>First beta version</li>
+        <li>Icons can be changed on few technical elements using the "icon" property</li>
     </ul></li>
 </ul>
 
