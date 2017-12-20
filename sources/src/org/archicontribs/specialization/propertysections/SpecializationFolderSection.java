@@ -161,7 +161,7 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
-        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/configureFolder.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/configureFolder.html"); } });
+        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeFolder.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeFolder.html"); } });
         
         Label helpLbl = new Label(parent, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
