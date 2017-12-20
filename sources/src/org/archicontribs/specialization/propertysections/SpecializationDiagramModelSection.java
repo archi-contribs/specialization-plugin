@@ -227,7 +227,7 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
-        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/configureview.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/configureView.html"); } });
+        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeView.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeView.html"); } });
         
         Label helpLbl = new Label(parent, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
