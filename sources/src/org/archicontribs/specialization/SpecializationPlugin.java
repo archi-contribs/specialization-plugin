@@ -1051,8 +1051,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	        } else {
 	            try {
 	                String[] parts = imageSize.split("x");
-	                width = Integer.parseInt(parts[0]);
-	                height = Integer.parseInt(parts[1]);
+	                width = Integer.parseInt(parts[0].trim());
+	                height = Integer.parseInt(parts[1].trim());
 	            } catch ( Exception ign ) {
 	                width = 0;
 	                height = 0;
