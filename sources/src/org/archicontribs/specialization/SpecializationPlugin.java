@@ -1209,12 +1209,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     }
     
     /**
-     * draw an image in a IDiagramModelArchimateObject
+     * draw an image in a IDiagramModelObject
      * @param obj
      * @param graphics
      * @param bounds
      */
-    public static void drawIcon(IDiagramModelArchimateObject obj, Graphics graphics, Rectangle bounds) {
+    public static void drawIcon(IDiagramModelObject obj, Graphics graphics, Rectangle bounds) {
         Image image = ObjectUIFactory.INSTANCE.getProvider(obj).getImage();
         
         if ( image == null )
