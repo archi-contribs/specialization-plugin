@@ -2,7 +2,22 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Specialization plugin" topic="help/html/index.html">
- <topic href="help/html/pluginObjectives.html" label="Plugin objectives"/>
- <topic href="help/html/configurePlugin.html"  label="Configure the plugin"/>
- <topic href="help/html/releaseNotes.html"     label="Release notes"/>
+ <topic href="help/html/pluginObjectives.html" label="Plugin objectives">
+ </topic>
+ <topic href="help/html/preferencePageBehaviour.html" label="Preference page - Behaviour">
+ </topic>
+ <topic href="help/html/preferencePageLogger.html" label="Preference page - Logger">
+ </topic>
+ <topic href="help/html/specializeModel.html" label="Specialize model">
+ </topic>
+ <topic href="help/html/specializeView.html" label="Specialize view">
+ </topic>
+ <topic href="help/html/specializeFolder.html" label="Specialize folder">
+ </topic>
+ <topic href="help/html/replaceIcon.html" label="Replace icon">
+ </topic>
+ <topic href="help/html/replaceLabel.html" label="Replace label">
+ </topic>
+ <topic href="help/html/releaseNotes.html" label="Release notes">
+ </topic>
 </toc>

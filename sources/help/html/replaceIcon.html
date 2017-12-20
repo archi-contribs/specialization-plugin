@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Replace icon</title>
+</head>
+
+<body>
+<h1><u>Specialization plugin</u></h1>
+<h2><u>Replace label</u></h2>
+
+<img src="replaceIcon.png">
+
+When an element that contains an icon is selected in a view, a new "Replace icon" tab is shown in the properties window.
+<ul>
+   <li>Icon
+   <ul>
+      <li>The text field allows to enter an image filename that will replace the icon of the component.</li>
+      <li>This filename can begin with a "/" but this is not mandatory.</li>
+      <li>The first part of the path must be one of the folders that is configured in the <a href="preferencePageBehaviour.html">preference page</a> and will be mapped to the corresponding physical location.</li>
+   </ul></li>
+   <li>Icon size
+   <ul>
+      <li>It is possible to resize the image, specifying the new size under the following format:
+      <ul>
+          <li>width x height &rarr; to specify the width and the height (in pixels)</li>
+          <li>width x 0 or 0 x height &rarr; to scale the image (the zero value will be calculated to keep the image proportion)</li>
+          <li>auto &rarr; to automatically reclculate the image size to fit in the element rectangle</li> 
+      </ul>></li>
+      <li>An empty value keeps the image to its original size</li>
+   </ul></li>
+   <li>Icon location
+   <ul>
+      <li>It is possible to change the image location under the following format:
+      <ul>
+          <li>width x height &rarr; to specify the width and the height (in pixels)</li>
+          <li>width x 0 or 0 x height &rarr; to scale the image (the zero value will be calculated to keep the image proportion)</li>
+          <li>auto &rarr; to automatically reclculate the image size to fit in the element rectangle</li> 
+      </ul>></li>
+      <li>An empty value keeps the image to its original size</li>
+   </ul></li>
+</ul>
+
+Please note that all Archi elements do not have an icon that can be changed (like the Value and the Meaning) and that some elements have got several figures (like the Node) which all of them do not implement an icon.
+
+It is also possible to set the properties by hand.
+<img src="replaceIconProperties.png">
+
+if you experience a "you must configure the view or the model to allow icons replacement" message, this means that you view does not allow the icons replacement.<br>
+<br>
+You may change one of the following:
+<ul>
+   <li>Change the "Replace icons in views" to "always" on the <a href="preferencePageBehaviour.html">preference page</a></li>
+   <li>Change the "Replace icons in all views" in the <a href="specializeModel.html">model's properties</a></li>
+   <li>Change the "Replace icons in this view" in the <a href="specializeView.html">view's properties</a></li>
+</ul>
+<img src="replaceIconMustConfigure.png">
+</body>
+</html>

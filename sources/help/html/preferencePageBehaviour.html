@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Preference page - Behaviour</title>
+</head>
+
+<body>
+<h1><u>Specialization plugin</u></h1>
+<h2><u>Preference page - Behaviour</u></h2>
+
+<img src="preferencePageBehaviour.png">
+
+<ul>
+	<li><b><u>Version</u></b></li>
+</ul>
+In this section, you will find the plugin's version and a button to check if a newer version is available on Github. You may select the "Automatically check for update at startup" to automate this check each time Archi is started.
+
+If you are behind a proxy, you may add the following lines into your archi.ini file:
+<pre>
+     -Dhttp.proxyHost=<i>&lt;name or @IP&gt;</i>
+     -Dhttp.proxyPort=<i>&lt;port&gt;</i>
+     -Dhttp.proxyUser=<i>&lt;username&gt;</i>
+     -Dhttp.proxyPassword=<i>&lt;password&gt;</i>
+     -Dhttps.proxyHost=<i>&lt;name or @IP&gt;</i>
+     -Dhttps.proxyPort=<i>&lt;port&gt;</i>
+     -Dhttps.proxyUser=<i>&lt;username&gt;</i>
+     -Dhttps.proxyPassword=<i>&lt;password&gt;</i>
+     -Djdk.http.auth.tunneling.disabledSchemes=
+     -Djdk.http.auth.proxying.disabledSchemes=
+</pre>
+
+
+
+<ul>
+	<li><b><u>Behaviour</u></b></li>
+</ul>
+The specialization plugin uses properties to know what it can or can't do:
+<ul>
+   <li>at the model level:
+   <ul>
+      <li>must replace icons in tree &rarr; [yes|no]</li>
+      <li>must replace icons in views &rarr; [yes|no]</li>
+      <li>must replace labels in views &rarr; [yes|no]</li> 
+   </ul></li>
+   <li>at the view level:
+   <ul>
+      <li>must replace icons &rarr; [yes|no]</li>
+      <li>must replace labels &rarr; [yes|no]</li> 
+   </ul></li>
+   <li>at the folder level:
+   <ul>
+      <li>must replace icons &rarr; [yes|no]</li>
+   </ul></li>
+</ul>
+
+This section allows to specify how those properties will be used:
+<p style="margin-left: 40px">
+<b>Replace icons in model tree:</b>
+<ul><ul><ul>
+   <li>Always &rarr; do not use the "must replace icons in tree" property but always replace icons in the model tree
+   <li>Always &rarr; do not use the "must replace icons in tree" property but never replace icons in the model tree
+   <li>Always &rarr; use the "must replace icons in tree" property
+</ul></ul></ul>
+</p>
+<p style="margin-left: 40px">
+<b>Replace icons in views:</b>
+<ul><ul><ul>
+   <li>Always &rarr; do not use the "must replace icons in views" property but always replace icons in the views
+   <li>Always &rarr; do not use the "must replace icons in views" property but never replace icons in the views
+   <li>Always &rarr; use the "must replace icons in views" property
+</ul></ul></ul>
+</p>
+<p style="margin-left: 40px">
+<b>Replace labels in views:</b>
+<ul><ul><ul>
+   <li>Always &rarr; do not use the "must replace labels in views" property but always replace labels in the views
+   <li>Always &rarr; do not use the "must replace labels in views" property but never replace icons in the views
+   <li>Always &rarr; use the "must replace labels in views" property
+</ul></ul></ul>
+</p>
+
+
+
+<ul>
+	<li><b><u>Image folders</u></b></li>
+</ul>
+This table allows to specify witch folders will be used by the specialization plugin to search for image files.
+
+
+<ul>
+	<li><b><u>Online help</u></b></li>
+</ul>
+Click on the interrogation mark to show up the online help.
+</body>
+</html>
