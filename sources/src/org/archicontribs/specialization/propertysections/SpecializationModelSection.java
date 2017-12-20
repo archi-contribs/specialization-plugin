@@ -459,9 +459,9 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
 	                return;
 	            
 	            String value = null;
-	            if ( button.equals(btnIconsInViewsYes) )
+	            if ( button.equals(btnIconsInTreeYes) )
 	                value = "yes";
-	            else if ( button.equals(btnIconsInViewsNo) )
+	            else if ( button.equals(btnIconsInTreeNo) )
 	                value = "no";
 	            
 	            SpecializationPropertyCommand command = new SpecializationPropertyCommand(model, "must replace icons in tree", value);
