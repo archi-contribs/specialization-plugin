@@ -13,7 +13,7 @@ import com.archimatetool.model.IDiagramModelArchimateObject;
 /**
  * Product Figure
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class ProductFigure extends com.archimatetool.editor.diagram.figures.elements.ProductFigure {
     @Override

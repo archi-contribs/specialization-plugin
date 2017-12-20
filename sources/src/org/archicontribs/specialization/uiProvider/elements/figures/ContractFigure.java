@@ -14,7 +14,7 @@ import com.archimatetool.model.IDiagramModelArchimateObject;
 /**
  * Contract Figure
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class ContractFigure extends com.archimatetool.editor.diagram.figures.elements.ContractFigure {
     @Override

@@ -13,7 +13,7 @@ import com.archimatetool.model.IDiagramModelArchimateObject;
 /**
  * Representation Figure
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class RepresentationFigure extends com.archimatetool.editor.diagram.figures.elements.RepresentationFigure {
     @Override

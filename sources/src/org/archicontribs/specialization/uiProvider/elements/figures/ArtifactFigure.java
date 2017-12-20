@@ -14,7 +14,7 @@ import com.archimatetool.model.IDiagramModelArchimateObject;
 /**
  * Artifact Figure
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class ArtifactFigure extends com.archimatetool.editor.diagram.figures.elements.ArtifactFigure {
     @Override

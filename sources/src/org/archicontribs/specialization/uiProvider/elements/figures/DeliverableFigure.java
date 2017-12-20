@@ -14,7 +14,7 @@ import com.archimatetool.model.IDiagramModelArchimateObject;
 /**
  * Deliverable Figure
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class DeliverableFigure extends com.archimatetool.editor.diagram.figures.elements.DeliverableFigure {
     @Override

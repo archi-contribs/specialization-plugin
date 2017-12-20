@@ -13,7 +13,7 @@ import com.archimatetool.model.IDiagramModelArchimateObject;
 /**
  * Meaning Figure
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class MeaningFigure extends com.archimatetool.editor.diagram.figures.elements.MeaningFigure {
     @Override

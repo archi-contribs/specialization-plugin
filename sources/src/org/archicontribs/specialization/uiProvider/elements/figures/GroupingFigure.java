@@ -13,7 +13,7 @@ import com.archimatetool.model.IDiagramModelArchimateObject;
 /**
  * Grouping Figure
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class GroupingFigure extends com.archimatetool.editor.diagram.figures.elements.GroupingFigure {
     @Override
