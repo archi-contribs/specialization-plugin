@@ -28,6 +28,9 @@ import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.log4j.Level;
+import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -53,6 +56,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.archimatetool.editor.ui.factory.ObjectUIFactory;
 import com.archimatetool.model.IArchimateElement;
 import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
@@ -1202,5 +1206,55 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 return true;
         }
         return false;
+    }
+    
+    /**
+     * draw an image in a IDiagramModelArchimateObject
+     * @param obj
+     * @param graphics
+     * @param bounds
+     */
+    public static void drawIcon(IDiagramModelArchimateObject obj, Graphics graphics, Rectangle bounds) {
+        Image image = ObjectUIFactory.INSTANCE.getProvider(obj).getImage();
+        
+        if ( image == null )
+            logger.error("Image not found");
+        else {
+            String iconLocation = SpecializationPlugin.getPropertyValue(obj, "icon location");
+            
+            int defaultX = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
+            int defaultY = bounds.y + SpecializationPlugin.getIconMargin();
+            int x;
+            int y;
+            
+            if ( SpecializationPlugin.mustReplaceIcon(obj) && iconLocation != null && !iconLocation.isEmpty() ) {
+                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(obj)+": found icon location = "+iconLocation);
+                String[] parts = iconLocation.split(",");
+                try {
+                    if ( parts[0].equals("center") )
+                        x = bounds.x+(bounds.width-image.getBounds().width)/2;
+                    else if ( parts[0].startsWith("-") )
+                        x = bounds.x + bounds.width - image.getBounds().width + Integer.parseInt(parts[0]);
+                    else
+                        x = bounds.x + Integer.parseInt(parts[0].trim());
+                    
+                    if ( parts[1].equals("center") )
+                        y = bounds.y+(bounds.height-image.getBounds().height)/2;
+                    else if ( parts[1].startsWith("-") )
+                        y = bounds.y + bounds.height - image.getBounds().height + Integer.parseInt(parts[1]);
+                    else
+                        y = bounds.y + Integer.parseInt(parts[1].trim());
+                } catch ( Exception e) {
+                    logger.error("Malformed location. Should be under the form \"x,y\"");
+                    x=defaultX;
+                    y=defaultY;
+                }
+                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(obj)+": setting image location to "+(x-bounds.x)+","+(y-bounds.y));
+            } else {
+                x=defaultX;
+                y=defaultY;
+            }
+            graphics.drawImage(image, new Point(x, y));
+        }
     }
 }
