@@ -1,3 +1,6 @@
+* v1.0.1 (08/01/2017)
+  * Replace "\n" string by newline in labels
+
 * v1.0 (19/12/2017)
   * Better integration into Archi
   * The image files can now be located outside Archi's editor folder
