@@ -1176,8 +1176,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": label is "+ label);
             
             // we replace special characters if any
-            label = label.replace("\\n","\n");
-            if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": new label is "+ label);
+            if ( label != null )
+                label = label.replace("\\n","\n");
             
             return label;
         } else
