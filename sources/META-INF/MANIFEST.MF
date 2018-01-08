@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Icon plugin for Archimate tool
 Bundle-SymbolicName: org.archicontribs.specialization;singleton:=true
-Bundle-Version: 1.0
+Bundle-Version: 1.0.1
 Bundle-Vendor: Hervé Jouin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
