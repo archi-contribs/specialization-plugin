@@ -109,12 +109,13 @@ import com.archimatetool.model.IProperty;
  *                                  Fix junction shape
  *                                  Do not replace the icon in the properties window anymore
  * 
+ * v1.0.1       08/01/2017      Replace "\n" string by a new line in labels
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "1.0";
+	public static final String pluginVersion = "1.0.1";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
@@ -1173,6 +1174,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             // Now we get the icon filename from the property
             String label = getPropertyValue(concept, "label");
             if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": label is "+ label);
+            
+            // we replace special characters if any
+            label = label.replace("\\n","\n");
+            if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": new label is "+ label);
+            
             return label;
         } else
             logger.error("got null object parameter");
