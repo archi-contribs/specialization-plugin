@@ -110,6 +110,7 @@ import com.archimatetool.model.IProperty;
  *                                  Do not replace the icon in the properties window anymore
  * 
  * v1.0.1       08/01/2017      Replace "\n" string by a new line in labels
+ *                              Expand variables ${name}, ${id}, ${property:xxx}
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
@@ -1175,9 +1176,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             String label = getPropertyValue(concept, "label");
             if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": label is "+ label);
             
-            // we replace special characters if any
+            //we expand the variables in the label
             if ( label != null )
-                label = label.replace("\\n","\n");
+                label = SpecializationVariable.expand(label,obj);
+            
+            // we replace "\n" string by new line if any
+            if ( label != null )
+                label = SpecializationVariable.expand(label,obj).replace("\\n","\n");
             
             return label;
         } else
