@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -58,7 +59,6 @@ import org.json.simple.parser.JSONParser;
 
 import com.archimatetool.editor.ui.factory.ObjectUIFactory;
 import com.archimatetool.model.IArchimateElement;
-import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IBounds;
 import com.archimatetool.model.IDiagramModel;
@@ -140,7 +140,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	 */
 	private static IPreferenceStore preferenceStore = null;
 	
-	private static SpecializationLogger logger;
+	static SpecializationLogger logger;
 
 	public SpecializationPlugin() {
 		INSTANCE = this;
@@ -206,14 +206,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 						popup(Level.INFO, "The specialization plugin has been correctly updated to version "+pluginVersion);
 					else
 						popup(Level.ERROR, "The specialization plugin has been correctly downloaded to \""+installedPluginsFilename+"\" but you are still using the specialization plugin version "+pluginVersion+".\n\nPlease check the plugin files located in the \""+pluginsFolder+"\" folder.");
-				} catch (IOException e1) {
+				} catch (@SuppressWarnings("unused") IOException ign) {
 					popup(Level.WARN, "A new version of the specialization plugin has been downloaded but we failed to check if you are using the latest version.\n\nPlease check the plugin files located in the \""+pluginsFolder+"\" folder.");
 				}
 				
 				try {
 					if ( logger.isDebugEnabled() ) logger.debug("deleting file "+pluginsFolder+File.separator+"specializationPlugin.new");
 					Files.delete(FileSystems.getDefault().getPath(pluginsFolder+File.separator+"specializationPlugin.new"));
-				} catch ( IOException e ) {
+				} catch ( @SuppressWarnings("unused") IOException ign ) {
 					popup(Level.ERROR, "Failed to delete file \""+pluginsFolder+File.separator+"specializationPlugin.new\"\n\nYou need to delete it manually.");
 				}
 			} else if ( preferenceStore.getBoolean("checkForUpdateAtStartup") ) {
@@ -242,7 +242,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	    return preferenceStore.getString("mustReplaceLabelsInViews");
 	}
 	
-	public static boolean shouldShowImages() { return false; };
+	public static boolean shouldShowImages() { return false; }
 	
 	/**
 	 * Shows up an on screen popup, displaying the message (and the exception message if any) and wait for the user to click on the "OK" button
@@ -271,11 +271,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 				}
 				
 				switch ( level.toInt() ) {
-					case Level.FATAL_INT:
-					case Level.ERROR_INT:
+					case Priority.FATAL_INT:
+					case Priority.ERROR_INT:
 						MessageDialog.openError(null, SpecializationPlugin.pluginTitle, popupMessage);
 						break;
-					case Level.WARN_INT:
+					case Priority.WARN_INT:
 						MessageDialog.openWarning(null, SpecializationPlugin.pluginTitle, popupMessage);
 						break;
 					default:
@@ -320,8 +320,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		return objName.toString();
 	}
 	
-	private static Shell dialogShell = null;
-	private static Label dialogLabel = null;
+	static Shell dialogShell = null;
+	static Label dialogLabel = null;
 	
 	/**
 	 * shows up an on screen popup displaying the message but does not wait for any user input<br>
@@ -397,7 +397,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		refreshDisplay();
 	}
 	
-	private static int questionResult;
+	static int questionResult;
 	
 	/**
 	 * Shows up an on screen popup displaying the question (and the exception message if any)  and wait for the user to click on the "YES" or "NO" button<br>
@@ -466,12 +466,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	 * Refreshes the display
 	 */
 	public static void refreshDisplay() {
-		while ( Display.getCurrent().readAndDispatch() ) 
-			;
+		while ( Display.getCurrent().readAndDispatch() ) {
+			// nothing to do
+		}
 	}
 	
-	private static ProgressBar updateProgressbar = null;
-	private static int updateDownloaded = 0;
+	static ProgressBar updateProgressbar = null;
+	static int updateDownloaded = 0;
 	public static void checkForUpdate(boolean verbose) {
 		new Thread("checkForUpdate") {
 			@Override
@@ -517,9 +518,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 									// Seems to be OK.
 									logger.debug("Setting PasswordAuthenticator");
 									return new PasswordAuthentication(user, pass.toCharArray());
-								} else {
-								    logger.debug("Not setting PasswordAuthenticator as the request does not come from the proxy (host + port)");
 								}
+								logger.debug("Not setting PasswordAuthenticator as the request does not come from the proxy (host + port)");
 							}
 							return null;
 						}  
@@ -580,7 +580,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 					// treemap is sorted in descending order, so first entry should have the "bigger" key value, i.e. the latest version
 					Entry<String, String> entry = versions.entrySet().iterator().next();
 
-					if ( pluginVersion.compareTo((String)entry.getKey()) >= 0 ) {
+					if ( pluginVersion.compareTo(entry.getKey()) >= 0 ) {
 						if ( verbose )
 							popup(Level.INFO, "You already have got the latest version: "+pluginVersion);
 						else
@@ -590,20 +590,22 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 					
 					if ( !pluginsFilename.endsWith(".jar") ) {
 						if ( verbose )
-							popup(Level.ERROR,"A new version of the specialization plugin is available:\n     actual version: "+pluginVersion+"\n     new version: "+(String)entry.getKey()+"\n\nUnfortunately, it cannot be downloaded while Archi is running inside Eclipse.");
+							popup(Level.ERROR,"A new version of the specialization plugin is available:\n     actual version: "+pluginVersion+"\n     new version: "+entry.getKey()+"\n\nUnfortunately, it cannot be downloaded while Archi is running inside Eclipse.");
 						else
-							logger.error("A new version of the specialization plugin is available:\n     actual version: "+pluginVersion+"\n     new version: "+(String)entry.getKey()+"\n\nUnfortunately, it cannot be downloaded while Archi is running inside Eclipse.");
+							logger.error("A new version of the specialization plugin is available:\n     actual version: "+pluginVersion+"\n     new version: "+entry.getKey()+"\n\nUnfortunately, it cannot be downloaded while Archi is running inside Eclipse.");
 						return;
 					}
 
 					boolean ask = true;
 					while ( ask ) {
-					    switch ( question("A new version of the specialization plugin is available:\n     actual version: "+pluginVersion+"\n     new version: "+(String)entry.getKey()+"\n\nDo you wish to download and install it ?", new String[] {"Yes", "No", "Check release note"}) ) {
+					    switch ( question("A new version of the specialization plugin is available:\n     actual version: "+pluginVersion+"\n     new version: "+entry.getKey()+"\n\nDo you wish to download and install it ?", new String[] {"Yes", "No", "Check release note"}) ) {
 					        case 0: ask = false ; break;  // Yes
 					        case 1: return ;              // No
 					        case 2: ask = true ;          // release note
         					        Program.launch(RELEASENOTE_URL);
         					        break;
+                            default: // will never be here
+                                break;
 					    }
 					}
 
@@ -626,24 +628,24 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 
 					if (fileLength == -1)
 						throw new IOException("Failed to get file size.");
-					else
-						Display.getDefault().syncExec(new Runnable() { @Override public void run() { updateProgressbar.setMaximum(fileLength); }});
+					
+					Display.getDefault().syncExec(new Runnable() { @Override public void run() { updateProgressbar.setMaximum(fileLength); }});
 
-					InputStream in = conn.getInputStream();
-					FileOutputStream fos = new FileOutputStream(new File(tmpFilename));	                
-					byte[] buff = new byte[1024];
-					int n;
-					updateDownloaded = 0;
-
-					if ( logger.isDebugEnabled() ) logger.debug("downloading file ...");
-					while ((n=in.read(buff)) !=-1) {
-						fos.write(buff, 0, n);
-						updateDownloaded +=n;
-						Display.getDefault().syncExec(new Runnable() { @Override public void run() { updateProgressbar.setSelection(updateDownloaded); }});
-						//if ( logger.isTraceEnabled() ) logger.trace(updateDownloaded+"/"+fileLength);
+					try ( InputStream in = conn.getInputStream() ) {
+    					try ( FileOutputStream fos = new FileOutputStream(new File(tmpFilename)); ) {	                
+        					byte[] buff = new byte[1024];
+        					int n;
+        					updateDownloaded = 0;
+        
+        					if ( logger.isDebugEnabled() ) logger.debug("downloading file ...");
+        					while ((n=in.read(buff)) !=-1) {
+        						fos.write(buff, 0, n);
+        						updateDownloaded +=n;
+        						Display.getDefault().syncExec(new Runnable() { @Override public void run() { updateProgressbar.setSelection(updateDownloaded); }});
+        						//if ( logger.isTraceEnabled() ) logger.trace(updateDownloaded+"/"+fileLength);
+        					}
+    					}
 					}
-					fos.flush();
-					fos.close();
 
 					if ( logger.isDebugEnabled() ) logger.debug("download finished");
 
@@ -670,7 +672,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 				if ( logger.isDebugEnabled() ) logger.debug("renaming \""+tmpFilename+"\" to \""+newPluginFilename+"\"");
 				try {
 					Files.move(FileSystems.getDefault().getPath(tmpFilename), FileSystems.getDefault().getPath(newPluginFilename), StandardCopyOption.REPLACE_EXISTING);
-				} catch (IOException e) {
+				} catch (@SuppressWarnings("unused") IOException ign) {
 					if ( verbose )
 						popup(Level.ERROR, "Failed to rename \""+tmpFilename+"\" to \""+newPluginFilename+"\"");
 					else
@@ -691,7 +693,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 				if( question("A new version on the specialization plugin has been downloaded. Archi needs to be restarted to install it.\n\nDo you wish to restart Archi now ?") ) {
 					Display.getDefault().syncExec(new Runnable() { @Override public void run() { PlatformUI.getWorkbench().restart(); }});
 				}
-			};
+			}
 		}.start();
 	}
 	
@@ -716,60 +718,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         return null;
     }
     
-    public static void setProperty(EObject obj, String propertyName, String propertyValue) {
-        if ( obj == null )
-            return;
-        
-        EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
-        if ( !(concept instanceof IProperties) ) {
-            // Should not happen, but just in case
-            logger.error(getFullName(obj) + " does not have properties");
-            return;
-        }
-        
-    	boolean mustCreateProperty = true;
-    	
-        for ( IProperty property:((IProperties)concept).getProperties() ) {
-            if ( areEqual(property.getKey(), propertyName) ) {
-                property.setValue(propertyValue);
-                // we change all properties that have the required key
-                mustCreateProperty = false;
-            }
-        }
-        
-        if ( mustCreateProperty ) {
-	        IProperty property = IArchimateFactory.eINSTANCE.createProperty();
-	        property.setKey(propertyName);
-	        property.setValue(propertyValue);
-	        ((IProperties)concept).getProperties().add(property);
-        }
-    }
-    
-    public static void deleteProperty(EObject obj, String propertyName) {
-        if ( obj == null )
-            return;
-        
-        if ( ! (obj instanceof IProperties) ) {
-            logger.error(getFullName(obj)+" has not got properties");
-            return;
-        }
-        
-    	boolean propertyRemoved = true;
-    	
-    	while ( propertyRemoved ) {
-    		propertyRemoved = false;
-	        if ( obj != null && obj instanceof IProperties) {
-	            for ( IProperty property:((IProperties)obj).getProperties() ) {
-	                if ( areEqual(property.getKey(), propertyName) ) {
-	                	((IProperties)obj).getProperties().remove(property);
-	                	propertyRemoved = true;
-	                	break;
-	                }
-	            }
-	        }
-    	}
-    }
-	
     public static boolean mustReplaceIcon(EObject obj) {
         if ( obj != null ) {
         	// we do not change the icon of the element in the properties window
@@ -808,6 +756,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                     case "never":  
                         if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+": "+mustReplaceIcons);
                         return false;
+                    default: // should continue
+                        break;
                 }
             }
             
@@ -821,6 +771,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                         return true;
                     case "no":
                         return false;
+                    default: // we continue
+                        break;
                 }
             }
                         
@@ -841,6 +793,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                         return true;
                     case "no":
                         return false;
+                    default: // we continue
+                        break;
                 }
             }
             
@@ -910,29 +864,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             
             if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": icon name = \"" + iconName + "\"");
             return iconName;
-        } else
-        	logger.error("got null object parameter");
-        return null;
-    }
-    
-    /**
-     * Sets the icon name into the EObject properties
-     * @param obj
-     * @param iconName
-     */
-    public static void setIconName(EObject obj, String iconName) {
-        if ( obj != null ) {
-            EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
-            if ( !(concept instanceof IProperties) ) {
-                // Should not happen, but just in case
-                logger.error(getFullName(obj) + " does not have properties");
-                return;
-            }
-            
-            // we set the icon name into the property
-            logger.trace(getFullName(obj)+": setting property icon = "+iconName);
-            setProperty(concept, "icon", iconName);
         }
+        
+        logger.error("got null object parameter");
+        return null;
     }
     
     /**
@@ -975,29 +910,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 }
             }
             return iconSize;
-        } else
-            logger.error("got null object parameter");
-        return null;
-    }
-    
-    /**
-     * Sets the icon size into the EObject properties
-     * @param obj
-     * @param iconSize
-     */
-    public static void setIconSize(EObject obj, String iconSize) {
-        if ( obj != null ) {
-            EObject concept = (obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
-            if ( !(concept instanceof IProperties) ) {
-                // Should not happen, but just in case
-                logger.error(getFullName(obj) + " does not have properties");
-                return;
-            }
-            
-            // we set the icon size into the property
-            logger.trace(getFullName(obj)+": setting property icon size = "+iconSize);
-            setProperty(concept, "icon size", iconSize);
         }
+        
+        logger.error("got null object parameter");
+        return null;
     }
     
     /**
@@ -1059,10 +975,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	                String[] parts = imageSize.split("x");
 	                width = Integer.parseInt(parts[0].trim());
 	                height = Integer.parseInt(parts[1].trim());
-	            } catch ( Exception ign ) {
+	            } catch ( @SuppressWarnings("unused") Exception ign ) {
 	                width = 0;
 	                height = 0;
-	            };
+	            }
 	        }
 	        
 	        if ( width <= 0 && height <= 0 )  // in case of error on the size, we return the image unresized
@@ -1118,6 +1034,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                         return true;
                     case "never":
                         return false;
+                    default: // we continue
+                        break;
                 }
             }
             
@@ -1130,6 +1048,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                         return true;
                     case "no":
                         return false;
+                    default: // we continue
+                        break;
                 }
             }
                         
@@ -1147,6 +1067,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                         return true;
                     case "no":
                         return false;
+                    default: // we continue
+                        break;
                 }
             }
             
@@ -1185,8 +1107,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 label = SpecializationVariable.expand(label,obj).replace("\\n","\n");
             
             return label;
-        } else
-            logger.error("got null object parameter");
+        }
+        
+        logger.error("got null object parameter");
         return null;
     }
     
@@ -1255,7 +1178,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                         y = bounds.y + bounds.height - image.getBounds().height + Integer.parseInt(parts[1]);
                     else
                         y = bounds.y + Integer.parseInt(parts[1].trim());
-                } catch ( Exception e) {
+                } catch ( @SuppressWarnings("unused") Exception ign) {
                     logger.error("Malformed location. Should be under the form \"x,y\"");
                     x=defaultX;
                     y=defaultY;
