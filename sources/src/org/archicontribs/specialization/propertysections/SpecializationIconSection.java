@@ -15,12 +15,15 @@ import java.util.Arrays;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
+import org.archicontribs.specialization.SpecializationPropertyCommand;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.commands.CompoundCommand;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.ModifyEvent;
@@ -49,37 +52,38 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
+import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.*;
 import com.archimatetool.model.impl.Bounds;
 
 
 public class SpecializationIconSection extends AbstractArchimatePropertySection {
-    private static final SpecializationLogger logger = new SpecializationLogger(SpecializationIconSection.class);
+    static final SpecializationLogger logger = new SpecializationLogger(SpecializationIconSection.class);
 
-    private ArchimateElementEditPart elementEditPart = null;
+    ArchimateElementEditPart elementEditPart = null;
 
     private Composite compoIcon;
     private Composite compoNoIcon;
     private Label lblNoIcon;
-    private Text txtIconName;
-    private Text txtIconSize;
-    private Text txtIconLocation;
-    private Tree fileTree;
-    private Composite compoPreview;
+    Text txtIconName;
+    Text txtIconSize;
+    Text txtIconLocation;
+    Tree fileTree;
+    Composite compoPreview;
     private Button btnNoResize;
-    private Button btnAutoResize;
-    private Button btnCustomResize;
-    private Text txtWidth;
-    private Text txtHeight;
-    private Label imagePreview;
+    Button btnAutoResize;
+    Button btnCustomResize;
+    Text txtWidth;
+    Text txtHeight;
+    Label imagePreview;
     
-    private boolean mouseOverHelpButton = false;
+    boolean mouseOverHelpButton = false;
 
-    static final private String[] validImageSuffixes = {"jpg", "png", "gif", "bmp", "ico"};
-    static final private Image    closedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/closedFolder.png"));
-    static final private Image    openedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/openedFolder.png"));
-    static final private Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
+    static final String[] validImageSuffixes = {"jpg", "png", "gif", "bmp", "ico"};
+    static final Image    closedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/closedFolder.png"));
+    static final Image    openedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/openedFolder.png"));
+    static final Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 
     /**
      * Filter to show or reject this section depending on input value
@@ -99,15 +103,15 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             // the loggerLevel is a private property, so we use reflection to access it
             try {
                 ((ArchimateElementEditPart)object).getFigure().getClass().getDeclaredMethod("drawIcon", Graphics.class);
-            } catch (NoSuchMethodException e) {
-                logger.trace("hiding icon tab as the element has not got any icon");
+            } catch (@SuppressWarnings("unused") NoSuchMethodException ign) {
+                logger.trace("Hiding icon tab as the element has not got any icon");
                 return false;
             } catch (SecurityException e) {
-                logger.error("failed to check for \"drawIcon\" method", e);
+                logger.error("Failed to check for \"drawIcon\" method", e);
                 return false;
             }
 
-            logger.trace("showing icon tab as the element has got a icon");
+            logger.trace("Showing icon tab as the element has got a icon");
             return true;
         }
 
@@ -155,48 +159,48 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
      */
     @Override
     protected void createControls(Composite parent) {
-        compoNoIcon = new Composite(parent, SWT.NONE);
-        compoNoIcon.setForeground(parent.getForeground());
-        compoNoIcon.setBackground(parent.getBackground());
-        compoNoIcon.setLayout(new FormLayout());
+        this.compoNoIcon = new Composite(parent, SWT.NONE);
+        this.compoNoIcon.setForeground(parent.getForeground());
+        this.compoNoIcon.setBackground(parent.getBackground());
+        this.compoNoIcon.setLayout(new FormLayout());
         FormData fd = new FormData();
         fd.top = new FormAttachment(0);
         fd.left = new FormAttachment(0);
         fd.right = new FormAttachment(100);
         fd.bottom = new FormAttachment(100);
-        compoNoIcon.setLayoutData(fd);
+        this.compoNoIcon.setLayoutData(fd);
 
-        lblNoIcon = new Label(compoNoIcon, SWT.NONE);
-        lblNoIcon.setText("Please change the element's figure to show up the icon.");
-        lblNoIcon.setForeground(parent.getForeground());
-        lblNoIcon.setBackground(parent.getBackground());
+        this.lblNoIcon = new Label(this.compoNoIcon, SWT.NONE);
+        this.lblNoIcon.setText("Please change the element's figure to show up the icon.");
+        this.lblNoIcon.setForeground(parent.getForeground());
+        this.lblNoIcon.setBackground(parent.getBackground());
         fd = new FormData();
         fd.top = new FormAttachment(0, 20);
         fd.left = new FormAttachment(0, 20);
-        lblNoIcon.setLayoutData(fd);
+        this.lblNoIcon.setLayoutData(fd);
         
-        Label btnHelp = new Label(compoNoIcon, SWT.NONE);
+        Label btnHelp = new Label(this.compoNoIcon, SWT.NONE);
         btnHelp.setForeground(parent.getForeground());
         btnHelp.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(lblNoIcon, 25);
-        fd.bottom = new FormAttachment(lblNoIcon, 55, SWT.BOTTOM);
+        fd.top = new FormAttachment(this.lblNoIcon, 25);
+        fd.bottom = new FormAttachment(this.lblNoIcon, 55, SWT.BOTTOM);
         fd.left = new FormAttachment(0, 20);
         fd.right = new FormAttachment(0, 50);
         btnHelp.setLayoutData(fd);
-        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp.redraw(); } });
-        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { SpecializationIconSection.this.mouseOverHelpButton = true; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { SpecializationIconSection.this.mouseOverHelpButton = false; btnHelp.redraw(); } });
         btnHelp.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e)
             {
-                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 if ( SpecializationIconSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
         btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); } });
         
-        Label helpLbl = new Label(compoNoIcon, SWT.NONE);
+        Label helpLbl = new Label(this.compoNoIcon, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
         helpLbl.setForeground(parent.getForeground());
         helpLbl.setBackground(parent.getBackground());
@@ -206,18 +210,18 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         helpLbl.setLayoutData(fd);
 
         /* ********************************************************* */
-        compoIcon = new Composite(parent, SWT.NONE);
-        compoIcon.setForeground(parent.getForeground());
-        compoIcon.setBackground(parent.getBackground());
-        compoIcon.setLayout(new FormLayout());
+        this.compoIcon = new Composite(parent, SWT.NONE);
+        this.compoIcon.setForeground(parent.getForeground());
+        this.compoIcon.setBackground(parent.getBackground());
+        this.compoIcon.setLayout(new FormLayout());
         fd = new FormData();
         fd.top = new FormAttachment(0);
         fd.left = new FormAttachment(0);
         fd.right = new FormAttachment(100);
         fd.bottom = new FormAttachment(100);
-        compoIcon.setLayoutData(fd);
+        this.compoIcon.setLayoutData(fd);
 
-        Label lblIconName = new Label(compoIcon, SWT.NONE);
+        Label lblIconName = new Label(this.compoIcon, SWT.NONE);
         lblIconName.setText("Icon :");
         lblIconName.setForeground(parent.getForeground());
         lblIconName.setBackground(parent.getBackground());
@@ -226,7 +230,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.left = new FormAttachment(0, 10);
         lblIconName.setLayoutData(fd);
         
-        Label lblIconSize = new Label(compoIcon, SWT.NONE);
+        Label lblIconSize = new Label(this.compoIcon, SWT.NONE);
         lblIconSize.setText("Icon size:");
         lblIconSize.setForeground(parent.getForeground());
         lblIconSize.setBackground(parent.getBackground());
@@ -235,7 +239,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.left = new FormAttachment(0, 10);
         lblIconSize.setLayoutData(fd);
 
-        Label lblIconLocation = new Label(compoIcon, SWT.NONE);
+        Label lblIconLocation = new Label(this.compoIcon, SWT.NONE);
         lblIconLocation.setText("Icon location:");
         lblIconLocation.setForeground(parent.getForeground());
         lblIconLocation.setBackground(parent.getBackground());
@@ -244,71 +248,71 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.left = new FormAttachment(0, 10);
         lblIconLocation.setLayoutData(fd);
 
-        txtIconName = new Text(compoIcon, SWT.BORDER);
+        this.txtIconName = new Text(this.compoIcon, SWT.BORDER);
         fd = new FormData();
         fd.top = new FormAttachment(lblIconName, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblIconLocation, 5);
         fd.right = new FormAttachment(0, 400);
-        txtIconName.setLayoutData(fd);
-        txtIconName.addModifyListener(iconModifyListener);
+        this.txtIconName.setLayoutData(fd);
+        this.txtIconName.addModifyListener(this.iconModifyListener);
 
-        txtIconSize = new Text(compoIcon, SWT.BORDER);
+        this.txtIconSize = new Text(this.compoIcon, SWT.BORDER);
         fd = new FormData();
         fd.top = new FormAttachment(lblIconSize, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblIconLocation, 5);
         fd.right = new FormAttachment(0, 150);
-        txtIconSize.setLayoutData(fd);
-        txtIconSize.addModifyListener(iconSizeModifyListener);
+        this.txtIconSize.setLayoutData(fd);
+        this.txtIconSize.addModifyListener(this.iconSizeModifyListener);
 
-        txtIconLocation = new Text(compoIcon, SWT.BORDER);
+        this.txtIconLocation = new Text(this.compoIcon, SWT.BORDER);
         fd = new FormData();
         fd.top = new FormAttachment(lblIconLocation, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblIconLocation, 5);
         fd.right = new FormAttachment(0, 150);
-        txtIconLocation.setLayoutData(fd);
-        txtIconLocation.addModifyListener(iconLocationModifyListener);
+        this.txtIconLocation.setLayoutData(fd);
+        this.txtIconLocation.addModifyListener(this.iconLocationModifyListener);
 
-        fileTree = new Tree(compoIcon, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        fileTree.setBackground(parent.getBackground());
-        fileTree.addListener(SWT.Selection, fileTreeSelectionListener);
-        fileTree.addListener(SWT.Expand, fileTreeSelectionListener);
-        fileTree.addListener(SWT.Collapse, fileTreeSelectionListener);
+        this.fileTree = new Tree(this.compoIcon, SWT.VIRTUAL | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+        this.fileTree.setBackground(parent.getBackground());
+        this.fileTree.addListener(SWT.Selection, this.fileTreeSelectionListener);
+        this.fileTree.addListener(SWT.Expand, this.fileTreeSelectionListener);
+        this.fileTree.addListener(SWT.Collapse, this.fileTreeSelectionListener);
 
         fd = new FormData();
-        fd.top = new FormAttachment(txtIconLocation, 10);
+        fd.top = new FormAttachment(this.txtIconLocation, 10);
         fd.left = new FormAttachment(0, 10);
-        fd.right = new FormAttachment(txtIconName, 0, SWT.RIGHT);
+        fd.right = new FormAttachment(this.txtIconName, 0, SWT.RIGHT);
         fd.bottom = new FormAttachment(0, 220);
-        fileTree.setLayoutData(fd);
+        this.fileTree.setLayoutData(fd);
 
-        Label lblReminder = new Label(compoIcon, SWT.NONE);
+        Label lblReminder = new Label(this.compoIcon, SWT.NONE);
         lblReminder.setText("(you may define new image folders on the preference page)");
         lblReminder.setForeground(parent.getForeground());
         lblReminder.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(fileTree, 3);
-        fd.left = new FormAttachment(fileTree, 0, SWT.CENTER);
+        fd.top = new FormAttachment(this.fileTree, 3);
+        fd.left = new FormAttachment(this.fileTree, 0, SWT.CENTER);
         lblReminder.setLayoutData(fd);
         
-        compoPreview = new Composite(compoIcon, SWT.RESIZE);
-        compoPreview.setForeground(parent.getForeground());
-        compoPreview.setBackground(parent.getBackground());
+        this.compoPreview = new Composite(this.compoIcon, SWT.RESIZE);
+        this.compoPreview.setForeground(parent.getForeground());
+        this.compoPreview.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(fileTree, 0, SWT.TOP);
-        fd.left = new FormAttachment(fileTree, 10, SWT.RIGHT);
-        compoPreview.setLayoutData(fd);
-        compoPreview.setVisible(false);
-        compoPreview.setLayout(new FormLayout());
+        fd.top = new FormAttachment(this.fileTree, 0, SWT.TOP);
+        fd.left = new FormAttachment(this.fileTree, 10, SWT.RIGHT);
+        this.compoPreview.setLayoutData(fd);
+        this.compoPreview.setVisible(false);
+        this.compoPreview.setLayout(new FormLayout());
                 
-        Button btnSetIcon = new Button(compoPreview, SWT.NONE);
+        Button btnSetIcon = new Button(this.compoPreview, SWT.NONE);
         btnSetIcon.setText("Set Icon");
         fd = new FormData();
         fd.top = new FormAttachment(0);
         fd.left = new FormAttachment(0);
         btnSetIcon.setLayoutData(fd);
-        btnSetIcon.addSelectionListener(setIconSelectionListener);
+        btnSetIcon.addSelectionListener(this.setIconSelectionListener);
         
-        Label lblResize = new Label(compoPreview, SWT.NONE);
+        Label lblResize = new Label(this.compoPreview, SWT.NONE);
         lblResize.setText("Resize to");
         lblResize.setForeground(parent.getForeground());
         lblResize.setBackground(parent.getBackground());
@@ -317,76 +321,76 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.left = new FormAttachment(0);
         lblResize.setLayoutData(fd);
 
-        btnNoResize = new Button(compoPreview, SWT.RADIO);
-        btnNoResize.setForeground(parent.getForeground());
-        btnNoResize.setBackground(parent.getBackground());
-        btnNoResize.setText("Do not Resize");
+        this.btnNoResize = new Button(this.compoPreview, SWT.RADIO);
+        this.btnNoResize.setForeground(parent.getForeground());
+        this.btnNoResize.setBackground(parent.getBackground());
+        this.btnNoResize.setText("Do not Resize");
         fd = new FormData();
         fd.top = new FormAttachment(lblResize, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblResize, 5);
-        btnNoResize.setLayoutData(fd);
-        btnNoResize.setSelection(true);
-        btnNoResize.addSelectionListener(resizeSelectionListener);
+        this.btnNoResize.setLayoutData(fd);
+        this.btnNoResize.setSelection(true);
+        this.btnNoResize.addSelectionListener(this.resizeSelectionListener);
         
-        btnAutoResize = new Button(compoPreview, SWT.RADIO);
-        btnAutoResize.setForeground(parent.getForeground());
-        btnAutoResize.setBackground(parent.getBackground());
-        btnAutoResize.setText("Figure's size");
+        this.btnAutoResize = new Button(this.compoPreview, SWT.RADIO);
+        this.btnAutoResize.setForeground(parent.getForeground());
+        this.btnAutoResize.setBackground(parent.getBackground());
+        this.btnAutoResize.setText("Figure's size");
         fd = new FormData();
-        fd.top = new FormAttachment(btnNoResize, 5);
-        fd.left = new FormAttachment(btnNoResize, 0, SWT.LEFT);
-        btnAutoResize.setLayoutData(fd);
-        btnAutoResize.addSelectionListener(resizeSelectionListener);
+        fd.top = new FormAttachment(this.btnNoResize, 5);
+        fd.left = new FormAttachment(this.btnNoResize, 0, SWT.LEFT);
+        this.btnAutoResize.setLayoutData(fd);
+        this.btnAutoResize.addSelectionListener(this.resizeSelectionListener);
         
-        btnCustomResize = new Button(compoPreview, SWT.RADIO);
-        btnCustomResize.setForeground(parent.getForeground());
-        btnCustomResize.setBackground(parent.getBackground());
+        this.btnCustomResize = new Button(this.compoPreview, SWT.RADIO);
+        this.btnCustomResize.setForeground(parent.getForeground());
+        this.btnCustomResize.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(btnAutoResize, 5);
-        fd.left = new FormAttachment(btnAutoResize, 0, SWT.LEFT);
-        btnCustomResize.setLayoutData(fd);
-        btnCustomResize.addSelectionListener(resizeSelectionListener);
+        fd.top = new FormAttachment(this.btnAutoResize, 5);
+        fd.left = new FormAttachment(this.btnAutoResize, 0, SWT.LEFT);
+        this.btnCustomResize.setLayoutData(fd);
+        this.btnCustomResize.addSelectionListener(this.resizeSelectionListener);
         
-        txtWidth = new Text(compoPreview, SWT.BORDER);
-        txtWidth.setTextLimit(4);
+        this.txtWidth = new Text(this.compoPreview, SWT.BORDER);
+        this.txtWidth.setTextLimit(4);
         fd = new FormData();
-        fd.top = new FormAttachment(btnCustomResize, 0, SWT.CENTER);
-        fd.left = new FormAttachment(btnCustomResize, 5, SWT.RIGHT);
-        fd.right = new FormAttachment(btnCustomResize, 35, SWT.RIGHT);
-        txtWidth.setLayoutData(fd);
-        txtWidth.addVerifyListener(numberOnlyVerifyListener);
-        txtWidth.addModifyListener(resizeModifyListener);
-        txtWidth.setEnabled(false);
+        fd.top = new FormAttachment(this.btnCustomResize, 0, SWT.CENTER);
+        fd.left = new FormAttachment(this.btnCustomResize, 5, SWT.RIGHT);
+        fd.right = new FormAttachment(this.btnCustomResize, 35, SWT.RIGHT);
+        this.txtWidth.setLayoutData(fd);
+        this.txtWidth.addVerifyListener(this.numberOnlyVerifyListener);
+        this.txtWidth.addModifyListener(this.resizeModifyListener);
+        this.txtWidth.setEnabled(false);
         
-        Label lblX = new Label(compoPreview, SWT.NONE);
+        Label lblX = new Label(this.compoPreview, SWT.NONE);
         lblX.setText("x");
         lblX.setForeground(parent.getForeground());
         lblX.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(txtWidth, 0, SWT.CENTER);
-        fd.left = new FormAttachment(txtWidth, 5, SWT.RIGHT);
+        fd.top = new FormAttachment(this.txtWidth, 0, SWT.CENTER);
+        fd.left = new FormAttachment(this.txtWidth, 5, SWT.RIGHT);
         lblX.setLayoutData(fd);
         
-        txtHeight = new Text(compoPreview, SWT.BORDER);
-        txtHeight.setTextLimit(4);
+        this.txtHeight = new Text(this.compoPreview, SWT.BORDER);
+        this.txtHeight.setTextLimit(4);
         fd = new FormData();
         fd.top = new FormAttachment(lblX, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblX, 5, SWT.RIGHT);
         fd.right = new FormAttachment(lblX, 35, SWT.RIGHT);
-        txtHeight.setLayoutData(fd);
-        txtHeight.addVerifyListener(numberOnlyVerifyListener);
-        txtHeight.addModifyListener(resizeModifyListener);
-        txtHeight.setEnabled(false);
+        this.txtHeight.setLayoutData(fd);
+        this.txtHeight.addVerifyListener(this.numberOnlyVerifyListener);
+        this.txtHeight.addModifyListener(this.resizeModifyListener);
+        this.txtHeight.setEnabled(false);
 
-        imagePreview = new Label(compoPreview, SWT.NONE);
-        imagePreview.setForeground(parent.getForeground());
-        imagePreview.setBackground(parent.getBackground());
+        this.imagePreview = new Label(this.compoPreview, SWT.NONE);
+        this.imagePreview.setForeground(parent.getForeground());
+        this.imagePreview.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(txtHeight, 10);
+        fd.top = new FormAttachment(this.txtHeight, 10);
         fd.left = new FormAttachment(0);
-        imagePreview.setLayoutData(fd);
+        this.imagePreview.setLayoutData(fd);
         
-        Label btnHelp2 = new Label(compoIcon, SWT.NONE);
+        Label btnHelp2 = new Label(this.compoIcon, SWT.NONE);
         btnHelp2.setForeground(parent.getForeground());
         btnHelp2.setBackground(parent.getBackground());
         fd = new FormData();
@@ -395,19 +399,19 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         fd.left = new FormAttachment(0, 10);
         fd.right = new FormAttachment(0, 40);
         btnHelp2.setLayoutData(fd);
-        btnHelp2.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp2.redraw(); } });
-        btnHelp2.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp2.redraw(); } });
+        btnHelp2.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { SpecializationIconSection.this.mouseOverHelpButton = true; btnHelp2.redraw(); } });
+        btnHelp2.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { SpecializationIconSection.this.mouseOverHelpButton = false; btnHelp2.redraw(); } });
         btnHelp2.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e)
             {
-                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 if ( SpecializationIconSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
         btnHelp2.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); } });
         
-        helpLbl = new Label(compoIcon, SWT.NONE);
+        helpLbl = new Label(this.compoIcon, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
         helpLbl.setForeground(parent.getForeground());
         helpLbl.setBackground(parent.getBackground());
@@ -419,23 +423,23 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         refreshControls();            
     }
     
-    private void showPreviewImage() {
+    void showPreviewImage() {
         showPreviewImage(0, 0);
     }
     
-    private void showPreviewImage(int forceWidth, int forceHeight) {
-        Image image = imagePreview.getImage();
+    void showPreviewImage(int forceWidth, int forceHeight) {
+        Image image = this.imagePreview.getImage();
         if ( image != null ) {
-            imagePreview.setImage(null);
-            imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-            compoPreview.setSize(compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            this.imagePreview.setImage(null);
+            this.imagePreview.setSize(this.imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            this.compoPreview.setSize(this.compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
             image.dispose();
         }
         
-        if ( fileTree.getItemCount() == 0 || fileTree.getSelection().length == 0 )
+        if ( this.fileTree.getItemCount() == 0 || this.fileTree.getSelection().length == 0 )
             return;
         
-        String location = (String)fileTree.getSelection()[0].getData("location");
+        String location = (String)this.fileTree.getSelection()[0].getData("location");
         if ( location == null )
             return;
         
@@ -451,16 +455,16 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         
         ImageData imagePreviewData;
         
-        if ( btnNoResize.getSelection() ) {
+        if ( this.btnNoResize.getSelection() ) {
             imagePreviewData = imageData;
-        } else if ( btnAutoResize.getSelection() ) {
-            Rectangle rect = elementEditPart.getFigure().getBounds();
+        } else if ( this.btnAutoResize.getSelection() ) {
+            Rectangle rect = this.elementEditPart.getFigure().getBounds();
             int width = forceWidth != 0 ? forceWidth : rect.width;
             int height = forceHeight != 0 ? forceHeight : rect.height;
             imagePreviewData = imageData.scaledTo(width, height);
         } else {
-            int width = txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(txtWidth.getText());
-            int height = txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(txtHeight.getText());
+            int width = this.txtWidth.getText().isEmpty() ? 0 : Integer.parseInt(this.txtWidth.getText());
+            int height = this.txtHeight.getText().isEmpty() ? 0 : Integer.parseInt(this.txtHeight.getText());
             
             if ( width == 0 && height == 0 )
                 imagePreviewData = imageData;
@@ -480,24 +484,25 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         }
         
         image = new Image(Display.getCurrent(), imagePreviewData);
-        imagePreview.setImage(image);
-        imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-        compoPreview.setSize(compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        this.imagePreview.setImage(image);
+        this.imagePreview.setSize(this.imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        this.compoPreview.setSize(this.compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
         
-        compoPreview.setVisible(true);
+        this.compoPreview.setVisible(true);
     }
     
     private Listener fileTreeSelectionListener = new Listener() {
+        @Override
         public void handleEvent(Event e) {
-            Image image = imagePreview.getImage();
+            Image image = SpecializationIconSection.this.imagePreview.getImage();
             if ( image != null ) {
-                imagePreview.setImage(null);
-                imagePreview.setSize(imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-                compoPreview.setSize(compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+                SpecializationIconSection.this.imagePreview.setImage(null);
+                SpecializationIconSection.this.imagePreview.setSize(SpecializationIconSection.this.imagePreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+                SpecializationIconSection.this.compoPreview.setSize(SpecializationIconSection.this.compoPreview.computeSize(SWT.DEFAULT, SWT.DEFAULT));
                 image.dispose();
             }
             
-            compoPreview.setVisible(false);
+            SpecializationIconSection.this.compoPreview.setVisible(false);
             
             TreeItem treeItem = (TreeItem) e.item;
             if (treeItem == null)
@@ -523,9 +528,9 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 
                 treeItem.setImage(openedFolderImage);
 
-                File[] folders = file.listFiles(foldersFilter);
+                File[] folders = file.listFiles(SpecializationIconSection.this.foldersFilter);
                 if (folders != null) {
-                    Arrays.sort(folders, nameComparator);
+                    Arrays.sort(folders, SpecializationIconSection.this.nameComparator);
                     for (int i = 0; i < folders.length; i++) {
                         File folder = folders[i];
                         logger.trace("found folder : "+Paths.get(folder.getName()));
@@ -533,13 +538,14 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
                         subItem.setText(folder.getName());
                         subItem.setImage(closedFolderImage);
                         subItem.setData("location", folder.getPath());
-                        new TreeItem(subItem, SWT.NONE);         // to show the arrow in front of the folder
+                        @SuppressWarnings("unused")
+                        TreeItem newTreeItem = new TreeItem(subItem, SWT.NONE);         // to show the arrow in front of the folder
                     }
                 }
 
-                File[] files = file.listFiles(imagesFilter);
+                File[] files = file.listFiles(SpecializationIconSection.this.imagesFilter);
                 if (files != null) {
-                    Arrays.sort(files, nameComparator);
+                    Arrays.sort(files, SpecializationIconSection.this.nameComparator);
                     for (int i = 0; i < files.length; i++) {
                         File f = files[i];
                         logger.trace("found image : "+Paths.get(f.getName()));
@@ -556,7 +562,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         }
     };
 
-    private FileFilter imagesFilter = new FileFilter() {
+    FileFilter imagesFilter = new FileFilter() {
         @Override
         public boolean accept(File file) {
             if ( file.isFile() && (file.getName().lastIndexOf('.') != -1) )
@@ -565,14 +571,14 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         }
     };
 
-    private FileFilter foldersFilter = new FileFilter() {
+    FileFilter foldersFilter = new FileFilter() {
         @Override
         public boolean accept(File file) {
             return file.isDirectory();
         }
     };
 
-    private Comparator<File> nameComparator = new Comparator<File>() {
+    Comparator<File> nameComparator = new Comparator<File>() {
         @Override
         public int compare(File f1, File f2) {
             return f1.getName().compareToIgnoreCase(f2.getName());
@@ -589,15 +595,17 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             try {
                 if ( (event.character == '\b') || (Integer.parseInt(event.text) != -1) )
                     event.doit = true;
-            } catch (NumberFormatException ignore) {}
+            } catch (@SuppressWarnings("unused") NumberFormatException ignore) {
+                // nothing to do
+            }
         }
     };
     
     private SelectionListener resizeSelectionListener = new SelectionListener() {
         @Override
         public void widgetSelected(SelectionEvent event) {
-            txtWidth.setEnabled(event.widget == btnCustomResize);
-            txtHeight.setEnabled(event.widget == btnCustomResize);
+            SpecializationIconSection.this.txtWidth.setEnabled(event.widget == SpecializationIconSection.this.btnCustomResize);
+            SpecializationIconSection.this.txtHeight.setEnabled(event.widget == SpecializationIconSection.this.btnCustomResize);
             
             showPreviewImage();
         }
@@ -618,7 +626,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private SelectionListener setIconSelectionListener = new SelectionListener() {
         @Override
         public void widgetSelected(SelectionEvent event) {
-        	TreeItem selectedTreeItem = fileTree.getSelection()[0];
+        	TreeItem selectedTreeItem = SpecializationIconSection.this.fileTree.getSelection()[0];
         	TreeItem rootTreeItem = selectedTreeItem;
         	while ( rootTreeItem.getParentItem() != null )
         		rootTreeItem = rootTreeItem.getParentItem();
@@ -630,17 +638,17 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
                 logger.error("   root location = " + rootLocation);
             } else {
             	String locationName = location.substring(rootLocation.length()).replace("\\","/");
-                txtIconName.setText("/"+(String)rootTreeItem.getData("folder")+(locationName.startsWith("/")?"":"/")+locationName);
+                SpecializationIconSection.this.txtIconName.setText("/"+(String)rootTreeItem.getData("folder")+(locationName.startsWith("/")?"":"/")+locationName);
                 
-                if ( btnAutoResize.getSelection() )
-                    txtIconSize.setText("auto");
-                else if ( btnCustomResize.getSelection() )
-                    if ( txtWidth.getText().isEmpty() && txtHeight.getText().isEmpty() )
-                        txtIconSize.setText("");
+                if ( SpecializationIconSection.this.btnAutoResize.getSelection() )
+                    SpecializationIconSection.this.txtIconSize.setText("auto");
+                else if ( SpecializationIconSection.this.btnCustomResize.getSelection() )
+                    if ( SpecializationIconSection.this.txtWidth.getText().isEmpty() && SpecializationIconSection.this.txtHeight.getText().isEmpty() )
+                        SpecializationIconSection.this.txtIconSize.setText("");
                     else
-                        txtIconSize.setText( (txtWidth.getText().isEmpty() ? "0" : txtWidth.getText()) + "x" + (txtHeight.getText().isEmpty() ? "0" : txtHeight.getText()) );
+                        SpecializationIconSection.this.txtIconSize.setText( (SpecializationIconSection.this.txtWidth.getText().isEmpty() ? "0" : SpecializationIconSection.this.txtWidth.getText()) + "x" + (SpecializationIconSection.this.txtHeight.getText().isEmpty() ? "0" : SpecializationIconSection.this.txtHeight.getText()) );
                 else
-                    txtIconSize.setText("");
+                    SpecializationIconSection.this.txtIconSize.setText("");
             }
         }
 
@@ -656,15 +664,22 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private ModifyListener iconModifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent event) {
-            Text text = (Text)event.widget;
-            String value = text.getText();
-            IArchimateElement concept = elementEditPart.getModel().getArchimateConcept();
-            if ( value.isEmpty() )
-                SpecializationPlugin.deleteProperty(concept, "icon");
-            else
-                SpecializationPlugin.setProperty(concept, "icon", value);
-            // we force the icon to refresh on the graphical object
-            elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
+            IArchimateElement concept = SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept();
+            String value = ((Text)event.widget).getText();
+            if ( value.isEmpty() ) value = null;        // null value allows to delete the property
+            
+            SpecializationPropertyCommand command = new SpecializationPropertyCommand(concept, "icon", value);
+
+            if ( command.canExecute() ) {
+                CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
+                compoundCommand.add(command);
+
+                CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
+                stack.execute(compoundCommand);
+                
+                // we force the label to refresh on the graphical object
+                SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
+            }
         }
     };
     
@@ -676,13 +691,13 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         public void modifyText(ModifyEvent event) {
             Text text = (Text)event.widget;
             String value = text.getText();
-            IArchimateElement concept = elementEditPart.getModel().getArchimateConcept();
+            IArchimateElement concept = SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept();
             if ( value.isEmpty() )
                 SpecializationPlugin.deleteProperty(concept, "icon size");
             else
                 SpecializationPlugin.setProperty(concept, "icon size", value);
             // we force the icon to refresh on the graphical object
-            elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
+            SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
         }
     };
     
@@ -694,34 +709,35 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         public void modifyText(ModifyEvent event) {
             Text text = (Text)event.widget;
             String value = text.getText();
-            IArchimateElement concept = elementEditPart.getModel().getArchimateConcept();
+            IArchimateElement concept = SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept();
             if ( value.isEmpty() )
                 SpecializationPlugin.deleteProperty(concept, "icon location");
             else
                 SpecializationPlugin.setProperty(concept, "icon location", value);
             // we force the icon to refresh on the graphical object
-            elementEditPart.getModel().getArchimateConcept().setName(elementEditPart.getModel().getArchimateConcept().getName());
+            SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
         }
     };
 
     @Override
     protected Adapter getECoreAdapter() {
-        return eAdapter;
+        return this.eAdapter;
     }
 
     @Override
     protected EObject getEObject() {
-        if ( elementEditPart == null ) {
+        if ( this.elementEditPart == null ) {
             logger.error("elementEditPart is null"); //$NON-NLS-1$
             return null;
         }
 
-        return elementEditPart.getModel();
+        return this.elementEditPart.getModel();
     }
 
+    @Override
     protected void setElement(Object element) {
-        elementEditPart = (ArchimateElementEditPart)new Filter().adaptObject(element);
-        if(elementEditPart == null) {
+        this.elementEditPart = (ArchimateElementEditPart)new Filter().adaptObject(element);
+        if(this.elementEditPart == null) {
             logger.error("failed to get elementEditPart for " + element); //$NON-NLS-1$
         }
 
@@ -729,17 +745,17 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         //TODO: show up the image in the fileTree if it exists
     }
 
-    private void refreshControls() {
+    void refreshControls() {
         logger.trace("Refreshing controls");
         
-        if ( elementEditPart == null )
+        if ( this.elementEditPart == null )
             return;
         
-        if ( !SpecializationPlugin.mustReplaceIcon(elementEditPart.getModel()) ) {
-            compoNoIcon.setVisible(true);
-            compoIcon.setVisible(false);
+        if ( !SpecializationPlugin.mustReplaceIcon(this.elementEditPart.getModel()) ) {
+            this.compoNoIcon.setVisible(true);
+            this.compoIcon.setVisible(false);
             logger.trace("You must configure the view or the model to allow icons replacement.");
-            lblNoIcon.setText("You must configure the view or the model to allow icons replacement.");
+            this.lblNoIcon.setText("You must configure the view or the model to allow icons replacement.");
             return;
         }
         
@@ -747,8 +763,8 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         //IFigure figure = elementEditPart.getFigure();
         //IFigureDelegate figureDelegate = ((AbstractTextControlContainerFigure)figure).getFigureDelegate();
         //if ( figureDelegate instanceof RectangleFigureDelegate ) {
-        compoNoIcon.setVisible(false);
-        compoIcon.setVisible(true);
+        this.compoNoIcon.setVisible(false);
+        this.compoIcon.setVisible(true);
         //} else {
         //    logger.trace("Please change the element's figure to show up the icon.");
         //    lblNoIcon.setText("Please change the element's figure to show up the icon.");
@@ -757,22 +773,22 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         //    return;
         //}
         
-        txtIconName.removeModifyListener(iconModifyListener);
-        String iconName = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "icon");
-        txtIconName.setText(iconName == null ? "" : iconName);
-        txtIconName.addModifyListener(iconModifyListener);
+        this.txtIconName.removeModifyListener(this.iconModifyListener);
+        String iconName = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel().getArchimateConcept(), "icon");
+        this.txtIconName.setText(iconName == null ? "" : iconName);
+        this.txtIconName.addModifyListener(this.iconModifyListener);
         
-        txtIconSize.removeModifyListener(iconSizeModifyListener);
-        String iconSize = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "icon size");
-        txtIconSize.setText(iconSize == null ? "" : iconSize);
-        txtIconSize.addModifyListener(iconSizeModifyListener);
+        this.txtIconSize.removeModifyListener(this.iconSizeModifyListener);
+        String iconSize = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel().getArchimateConcept(), "icon size");
+        this.txtIconSize.setText(iconSize == null ? "" : iconSize);
+        this.txtIconSize.addModifyListener(this.iconSizeModifyListener);
         
-        txtIconLocation.removeModifyListener(iconLocationModifyListener);
-        String iconLocation = SpecializationPlugin.getPropertyValue(elementEditPart.getModel().getArchimateConcept(), "icon location");
-        txtIconLocation.setText(iconLocation == null ? "" : iconLocation);
-        txtIconLocation.addModifyListener(iconLocationModifyListener);
+        this.txtIconLocation.removeModifyListener(this.iconLocationModifyListener);
+        String iconLocation = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel().getArchimateConcept(), "icon location");
+        this.txtIconLocation.setText(iconLocation == null ? "" : iconLocation);
+        this.txtIconLocation.addModifyListener(this.iconLocationModifyListener);
         
-        fileTree.removeAll();
+        this.fileTree.removeAll();
         
         int lines = SpecializationPlugin.INSTANCE.getPreferenceStore().getInt(SpecializationPlugin.storeFolderPrefix+"_#");
         
@@ -784,13 +800,13 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
         for (int line = 0; line <lines; line++) {
         	String folder = SpecializationPlugin.INSTANCE.getPreferenceStore().getString(SpecializationPlugin.storeFolderPrefix+"_"+String.valueOf(line));
         	String location = SpecializationPlugin.INSTANCE.getPreferenceStore().getString(SpecializationPlugin.storeLocationPrefix+"_"+String.valueOf(line));
-            TreeItem rootItem = new TreeItem(fileTree, SWT.NONE);
+            TreeItem rootItem = new TreeItem(this.fileTree, SWT.NONE);
             rootItem.setText(folder);
             rootItem.setImage(closedFolderImage);
             try {
 				rootItem.setData("location", new File(location).getCanonicalPath());
 				rootItem.setData("folder", folder);
-			} catch (IOException e) {
+			} catch (@SuppressWarnings("unused") IOException ign) {
 				logger.error("Cannot access folder "+location);
 				rootItem.dispose();
 			}
