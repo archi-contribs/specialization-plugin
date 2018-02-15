@@ -689,15 +689,22 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private ModifyListener iconSizeModifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent event) {
-            Text text = (Text)event.widget;
-            String value = text.getText();
             IArchimateElement concept = SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept();
-            if ( value.isEmpty() )
-                SpecializationPlugin.deleteProperty(concept, "icon size");
-            else
-                SpecializationPlugin.setProperty(concept, "icon size", value);
-            // we force the icon to refresh on the graphical object
-            SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
+            String value = ((Text)event.widget).getText();
+            if ( value.isEmpty() ) value = null;        // null value allows to delete the property
+            
+            SpecializationPropertyCommand command = new SpecializationPropertyCommand(concept, "icon size", value);
+
+            if ( command.canExecute() ) {
+                CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
+                compoundCommand.add(command);
+
+                CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
+                stack.execute(compoundCommand);
+                
+                // we force the label to refresh on the graphical object
+                SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
+            }
         }
     };
     
@@ -707,15 +714,22 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     private ModifyListener iconLocationModifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent event) {
-            Text text = (Text)event.widget;
-            String value = text.getText();
             IArchimateElement concept = SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept();
-            if ( value.isEmpty() )
-                SpecializationPlugin.deleteProperty(concept, "icon location");
-            else
-                SpecializationPlugin.setProperty(concept, "icon location", value);
-            // we force the icon to refresh on the graphical object
-            SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
+            String value = ((Text)event.widget).getText();
+            if ( value.isEmpty() ) value = null;        // null value allows to delete the property
+            
+            SpecializationPropertyCommand command = new SpecializationPropertyCommand(concept, "icon location", value);
+
+            if ( command.canExecute() ) {
+                CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
+                compoundCommand.add(command);
+
+                CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
+                stack.execute(compoundCommand);
+                
+                // we force the label to refresh on the graphical object
+                SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
+            }
         }
     };
 
