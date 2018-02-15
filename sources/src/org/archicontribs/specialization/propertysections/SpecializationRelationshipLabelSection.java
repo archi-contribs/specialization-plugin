@@ -7,10 +7,13 @@ package org.archicontribs.specialization.propertysections;
 
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
+import org.archicontribs.specialization.SpecializationPropertyCommand;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.commands.CompoundCommand;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -30,22 +33,23 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateRelationshipEditPart;
+import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.IArchimatePackage;
 import com.archimatetool.model.IArchimateRelationship;
 
 public class SpecializationRelationshipLabelSection extends AbstractArchimatePropertySection {
-	private static final SpecializationLogger logger = new SpecializationLogger(SpecializationRelationshipLabelSection.class);
+	static final SpecializationLogger logger = new SpecializationLogger(SpecializationRelationshipLabelSection.class);
 
-	private ArchimateRelationshipEditPart relationshipEditPart = null;
+	ArchimateRelationshipEditPart relationshipEditPart = null;
 
     private Composite compoLabel;
     private Composite compoNoLabel;
     private Text txtLabelName;
     
-    private boolean mouseOverHelpButton = false;
+    boolean mouseOverHelpButton = false;
     
-    static final private Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
+    static final Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 	
 	/**
 	 * Filter to show or reject this section depending on input value
@@ -96,18 +100,18 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 	 */
 	@Override
 	protected void createControls(Composite parent) {
-	    compoNoLabel = new Composite(parent, SWT.NONE);
-        compoNoLabel.setForeground(parent.getForeground());
-        compoNoLabel.setBackground(parent.getBackground());
-        compoNoLabel.setLayout(new FormLayout());
+	    this.compoNoLabel = new Composite(parent, SWT.NONE);
+        this.compoNoLabel.setForeground(parent.getForeground());
+        this.compoNoLabel.setBackground(parent.getBackground());
+        this.compoNoLabel.setLayout(new FormLayout());
         FormData fd = new FormData();
         fd.top = new FormAttachment(0);
         fd.left = new FormAttachment(0);
         fd.right = new FormAttachment(100);
         fd.bottom = new FormAttachment(100);
-        compoNoLabel.setLayoutData(fd);
+        this.compoNoLabel.setLayoutData(fd);
 
-        Label lblNoLabel = new Label(compoNoLabel, SWT.NONE);
+        Label lblNoLabel = new Label(this.compoNoLabel, SWT.NONE);
         lblNoLabel.setText("You must configure the view to allow labels replacement.");
         lblNoLabel.setForeground(parent.getForeground());
         lblNoLabel.setBackground(parent.getBackground());
@@ -116,7 +120,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         fd.left = new FormAttachment(0, 20);
         lblNoLabel.setLayoutData(fd);
         
-        Label btnHelp = new Label(compoNoLabel, SWT.NONE);
+        Label btnHelp = new Label(this.compoNoLabel, SWT.NONE);
         btnHelp.setForeground(parent.getForeground());
         btnHelp.setBackground(parent.getBackground());
         fd = new FormData();
@@ -125,19 +129,19 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         fd.left = new FormAttachment(0, 20);
         fd.right = new FormAttachment(0, 50);
         btnHelp.setLayoutData(fd);
-        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp.redraw(); } });
-        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { SpecializationRelationshipLabelSection.this.mouseOverHelpButton = true; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { SpecializationRelationshipLabelSection.this.mouseOverHelpButton = false; btnHelp.redraw(); } });
         btnHelp.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e)
             {
-                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 if ( SpecializationRelationshipLabelSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
         btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });
         
-        Label helpLbl = new Label(compoNoLabel, SWT.NONE);
+        Label helpLbl = new Label(this.compoNoLabel, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
         helpLbl.setForeground(parent.getForeground());
         helpLbl.setBackground(parent.getBackground());
@@ -148,35 +152,35 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         
 
         /* ********************************************************* */
-        compoLabel = new Composite(parent, SWT.NONE);
-        compoLabel.setForeground(parent.getForeground());
-        compoLabel.setBackground(parent.getBackground());
-        compoLabel.setLayout(new FormLayout());
+        this.compoLabel = new Composite(parent, SWT.NONE);
+        this.compoLabel.setForeground(parent.getForeground());
+        this.compoLabel.setBackground(parent.getBackground());
+        this.compoLabel.setLayout(new FormLayout());
         fd = new FormData();
         fd.top = new FormAttachment(0);
         fd.left = new FormAttachment(0);
         fd.right = new FormAttachment(100);
         fd.bottom = new FormAttachment(100);
-        compoLabel.setLayoutData(fd);
+        this.compoLabel.setLayoutData(fd);
 
-		Label lblLabelName = new Label(compoLabel, SWT.NONE);
+		Label lblLabelName = new Label(this.compoLabel, SWT.NONE);
 		lblLabelName.setText("Label :");
-		lblLabelName.setForeground(compoLabel.getForeground());
-		lblLabelName.setBackground(compoLabel.getBackground());
+		lblLabelName.setForeground(this.compoLabel.getForeground());
+		lblLabelName.setBackground(this.compoLabel.getBackground());
         fd = new FormData();
         fd.top = new FormAttachment(0, 20);
         fd.left = new FormAttachment(0, 20);
         lblLabelName.setLayoutData(fd);
         
-        txtLabelName = new Text(compoLabel, SWT.BORDER);
+        this.txtLabelName = new Text(this.compoLabel, SWT.BORDER);
         fd = new FormData();
         fd.top = new FormAttachment(lblLabelName, 0, SWT.CENTER);
         fd.left = new FormAttachment(lblLabelName, 35);
         fd.right = new FormAttachment(0, 500);
-        txtLabelName.setLayoutData(fd);
-        txtLabelName.addModifyListener(labelModifyListener);
+        this.txtLabelName.setLayoutData(fd);
+        this.txtLabelName.addModifyListener(this.labelModifyListener);
         
-        Label btnHelp2 = new Label(compoLabel, SWT.NONE);
+        Label btnHelp2 = new Label(this.compoLabel, SWT.NONE);
         btnHelp2.setForeground(parent.getForeground());
         btnHelp2.setBackground(parent.getBackground());
         fd = new FormData();
@@ -185,19 +189,19 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         fd.left = new FormAttachment(0, 10);
         fd.right = new FormAttachment(0, 40);
         btnHelp2.setLayoutData(fd);
-        btnHelp2.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp2.redraw(); } });
-        btnHelp2.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp2.redraw(); } });
+        btnHelp2.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { SpecializationRelationshipLabelSection.this.mouseOverHelpButton = true; btnHelp2.redraw(); } });
+        btnHelp2.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { SpecializationRelationshipLabelSection.this.mouseOverHelpButton = false; btnHelp2.redraw(); } });
         btnHelp2.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e)
             {
-                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 if ( SpecializationRelationshipLabelSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
         btnHelp2.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });
         
-        helpLbl = new Label(compoLabel, SWT.NONE);
+        helpLbl = new Label(this.compoLabel, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
         helpLbl.setForeground(parent.getForeground());
         helpLbl.setBackground(parent.getBackground());
@@ -213,60 +217,68 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
     private ModifyListener labelModifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent event) {
-            Text text = (Text)event.widget;
-            String value = text.getText();
-            IArchimateRelationship relationship = relationshipEditPart.getModel().getArchimateRelationship();
-            if ( value.isEmpty() )
-                SpecializationPlugin.deleteProperty(relationship, "label");
-            else
-                SpecializationPlugin.setProperty(relationship, "label", value);
-            // we force the label to refresh on the graphical object
-            relationshipEditPart.getModel().getArchimateRelationship().setName(relationshipEditPart.getModel().getArchimateRelationship().getName());
+            IArchimateRelationship concept = SpecializationRelationshipLabelSection.this.relationshipEditPart.getModel().getArchimateConcept();
+            String value = ((Text)event.widget).getText();
+            if ( value.isEmpty() ) value = null;        // null value allows to delete the property
+            
+            SpecializationPropertyCommand command = new SpecializationPropertyCommand(concept, "label", value);
+
+            if ( command.canExecute() ) {
+                CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
+                compoundCommand.add(command);
+
+                CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
+                stack.execute(compoundCommand);
+                
+                // we force the label to refresh on the graphical object
+                SpecializationRelationshipLabelSection.this.relationshipEditPart.getModel().getArchimateConcept().setName(SpecializationRelationshipLabelSection.this.relationshipEditPart.getModel().getArchimateConcept().getName());
+            }
         }
     };
 	
 	@Override
 	protected Adapter getECoreAdapter() {
-		return eAdapter;
+		return this.eAdapter;
 	}
 
 	@Override
 	protected EObject getEObject() {
-        if ( relationshipEditPart == null ) {
+        if ( this.relationshipEditPart == null ) {
             logger.error("relationshipEditPart is null"); //$NON-NLS-1$
             return null;
         }
 
-        return relationshipEditPart.getModel();
+        return this.relationshipEditPart.getModel();
 	}
 
-	protected void setElement(Object element) {
-        relationshipEditPart = (ArchimateRelationshipEditPart)new Filter().adaptObject(element);
-        if(relationshipEditPart == null) {
+	@Override
+    protected void setElement(Object element) {
+        this.relationshipEditPart = (ArchimateRelationshipEditPart)new Filter().adaptObject(element);
+        if(this.relationshipEditPart == null) {
             logger.error("failed to get relationshipEditPart for " + element); //$NON-NLS-1$
         }
 
         refreshControls();
 	}
 	
-	private void refreshControls() {
+	void refreshControls() {
 	    logger.trace("Refreshing controls");
         
-        if ( relationshipEditPart == null )
+        if ( this.relationshipEditPart == null )
             return;
         
-        if ( !SpecializationPlugin.mustReplaceLabel(relationshipEditPart.getModel()) ) {
-            compoNoLabel.setVisible(true);
-            compoLabel.setVisible(false);
+        if ( !SpecializationPlugin.mustReplaceLabel(this.relationshipEditPart.getModel()) ) {
+            this.compoNoLabel.setVisible(true);
+            this.compoLabel.setVisible(false);
             return;
         }
         
-        compoNoLabel.setVisible(false);
-        compoLabel.setVisible(true);
+        this.compoNoLabel.setVisible(false);
+        this.compoLabel.setVisible(true);
         
-        txtLabelName.removeModifyListener(labelModifyListener);
-        String labelName = SpecializationPlugin.getPropertyValue(relationshipEditPart.getModel().getArchimateConcept(), "label");
-        txtLabelName.setText(labelName == null ? "" : labelName);
-        txtLabelName.addModifyListener(labelModifyListener);
+        this.txtLabelName.removeModifyListener(this.labelModifyListener);
+        String labelName = SpecializationPlugin.getPropertyValue(this.relationshipEditPart.getModel().getArchimateConcept(), "label");
+        this.txtLabelName.setText(labelName == null ? "" : labelName);
+        this.txtLabelName.addModifyListener(this.labelModifyListener);
 	}
 }
