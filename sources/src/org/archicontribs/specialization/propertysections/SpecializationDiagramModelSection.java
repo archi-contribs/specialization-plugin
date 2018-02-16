@@ -69,7 +69,6 @@ public class SpecializationDiagramModelSection extends AbstractArchimateProperty
 			if ( object == null )
 				return false;
 			
-			logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof IArchimateDiagramModel));
 			return object instanceof IArchimateDiagramModel;
 		}
 

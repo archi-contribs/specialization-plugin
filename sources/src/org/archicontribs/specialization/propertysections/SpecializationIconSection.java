@@ -94,7 +94,6 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
             if ( object == null )
                 return false;
 
-            logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof ArchimateElementEditPart));
             if ( !(object instanceof ArchimateElementEditPart) )
                 return false;
 
@@ -726,9 +725,6 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
 
                 CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
                 stack.execute(compoundCommand);
-                
-                // we force the label to refresh on the graphical object
-                SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().setName(SpecializationIconSection.this.elementEditPart.getModel().getArchimateConcept().getName());
             }
         }
     };

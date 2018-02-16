@@ -63,7 +63,6 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
 			if ( object == null )
 				return false;
 			
-			logger.trace(object.getClass().getSimpleName()+" -> filter : "+((object instanceof IFolder) && !(object instanceof IArchimateModel)));
 			return (object instanceof IFolder) && !(object instanceof IArchimateModel);
 		}
 

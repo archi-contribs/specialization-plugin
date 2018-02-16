@@ -75,7 +75,6 @@ public class SpecializationModelSection extends AbstractArchimatePropertySection
 			if ( object == null )
 				return false;
 			
-			logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof IArchimateModel));
 			return object instanceof IArchimateModel;
 		}
 

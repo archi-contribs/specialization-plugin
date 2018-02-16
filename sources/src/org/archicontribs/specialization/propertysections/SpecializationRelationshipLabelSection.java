@@ -60,7 +60,6 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 			if ( object == null )
 				return false;
 			
-            logger.trace(object.getClass().getSimpleName()+" -> filter : "+(object instanceof ArchimateRelationshipEditPart));
             if ( !(object instanceof ArchimateRelationshipEditPart) )
                 return false;
             
@@ -229,9 +228,6 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 
                 CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
                 stack.execute(compoundCommand);
-                
-                // we force the label to refresh on the graphical object
-                SpecializationRelationshipLabelSection.this.relationshipEditPart.getModel().getArchimateConcept().setName(SpecializationRelationshipLabelSection.this.relationshipEditPart.getModel().getArchimateConcept().getName());
             }
         }
     };

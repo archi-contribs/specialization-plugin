@@ -109,8 +109,10 @@ import com.archimatetool.model.IProperty;
  *                                  Fix junction shape
  *                                  Do not replace the icon in the properties window anymore
  * 
- * v1.0.1       08/01/2017      Replace "\n" string by a new line in labels
+ * v1.0.1       08/01/2018      Replace "\n" string by a new line in labels
  *                              Expand variables ${name}, ${id}, ${property:xxx}
+ *
+ * v1.0.2       15/02/2018      Use CompoundXommands to change property values
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
