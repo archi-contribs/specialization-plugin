@@ -40,19 +40,19 @@ import com.archimatetool.model.IArchimatePackage;
 import com.archimatetool.model.IFolder;
 
 public class SpecializationFolderSection extends AbstractArchimatePropertySection {
-	private static final SpecializationLogger logger = new SpecializationLogger(SpecializationFolderSection.class);
+	static final SpecializationLogger logger = new SpecializationLogger(SpecializationFolderSection.class);
 
-	private IFolder folder;
+	IFolder folder;
 
 	private Label lblIconInfo;
 	private Label lblReplaceIcons;
-	private Button btnIconsYes;
-	private Button btnIconsNo;
+	Button btnIconsYes;
+	Button btnIconsNo;
 	private Button btnIconsDefault;
 	
-    private boolean mouseOverHelpButton = false;
+    boolean mouseOverHelpButton = false;
 	
-    static final private Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
+    static final Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 	
 	/**
 	 * Filter to show or reject this section depending on input value
@@ -82,64 +82,64 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
 	      
         boolean mustUseIconProperty = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree").length() == 0;
 
-        lblIconInfo = new Label(parent, SWT.NONE);
+        this.lblIconInfo = new Label(parent, SWT.NONE);
         if ( mustUseIconProperty )
-            lblIconInfo.setText("Icons in model tree: the preference states to use properties.");
+            this.lblIconInfo.setText("Icons in model tree: the preference states to use properties.");
         else 
-            lblIconInfo.setText("Icons in model tree: the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
-        lblIconInfo.setForeground(parent.getForeground());
-        lblIconInfo.setBackground(parent.getBackground());
-        lblIconInfo.setFont(parent.getFont());
+            this.lblIconInfo.setText("Icons in model tree: the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
+        this.lblIconInfo.setForeground(parent.getForeground());
+        this.lblIconInfo.setBackground(parent.getBackground());
+        this.lblIconInfo.setFont(parent.getFont());
         FormData fd = new FormData();
         fd.top = new FormAttachment(0, 5);
         fd.left = new FormAttachment(0, 10);
-        lblIconInfo.setLayoutData(fd);
+        this.lblIconInfo.setLayoutData(fd);
         
-        lblReplaceIcons = new Label(parent, SWT.NONE);
-		lblReplaceIcons.setText("Replace icons in this folder:");
-		lblReplaceIcons.setForeground(parent.getForeground());
-		lblReplaceIcons.setBackground(parent.getBackground());
-		lblReplaceIcons.setFont(parent.getFont());
-		lblReplaceIcons.setEnabled(false);
+        this.lblReplaceIcons = new Label(parent, SWT.NONE);
+		this.lblReplaceIcons.setText("Replace icons in this folder:");
+		this.lblReplaceIcons.setForeground(parent.getForeground());
+		this.lblReplaceIcons.setBackground(parent.getBackground());
+		this.lblReplaceIcons.setFont(parent.getFont());
+		this.lblReplaceIcons.setEnabled(false);
 		fd = new FormData();
-        fd.top = new FormAttachment(lblIconInfo, 5);
+        fd.top = new FormAttachment(this.lblIconInfo, 5);
         fd.left = new FormAttachment(0, 10);
-		lblReplaceIcons.setLayoutData(fd);
+		this.lblReplaceIcons.setLayoutData(fd);
 
 		Composite compoReplaceIcons = new Composite(parent, SWT.NONE);
 		compoReplaceIcons.setBackground(parent.getBackground());
 		compoReplaceIcons.setLayout(new RowLayout(SWT.VERTICAL));
 		fd = new FormData();
-        fd.top = new FormAttachment(lblReplaceIcons, 0, SWT.TOP);
-        fd.left = new FormAttachment(lblReplaceIcons, 20);
+        fd.top = new FormAttachment(this.lblReplaceIcons, 0, SWT.TOP);
+        fd.left = new FormAttachment(this.lblReplaceIcons, 20);
 		compoReplaceIcons.setLayoutData(fd);
 
-		btnIconsYes = new Button(compoReplaceIcons, SWT.RADIO);
-		btnIconsYes.setBackground(parent.getBackground());
-		btnIconsYes.setForeground(parent.getForeground());
-		btnIconsYes.setFont(parent.getFont());
-		btnIconsYes.setText("yes");
-		btnIconsYes.setSelection(false);
-		btnIconsYes.setEnabled(false);
-		btnIconsYes.addSelectionListener(replaceIconsListener);
+		this.btnIconsYes = new Button(compoReplaceIcons, SWT.RADIO);
+		this.btnIconsYes.setBackground(parent.getBackground());
+		this.btnIconsYes.setForeground(parent.getForeground());
+		this.btnIconsYes.setFont(parent.getFont());
+		this.btnIconsYes.setText("yes");
+		this.btnIconsYes.setSelection(false);
+		this.btnIconsYes.setEnabled(false);
+		this.btnIconsYes.addSelectionListener(this.replaceIconsListener);
 
-		btnIconsNo = new Button(compoReplaceIcons, SWT.RADIO);
-		btnIconsNo.setBackground(parent.getBackground());
-		btnIconsNo.setForeground(parent.getForeground());
-		btnIconsNo.setFont(parent.getFont());
-		btnIconsNo.setText("no");
-		btnIconsNo.setSelection(false);
-		btnIconsNo.setEnabled(false);
-		btnIconsNo.addSelectionListener(replaceIconsListener);
+		this.btnIconsNo = new Button(compoReplaceIcons, SWT.RADIO);
+		this.btnIconsNo.setBackground(parent.getBackground());
+		this.btnIconsNo.setForeground(parent.getForeground());
+		this.btnIconsNo.setFont(parent.getFont());
+		this.btnIconsNo.setText("no");
+		this.btnIconsNo.setSelection(false);
+		this.btnIconsNo.setEnabled(false);
+		this.btnIconsNo.addSelectionListener(this.replaceIconsListener);
 
-		btnIconsDefault = new Button(compoReplaceIcons, SWT.RADIO);
-		btnIconsDefault.setBackground(parent.getBackground());
-		btnIconsDefault.setForeground(parent.getForeground());
-		btnIconsDefault.setFont(parent.getFont());
-		btnIconsDefault.setText("use model properties");
-		btnIconsDefault.setSelection(false);
-		btnIconsDefault.setEnabled(false);
-		btnIconsDefault.addSelectionListener(replaceIconsListener);
+		this.btnIconsDefault = new Button(compoReplaceIcons, SWT.RADIO);
+		this.btnIconsDefault.setBackground(parent.getBackground());
+		this.btnIconsDefault.setForeground(parent.getForeground());
+		this.btnIconsDefault.setFont(parent.getFont());
+		this.btnIconsDefault.setText("use model properties");
+		this.btnIconsDefault.setSelection(false);
+		this.btnIconsDefault.setEnabled(false);
+		this.btnIconsDefault.addSelectionListener(this.replaceIconsListener);
 
 		Label btnHelp = new Label(parent, SWT.NONE);
         btnHelp.setForeground(parent.getForeground());
@@ -150,13 +150,13 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
         fd.left = new FormAttachment(0, 10);
         fd.right = new FormAttachment(0, 50);
         btnHelp.setLayoutData(fd);
-        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp.redraw(); } });
-        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { SpecializationFolderSection.this.mouseOverHelpButton = true; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { SpecializationFolderSection.this.mouseOverHelpButton = false; btnHelp.redraw(); } });
         btnHelp.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e)
             {
-                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 if ( SpecializationFolderSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
@@ -188,56 +188,58 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
 
 	@Override
 	protected Adapter getECoreAdapter() {
-		return eAdapter;
+		return this.eAdapter;
 	}
 
 	@Override
 	protected EObject getEObject() {
-		return folder;
+		return this.folder;
 	}
 
-	protected void setElement(Object element) {
-		folder = (IFolder)new Filter().adaptObject(element);
-		if(folder == null) {
+	@Override
+    protected void setElement(Object element) {
+		this.folder = (IFolder)new Filter().adaptObject(element);
+		if(this.folder == null) {
 			logger.error("failed to get element for " + element); //$NON-NLS-1$
 		}
 		
 		refreshControls();
 	}
 	
-	private void refreshControls() {
+	void refreshControls() {
         boolean yes;
         boolean no;
         boolean mustUseIconProperty = SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree").length() == 0;
 
         if ( mustUseIconProperty ) {
-            lblIconInfo.setText("Icons in model tree: the preference states to use properties.");
-            String propValue = SpecializationPlugin.getPropertyValue(folder, "must replace icons");
+            this.lblIconInfo.setText("Icons in model tree: the preference states to use properties.");
+            String propValue = SpecializationPlugin.getPropertyValue(this.folder, "must replace icons");
             if ( propValue != null )
                 propValue = propValue.toLowerCase();
             yes = SpecializationPlugin.areEqual(propValue, "yes");
             no = SpecializationPlugin.areEqual(propValue, "no");
 
-            btnIconsYes.setSelection(yes);
-            btnIconsNo.setSelection(no);
-            btnIconsDefault.setSelection(!yes && !no);
+            this.btnIconsYes.setSelection(yes);
+            this.btnIconsNo.setSelection(no);
+            this.btnIconsDefault.setSelection(!yes && !no);
         } else { 
-            lblIconInfo.setText("Icons in model tree: the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
+            this.lblIconInfo.setText("Icons in model tree: the preference states to "+SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree")+" replace icons.");
             yes = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree").toLowerCase(), "always");
-            btnIconsYes.setSelection(yes);
-            btnIconsNo.setSelection(!yes);
-            btnIconsDefault.setSelection(false);
+            this.btnIconsYes.setSelection(yes);
+            this.btnIconsNo.setSelection(!yes);
+            this.btnIconsDefault.setSelection(false);
         }
-        lblReplaceIcons.setEnabled(mustUseIconProperty);
-        btnIconsYes.setEnabled(mustUseIconProperty);
-        btnIconsNo.setEnabled(mustUseIconProperty);
-        btnIconsDefault.setEnabled(mustUseIconProperty);
+        this.lblReplaceIcons.setEnabled(mustUseIconProperty);
+        this.btnIconsYes.setEnabled(mustUseIconProperty);
+        this.btnIconsNo.setEnabled(mustUseIconProperty);
+        this.btnIconsDefault.setEnabled(mustUseIconProperty);
 	}
 
 
 	private SelectionListener replaceIconsListener = new SelectionAdapter () {
-		public void widgetSelected(SelectionEvent event) {
-			if ( folder == null ) 
+		@Override
+        public void widgetSelected(SelectionEvent event) {
+			if ( SpecializationFolderSection.this.folder == null ) 
 				return;
 
 			Button button = ((Button) event.widget);
@@ -245,22 +247,22 @@ public class SpecializationFolderSection extends AbstractArchimatePropertySectio
 				return;
 			
 			String value = null;
-			if ( button.equals(btnIconsYes) )
+			if ( button.equals(SpecializationFolderSection.this.btnIconsYes) )
 				value = "yes";
-			else if ( button.equals(btnIconsNo) )
+			else if ( button.equals(SpecializationFolderSection.this.btnIconsNo) )
 				value = "no";
 			
-			SpecializationPropertyCommand command = new SpecializationPropertyCommand(folder, "must replace icons", value);
+			SpecializationPropertyCommand command = new SpecializationPropertyCommand(SpecializationFolderSection.this.folder, "must replace icons", value);
 			
             if ( command.canExecute() ) {
     			CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
             	compoundCommand.add(command);
 
-    		    CommandStack stack = (CommandStack) folder.getArchimateModel().getAdapter(CommandStack.class);
+    		    CommandStack stack = (CommandStack) SpecializationFolderSection.this.folder.getArchimateModel().getAdapter(CommandStack.class);
     		    stack.execute(compoundCommand);
     		    logger.trace("Setting property \"must replace icons\" to "+value);
-    		    SpecializationPlugin.refreshIconsAndLabels(folder);
+    		    SpecializationPlugin.refreshIconsAndLabels(SpecializationFolderSection.this.folder);
             }
-		};
+		}
 	};
 }

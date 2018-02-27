@@ -33,14 +33,14 @@ public class SpecializationLogger {
 				SpecializationPlugin.popup(Level.ERROR, "Failed to configure logger", e);
 			}
 		}
-		logger = Logger.getLogger(clazz);
+		this.logger = Logger.getLogger(clazz);
 	}
 	
 	/**
 	 * Gets the logger
 	 */
 	public Logger getLogger() {
-		return logger;
+		return this.logger;
 	}
 	
 	/**
@@ -49,29 +49,29 @@ public class SpecializationLogger {
 	public void configure() throws Exception {
 		LinkedProperties properties = getLoggerProperties();
 
-		if ( properties != null ) {
-			PropertyConfigurator.configure(properties);
-			initialised = true;
-		} else {
-			LogManager.shutdown();
-			initialised = false;
+		if ( properties == null ) {
+		    LogManager.shutdown();
+	        initialised = false;
+	        return;
 		}
 		
-		if ( initialised ) {
-			Logger oldLogger = logger;
-			logger = Logger.getLogger(SpecializationLogger.class);
-			if ( isDebugEnabled() ) debug("Logger initialised.");
-			if ( isTraceEnabled() ) {
-				StringBuilder param = new StringBuilder();
-				String eol = "";
-				for ( Object oKey: properties.orderedKeys() ) {
-					param.append((String)oKey+" = "+properties.getProperty((String)oKey)+eol);
-					eol = "\n";
-				}
-				trace(param.toString());
+		
+		PropertyConfigurator.configure(properties);
+		initialised = true;
+
+		Logger oldLogger = this.logger;
+		this.logger = Logger.getLogger(SpecializationLogger.class);
+		if ( isDebugEnabled() ) debug("Logger initialised.");
+		if ( isTraceEnabled() ) {
+			StringBuilder param = new StringBuilder();
+			String eol = "";
+			for ( Object oKey: properties.orderedKeys() ) {
+				param.append((String)oKey+" = "+properties.getProperty((String)oKey)+eol);
+				eol = "\n";
 			}
-			logger = oldLogger;
+			trace(param.toString());
 		}
+		this.logger = oldLogger;
     }
 
 	/**
@@ -83,13 +83,13 @@ public class SpecializationLogger {
 		if ( initialised ) {
 			String[] lines = message.split("\n");
 			if ( lines.length == 1 ) {
-				logger.log(className, level, "- "+message.replace("\r",""), t);
+				this.logger.log(className, level, "- "+message.replace("\r",""), t);
 			} else {
-				logger.log(className, level, "┌ "+lines[0].replace("\r",""), null);
+				this.logger.log(className, level, "┌ "+lines[0].replace("\r",""), null);
 				for ( int i=1 ; i < lines.length-2 ; ++i) {
-					logger.log(className, level, "│ "+lines[i].replace("\r",""), null);
+					this.logger.log(className, level, "│ "+lines[i].replace("\r",""), null);
 				}
-				logger.log(className, level, "└ "+lines[lines.length-1].replace("\r",""), t);
+				this.logger.log(className, level, "└ "+lines[lines.length-1].replace("\r",""), t);
 			}
 		}
 	}
@@ -208,7 +208,7 @@ public class SpecializationLogger {
 	/**
 	 * Get the initialised state of the logger
 	 */
-    public boolean isInitialised() {
+    public static boolean isInitialised() {
     	return initialised;
     }
     
@@ -259,8 +259,12 @@ public class SpecializationLogger {
     		try {
 				properties.load(new StringReader(loggerExpert));
 			} catch (IOException err) {
-				throw new Exception("Error while parsing \"loggerExpert\" properties from the preference store");
+				throw new Exception("Error while parsing \"loggerExpert\" properties from the preference store", err);
 			}
+    		break;
+    		
+            default:
+                // should never be here
 		}
 		
 		return properties;
@@ -281,12 +285,14 @@ public class SpecializationLogger {
 	        return Collections.list(keys());
 	    }
 
-	    public Enumeration<Object> keys() {
-	        return Collections.<Object>enumeration(keys);
+	    @Override
+        public synchronized Enumeration<Object> keys() {
+	        return Collections.<Object>enumeration(this.keys);
 	    }
 
-	    public Object put(Object key, Object value) {
-	        keys.add(key);
+	    @Override
+        public synchronized Object put(Object key, Object value) {
+	        this.keys.add(key);
 	        return super.put(key, value);
 	    }
 	}
@@ -295,13 +301,13 @@ public class SpecializationLogger {
 	 * Returns true if the logger is configured to print trace messages
 	 */
 	public boolean isTraceEnabled() {
-		return logger.isTraceEnabled();
+		return this.logger.isTraceEnabled();
 	}
 	
 	/**
 	 * Returns true if the logger is configured to print debug messages
 	 */
 	public boolean isDebugEnabled() {
-		return logger.isDebugEnabled();
+		return this.logger.isDebugEnabled();
 	}
 }

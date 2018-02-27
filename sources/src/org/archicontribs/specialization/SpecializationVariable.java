@@ -204,7 +204,9 @@ public class SpecializationVariable {
      * Gets the value of the variable<br>
      * can return a null value in case the property does not exist. This way it is possible to distinguish between empty value and null value
      */
-    public static String getVariable(String variable, EObject eObject) throws RuntimeException  {
+    public static String getVariable(String variable, EObject selectedEObject) throws RuntimeException  {
+        EObject eObject = selectedEObject; 
+        
         if ( logger.isTraceEnabled() ) logger.trace("         getting variable \""+variable+"\"");
 
         // we check that the variable provided is a string enclosed between "${" and "}"

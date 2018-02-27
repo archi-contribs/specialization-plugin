@@ -9,6 +9,7 @@ import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -48,7 +49,7 @@ import org.eclipse.ui.PlatformUI;
  * @author Herve Jouin
  */
 public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-	private static final SpecializationLogger logger = new SpecializationLogger(PreferencePage.class);
+	static final SpecializationLogger logger = new SpecializationLogger(PreferencePage.class);
 	
 	private static String HELP_ID = "com.archimatetool.help.IconPreferencePage";
 	
@@ -72,7 +73,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	private Button btnNeverReplaceIconsInViews;
     private Button btnAlwaysReplaceLabelsInViews;
     private Button btnNeverReplaceLabelsInViews;
-	private boolean mouseOverHelpButton = false;
+	boolean mouseOverHelpButton = false;
 	private Composite loggerComposite;
 	private RadioGroupFieldEditor loggerModeRadioGroupEditor;
 	private FileFieldEditor filenameFileFieldEditor;
@@ -93,15 +94,15 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	protected void createFieldEditors() {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getFieldEditorParent().getParent(), HELP_ID);
 		
-		tabFolder = new TabFolder(getFieldEditorParent(), SWT.NONE);
-		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		tabFolder.setBackground(GROUP_BACKGROUND_COLOR);
+		this.tabFolder = new TabFolder(getFieldEditorParent(), SWT.NONE);
+		this.tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		this.tabFolder.setBackground(GROUP_BACKGROUND_COLOR);
 		
 		// ********************************* */
 		// * Behaviour tab  **************** */
 		// ********************************* */
 		
-		Composite behaviourComposite = new Composite(tabFolder, SWT.NULL);
+		Composite behaviourComposite = new Composite(this.tabFolder, SWT.NULL);
         GridLayout layout = new GridLayout();
         layout.numColumns = 1;
         layout.marginWidth = 0;
@@ -119,7 +120,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         behaviourComposite.setLayoutData(rowLayout);
         behaviourComposite.setBackground(GROUP_BACKGROUND_COLOR);
         
-		TabItem behaviourTabItem = new TabItem(tabFolder, SWT.NONE);
+		TabItem behaviourTabItem = new TabItem(this.tabFolder, SWT.NONE);
         behaviourTabItem.setText("Behaviour");
         behaviourTabItem.setControl(behaviourComposite);
         
@@ -155,18 +156,20 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		fd.left = new FormAttachment(versionValue, 100);
 		checkUpdateButton.setLayoutData(fd);
 		checkUpdateButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) { SpecializationPlugin.checkForUpdate(true); }
-			public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
+			@Override
+            public void widgetSelected(SelectionEvent e) { SpecializationPlugin.checkForUpdate(true); }
+			@Override
+            public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 		});
 		
-		btnCheckForUpdateAtStartupButton = new Button(grpVersion, SWT.CHECK);
-		btnCheckForUpdateAtStartupButton.setBackground(COMPO_BACKGROUND_COLOR);
-		btnCheckForUpdateAtStartupButton.setText("Automatically check for update at startup");
+		this.btnCheckForUpdateAtStartupButton = new Button(grpVersion, SWT.CHECK);
+		this.btnCheckForUpdateAtStartupButton.setBackground(COMPO_BACKGROUND_COLOR);
+		this.btnCheckForUpdateAtStartupButton.setText("Automatically check for update at startup");
 		fd = new FormData();
 		fd.top = new FormAttachment(versionLbl, 5);
 		fd.left = new FormAttachment(0, 10);
-		btnCheckForUpdateAtStartupButton.setLayoutData(fd);
-		btnCheckForUpdateAtStartupButton.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("checkForUpdateAtStartup"));
+		this.btnCheckForUpdateAtStartupButton.setLayoutData(fd);
+		this.btnCheckForUpdateAtStartupButton.setSelection(SpecializationPlugin.INSTANCE.getPreferenceStore().getBoolean("checkForUpdateAtStartup"));
 		
 		GridData gd = new GridData();
 		//gd.heightHint = 45;
@@ -208,17 +211,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         fd.left = new FormAttachment(0, 27);
         replaceIconsInModelTreeComposite.setLayoutData(fd);
         
-        btnAlwaysReplaceIconsInModelTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
-        btnAlwaysReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
-        btnAlwaysReplaceIconsInModelTree.setText("Always");
+        this.btnAlwaysReplaceIconsInModelTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
+        this.btnAlwaysReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
+        this.btnAlwaysReplaceIconsInModelTree.setText("Always");
         boolean always = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree"), "always");
-        btnAlwaysReplaceIconsInModelTree.setSelection(always);
+        this.btnAlwaysReplaceIconsInModelTree.setSelection(always);
 
-        btnNeverReplaceIconsInModelTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
-        btnNeverReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
-        btnNeverReplaceIconsInModelTree.setText("Never");
+        this.btnNeverReplaceIconsInModelTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
+        this.btnNeverReplaceIconsInModelTree.setBackground(COMPO_BACKGROUND_COLOR);
+        this.btnNeverReplaceIconsInModelTree.setText("Never");
         boolean never = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInTree"), "never");
-        btnNeverReplaceIconsInModelTree.setSelection(never);
+        this.btnNeverReplaceIconsInModelTree.setSelection(never);
         
         Button btnReplaceIconsInTree = new Button(replaceIconsInModelTreeComposite, SWT.RADIO);
         btnReplaceIconsInTree.setBackground(COMPO_BACKGROUND_COLOR);
@@ -246,17 +249,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         fd.left = new FormAttachment(0, 27);
         replaceIconsInViewsComposite.setLayoutData(fd);
         
-        btnAlwaysReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
-        btnAlwaysReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnAlwaysReplaceIconsInViews.setText("Always");
+        this.btnAlwaysReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
+        this.btnAlwaysReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        this.btnAlwaysReplaceIconsInViews.setText("Always");
         always = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews"), "always");
-        btnAlwaysReplaceIconsInViews.setSelection(always);
+        this.btnAlwaysReplaceIconsInViews.setSelection(always);
 
-        btnNeverReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
-        btnNeverReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnNeverReplaceIconsInViews.setText("Never");
+        this.btnNeverReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
+        this.btnNeverReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        this.btnNeverReplaceIconsInViews.setText("Never");
         never = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceIconsInViews"), "never");
-        btnNeverReplaceIconsInViews.setSelection(never);
+        this.btnNeverReplaceIconsInViews.setSelection(never);
         
         Button btnReplaceIconsInViews = new Button(replaceIconsInViewsComposite, SWT.RADIO);
         btnReplaceIconsInViews.setBackground(COMPO_BACKGROUND_COLOR);
@@ -284,17 +287,17 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         fd.left = new FormAttachment(0, 27);
         ReplaceLabelsInViewsComposite.setLayoutData(fd);
         
-        btnAlwaysReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
-        btnAlwaysReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnAlwaysReplaceLabelsInViews.setText("Always");
+        this.btnAlwaysReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
+        this.btnAlwaysReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        this.btnAlwaysReplaceLabelsInViews.setText("Always");
         always = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews"), "always");
-        btnAlwaysReplaceLabelsInViews.setSelection(always);
+        this.btnAlwaysReplaceLabelsInViews.setSelection(always);
 
-        btnNeverReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
-        btnNeverReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
-        btnNeverReplaceLabelsInViews.setText("Never");
+        this.btnNeverReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
+        this.btnNeverReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
+        this.btnNeverReplaceLabelsInViews.setText("Never");
         never = SpecializationPlugin.areEqual(SpecializationPlugin.INSTANCE.getPreferenceStore().getString("mustReplaceLabelsInViews"), "never");
-        btnNeverReplaceLabelsInViews.setSelection(never);
+        this.btnNeverReplaceLabelsInViews.setSelection(never);
         
         Button btnReplaceLabelsInViews = new Button(ReplaceLabelsInViewsComposite, SWT.RADIO);
         btnReplaceLabelsInViews.setBackground(COMPO_BACKGROUND_COLOR);
@@ -303,8 +306,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         
         /* **************************************************************************** */
         
-        folderTableEditor = new FolderTableEditor("Image folders:","", behaviourComposite);
-        addField(folderTableEditor);
+        this.folderTableEditor = new FolderTableEditor("Image folders:","", behaviourComposite);
+        addField(this.folderTableEditor);
 		
         /* **************************************************************************** */
         
@@ -320,13 +323,13 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         grpHelp.setLayoutData(gd);
         
         Label btnHelp = new Label(grpHelp, SWT.NONE);
-        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = true; btnHelp.redraw(); } });
-        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { mouseOverHelpButton = false; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseEnter, new Listener() { @Override public void handleEvent(Event event) { PreferencePage.this.mouseOverHelpButton = true; btnHelp.redraw(); } });
+        btnHelp.addListener(SWT.MouseExit, new Listener() { @Override public void handleEvent(Event event) { PreferencePage.this.mouseOverHelpButton = false; btnHelp.redraw(); } });
         btnHelp.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e)
             {
-                 if ( mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
+                 if ( PreferencePage.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
                  e.gc.drawImage(HELP_ICON, 2, 2);
             }
         });
@@ -347,57 +350,58 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		// ********************************* */
 		// * Logging tab  ****************** */
 		// ********************************* */
-        loggerComposite = new Composite(tabFolder, SWT.NULL);
+        this.loggerComposite = new Composite(this.tabFolder, SWT.NULL);
         rowLayout = new RowLayout();
         rowLayout.type = SWT.VERTICAL;
-        loggerComposite.setLayout(rowLayout);
+        this.loggerComposite.setLayout(rowLayout);
         
-        TabItem loggerTabItem = new TabItem(tabFolder, SWT.NONE);
+        TabItem loggerTabItem = new TabItem(this.tabFolder, SWT.NONE);
         loggerTabItem.setText("Logger");
-        loggerTabItem.setControl(loggerComposite);
+        loggerTabItem.setControl(this.loggerComposite);
         
-        Label note = new Label(loggerComposite, SWT.NONE);
-        note = new Label(loggerComposite, SWT.NONE);
+        Label note = new Label(this.loggerComposite, SWT.NONE);
+        note = new Label(this.loggerComposite, SWT.NONE);
         note.setText(" Please be aware that enabling debug or, even more, trace level has got important impact on performances!\n Activate only if required.");
         note.setForeground(RED_COLOR);
     	
-    	loggerModeRadioGroupEditor = new RadioGroupFieldEditor("loggerMode", "", 1, LOGGER_MODES, loggerComposite, true);
-    	addField(loggerModeRadioGroupEditor);
+    	this.loggerModeRadioGroupEditor = new RadioGroupFieldEditor("loggerMode", "", 1, LOGGER_MODES, this.loggerComposite, true);
+    	addField(this.loggerModeRadioGroupEditor);
     	
-    	simpleModeGroup = new Group(loggerComposite, SWT.NONE);
-    	simpleModeGroup.setLayout(new GridLayout(3, false));
+    	this.simpleModeGroup = new Group(this.loggerComposite, SWT.NONE);
+    	this.simpleModeGroup.setLayout(new GridLayout(3, false));
     	gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.widthHint = 500;
-        simpleModeGroup.setLayoutData(gd);
+        this.simpleModeGroup.setLayoutData(gd);
         
         
-        loggerLevelRadioGroupEditor = new RadioGroupFieldEditor("loggerLevel", "", 6, LOGGER_LEVELS, simpleModeGroup, false);
-        addField(loggerLevelRadioGroupEditor);
+        this.loggerLevelRadioGroupEditor = new RadioGroupFieldEditor("loggerLevel", "", 6, LOGGER_LEVELS, this.simpleModeGroup, false);
+        addField(this.loggerLevelRadioGroupEditor);
         
-        filenameFileFieldEditor = new FileFieldEditor("loggerFilename", "Log filename : ", false, FileFieldEditor.VALIDATE_ON_KEY_STROKE, simpleModeGroup);
-        addField(filenameFileFieldEditor);    
+        this.filenameFileFieldEditor = new FileFieldEditor("loggerFilename", "Log filename : ", false, StringFieldEditor.VALIDATE_ON_KEY_STROKE, this.simpleModeGroup);
+        addField(this.filenameFileFieldEditor);    
         
-    	expertModeGroup = new Group(loggerComposite, SWT.NONE);
-    	expertModeGroup.setLayout(new GridLayout());
+    	this.expertModeGroup = new Group(this.loggerComposite, SWT.NONE);
+    	this.expertModeGroup.setLayout(new GridLayout());
     	gd = new GridData(GridData.FILL_BOTH);
     	gd.widthHint = 650;
-    	expertModeGroup.setLayoutData(gd);
+    	this.expertModeGroup.setLayoutData(gd);
         
-        expertTextFieldEditor = new TextFieldEditor("loggerExpert", "", expertModeGroup);
-        expertTextFieldEditor.getTextControl().setLayoutData(gd);
-        expertTextFieldEditor.getTextControl().setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-        addField(expertTextFieldEditor);
+        this.expertTextFieldEditor = new TextFieldEditor("loggerExpert", "", this.expertModeGroup);
+        this.expertTextFieldEditor.getTextControl().setLayoutData(gd);
+        this.expertTextFieldEditor.getTextControl().setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
+        addField(this.expertTextFieldEditor);
 
         showLogger();
 	}
 	
-	public void propertyChange(PropertyChangeEvent event) {
+	@Override
+    public void propertyChange(PropertyChangeEvent event) {
 		super.propertyChange(event);
 		
-		if ( event.getSource() == loggerModeRadioGroupEditor )
+		if ( event.getSource() == this.loggerModeRadioGroupEditor )
 			showLogger();
 		
-		 if( event.getSource() == filenameFileFieldEditor )
+		 if( event.getSource() == this.filenameFileFieldEditor )
 			 setValid(true);
 	}
 	
@@ -405,7 +409,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		String mode = null;
 		
 		// If the user changes the value, we get it
-		for ( Control control: loggerModeRadioGroupEditor.getRadioBoxControl(loggerComposite).getChildren() ) {
+		for ( Control control: this.loggerModeRadioGroupEditor.getRadioBoxControl(this.loggerComposite).getChildren() ) {
 			if (((Button)control).getSelection())
 				mode = (String)((Button)control).getData();
 		}
@@ -422,20 +426,20 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		// Defining of the user's choice, we show up the simple or expert parameters or none of them
 		switch ( mode ) {
 		case "disabled" :
-			expertModeGroup.setVisible(false);
-			simpleModeGroup.setVisible(false);
+			this.expertModeGroup.setVisible(false);
+			this.simpleModeGroup.setVisible(false);
 			break;
 		case "simple" :
-			expertModeGroup.setVisible(false);
-			simpleModeGroup.setVisible(true);
+			this.expertModeGroup.setVisible(false);
+			this.simpleModeGroup.setVisible(true);
 			break;
 		case "expert" :
-			expertModeGroup.setVisible(true);
-			simpleModeGroup.setVisible(false);
+			this.expertModeGroup.setVisible(true);
+			this.simpleModeGroup.setVisible(false);
 			break;
 		default : 
-			expertModeGroup.setVisible(false);
-			simpleModeGroup.setVisible(false);
+			this.expertModeGroup.setVisible(false);
+			this.simpleModeGroup.setVisible(false);
 			logger.error("Unknown value \""+mode+"\" in loggerModeRadioGroupEditor.");
 		}
 	}
@@ -444,25 +448,25 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     public boolean performOk() {
     	if ( logger.isTraceEnabled() ) logger.trace("Saving preferences in preference store");
     	
-    	if ( logger.isTraceEnabled() ) logger.trace("   setting checkForUpdateAtStartup = "+btnCheckForUpdateAtStartupButton.getSelection());
-    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("checkForUpdateAtStartup", btnCheckForUpdateAtStartupButton.getSelection());
+    	if ( logger.isTraceEnabled() ) logger.trace("   setting checkForUpdateAtStartup = "+this.btnCheckForUpdateAtStartupButton.getSelection());
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("checkForUpdateAtStartup", this.btnCheckForUpdateAtStartupButton.getSelection());
     	
-    	if ( logger.isTraceEnabled() ) logger.trace("   setting showImagesInView = "+btnAlwaysReplaceIconsInViews.getSelection());
-    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInView", btnAlwaysReplaceIconsInViews.getSelection());
+    	if ( logger.isTraceEnabled() ) logger.trace("   setting showImagesInView = "+this.btnAlwaysReplaceIconsInViews.getSelection());
+    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInView", this.btnAlwaysReplaceIconsInViews.getSelection());
     	
     	String value;
-    	if ( btnAlwaysReplaceIconsInModelTree.getSelection() )
+    	if ( this.btnAlwaysReplaceIconsInModelTree.getSelection() )
     	    value = "always";
-    	else if ( btnNeverReplaceIconsInModelTree.getSelection() )
+    	else if ( this.btnNeverReplaceIconsInModelTree.getSelection() )
             value = "never";
     	else 
     	    value = "";
     	if ( logger.isTraceEnabled() ) logger.trace("   setting mustReplaceIconsInTree = "+value);
     	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceIconsInTree", value);
     	
-        if ( btnAlwaysReplaceIconsInViews.getSelection() )
+        if ( this.btnAlwaysReplaceIconsInViews.getSelection() )
             value = "always";
-        else if ( btnNeverReplaceIconsInViews.getSelection() )
+        else if ( this.btnNeverReplaceIconsInViews.getSelection() )
             value = "never";
         else 
             value = "";
@@ -470,9 +474,9 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceIconsInViews", value);
         
         
-        if ( btnAlwaysReplaceLabelsInViews.getSelection() )
+        if ( this.btnAlwaysReplaceLabelsInViews.getSelection() )
             value = "always";
-        else if ( btnNeverReplaceLabelsInViews.getSelection() )
+        else if ( this.btnNeverReplaceLabelsInViews.getSelection() )
             value = "never";
         else 
             value = "";
@@ -483,32 +487,32 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		try {
 			Field field = RadioGroupFieldEditor.class.getDeclaredField("value");
 			field.setAccessible(true);
-			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerMode = "+(String)field.get(loggerModeRadioGroupEditor));
+			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerMode = "+(String)field.get(this.loggerModeRadioGroupEditor));
 			field.setAccessible(false);
 		} catch (Exception err) {
 			logger.error("Failed to retrieve the \"loggerMode\" value from the preference page", err);
 		}
-		loggerModeRadioGroupEditor.store();
+		this.loggerModeRadioGroupEditor.store();
     	
     		// the loggerLevel is a private property, so we use reflection to access it
 		try {
 			Field field = RadioGroupFieldEditor.class.getDeclaredField("value");
 			field.setAccessible(true);
-			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerLevel = "+(String)field.get(loggerLevelRadioGroupEditor));
+			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerLevel = "+(String)field.get(this.loggerLevelRadioGroupEditor));
 			field.setAccessible(false);
 		} catch (Exception err) {
 			logger.error("Failed to retrieve the \"loggerLevel\" value from the preference page", err);
 		}
-		loggerLevelRadioGroupEditor.store();
+		this.loggerLevelRadioGroupEditor.store();
 		
 			//TODO : if we are in simple mode, check that is is a valid writable filename
-		if ( logger.isTraceEnabled() ) logger.trace("   setting loggerFilename = "+filenameFileFieldEditor.getStringValue());
-		filenameFileFieldEditor.store();
+		if ( logger.isTraceEnabled() ) logger.trace("   setting loggerFilename = "+this.filenameFileFieldEditor.getStringValue());
+		this.filenameFileFieldEditor.store();
 		
-		if ( logger.isTraceEnabled() ) logger.trace("   setting loggerExpert = "+expertTextFieldEditor.getStringValue());
-		expertTextFieldEditor.store();
+		if ( logger.isTraceEnabled() ) logger.trace("   setting loggerExpert = "+this.expertTextFieldEditor.getStringValue());
+		this.expertTextFieldEditor.store();
 		
-        folderTableEditor.store();
+        this.folderTableEditor.store();
 		
         try {
         	if ( logger.isDebugEnabled() ) logger.debug("setting Saving the preference store to disk.");
@@ -527,5 +531,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
 	@Override
 	public void init(IWorkbench workbench) {
+	    // nothing to do
 	}
 }
