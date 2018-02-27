@@ -106,4 +106,16 @@ public class SpecializationPropertyCommand extends Command {
         if ( this.eObject instanceof IArchimateElement || this.eObject instanceof IArchimateRelationship )
             ((INameable)this.eObject).setName(((INameable)this.eObject).getName());
     }
+    
+    @Override
+    public void dispose() {
+        this.eObject = null;
+        this.key = null;
+        this.value = null;
+
+        this.action = null;
+        this.property = null;
+        this.oldValue = null;
+        this.propertyIndex = 0;
+    }
 }
