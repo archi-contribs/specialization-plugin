@@ -207,7 +207,6 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
     
 	@Override
 	protected Adapter getECoreAdapter() {
-	    logger.trace("Returning eAdapter");
 		return this.eAdapter;
 	}
 	   
@@ -219,7 +218,6 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         @Override
         public void notifyChanged(Notification msg) {
             if ( msg.getNotifier() instanceof IProperty ) {
-                logger.trace("***** msg = "+msg);
                 IProperty property = (IProperty)msg.getNotifier();
                 if( property.getKey().equals("label") )
                     refreshControls();
@@ -228,6 +226,9 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         
         @Override
         public void setTarget(Notifier n) {
+        	if ( n == null )
+        		return;
+        	
             if ( n instanceof IDiagramModelArchimateObject)
                 super.setTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
             else
@@ -236,6 +237,9 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         
         @Override
         public void unsetTarget(Notifier n) {
+        	if ( n == null )
+        		return;
+        	
             if ( n instanceof IDiagramModelArchimateObject)
                 super.unsetTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
             else
@@ -249,7 +253,6 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
             logger.trace("elementEditPart is null"); //$NON-NLS-1$
             return null;
         }
-        logger.trace("elementEditPart is "+this.elementEditPart); //$NON-NLS-1$
         return this.elementEditPart.getModel();
 	}
 
@@ -263,6 +266,9 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 	}
 	
 	void refreshControls() {
+		if ( this.txtLabelName == null || this.txtLabelName.isDisposed() )
+			return;
+		
         if ( this.elementEditPart == null ) {
             logger.trace("Not refreshing controls as elementEditPart is null");
             this.txtLabelName.removeModifyListener(this.labelModifyListener);
@@ -288,6 +294,7 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         if ( !this.txtLabelName.getText().equals(labelName) ) {
             this.txtLabelName.removeModifyListener(this.labelModifyListener);
             this.txtLabelName.setText(labelName);
+            this.txtLabelName.setSelection(labelName.length());
             this.txtLabelName.addModifyListener(this.labelModifyListener);
             // we reset the element's name to force the diagram to refresh it
             this.elementEditPart.getModel().setName(this.elementEditPart.getModel().getName());

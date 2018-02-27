@@ -33,9 +33,9 @@ import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateRelationshipEditPart;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
-import com.archimatetool.model.IArchimatePackage;
 import com.archimatetool.model.IArchimateRelationship;
 import com.archimatetool.model.IDiagramModelArchimateObject;
+import com.archimatetool.model.IProperty;
 
 public class SpecializationRelationshipLabelSection extends AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationRelationshipLabelSection.class);
@@ -131,7 +131,6 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         fd.left = new FormAttachment(btnHelp, 5);
         helpLbl.setLayoutData(fd);
         
-
         /* ********************************************************* */
         this.compoLabel = new Composite(parent, SWT.NONE);
         this.compoLabel.setForeground(parent.getForeground());
@@ -218,17 +217,18 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
     private Adapter eAdapter = new EContentAdapter() {
         @Override
         public void notifyChanged(Notification msg) {
-            Object feature = msg.getFeature();
-            // Diagram Name event (Undo/Redo and here!)
-            if(feature == IArchimatePackage.Literals.PROPERTIES__PROPERTIES) {
-                refreshControls();
+            if ( msg.getNotifier() instanceof IProperty ) {
+                IProperty property = (IProperty)msg.getNotifier();
+                if( property.getKey().equals("label") )
+                    refreshControls();
             }
-            logger.trace("***** feature = "+feature);
-            logger.trace("***** msg = "+msg);
         }
         
         @Override
         public void setTarget(Notifier n) {
+        	if ( n == null )
+        		return;
+        	
             if ( n instanceof IDiagramModelArchimateObject)
                 super.setTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
             else
@@ -237,7 +237,10 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         
         @Override
         public void unsetTarget(Notifier n) {
-            if ( n instanceof IDiagramModelArchimateObject)
+        	if ( n == null )
+        		return;
+        	
+        	if ( n instanceof IDiagramModelArchimateObject)
                 super.unsetTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
             else
                 super.unsetTarget(n);
@@ -250,8 +253,6 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
             logger.trace("relationshipEditPart is null"); //$NON-NLS-1$
             return null;
         }
-
-        logger.trace("relationshipEditPart is "+this.relationshipEditPart); //$NON-NLS-1$
         return this.relationshipEditPart.getModel();
 	}
 
@@ -265,6 +266,9 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 	}
 	
 	void refreshControls() {
+		if ( this.txtLabelName == null || this.txtLabelName.isDisposed() )
+			return;
+		
         if ( this.relationshipEditPart == null ) {
             logger.trace("Not refreshing controls as relationshipEditPart is null");
             this.txtLabelName.removeModifyListener(this.labelModifyListener);
@@ -290,6 +294,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         if ( !this.txtLabelName.getText().equals(labelName) ) {
             this.txtLabelName.removeModifyListener(this.labelModifyListener);
             this.txtLabelName.setText(labelName);
+            this.txtLabelName.setSelection(labelName.length());
             this.txtLabelName.addModifyListener(this.labelModifyListener);
             // we reset the element's name to force the diagram to refresh it
             this.relationshipEditPart.getModel().setName(this.relationshipEditPart.getModel().getName());
