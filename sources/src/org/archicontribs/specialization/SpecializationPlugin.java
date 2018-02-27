@@ -112,7 +112,9 @@ import com.archimatetool.model.IProperty;
  * v1.0.1       08/01/2018      Replace "\n" string by a new line in labels
  *                              Expand variables ${name}, ${id}, ${property:xxx}
  *
- * v1.0.2       15/02/2018      Use CompoundXommands to change property values
+ * v1.0.2       27/02/2018      Use CompoundCommands to change property values to allow undo/redo
+ * 								Manage adapters (notifications) to trap property update
+ * 								Changing the label of an element or a relationship or a relationships now sets the model's dirty flag 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
