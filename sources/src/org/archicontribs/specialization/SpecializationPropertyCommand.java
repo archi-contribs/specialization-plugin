@@ -6,6 +6,10 @@
 package org.archicontribs.specialization;
 
 import org.eclipse.emf.common.notify.Adapter;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.gef.commands.Command;
 
 import com.archimatetool.model.IArchimateElement;
@@ -77,6 +81,7 @@ public class SpecializationPropertyCommand extends Command {
 	            this.property.setKey(this.key);
 	            this.property.setValue(this.value);
 	            this.eObject.getProperties().add(this.property);
+	            this.property.eNotify(new ENotificationImpl((InternalEObject) this.property, Notification.ADD, EcorePackage.EATTRIBUTE, this.property.getValue(), null));
     		}
     	} else {
     		// else, we update the value ... but only if the value is not null
@@ -84,6 +89,7 @@ public class SpecializationPropertyCommand extends Command {
     			this.action = actionType.PropertyDeleted;
     			this.propertyIndex = this.eObject.getProperties().indexOf(this.property);
     			this.eObject.getProperties().remove(this.property);
+    			this.property.eNotify(new ENotificationImpl((InternalEObject) this.property, Notification.REMOVE, EcorePackage.EATTRIBUTE, null, this.property.getValue()));
     		} else {
     			this.action = actionType.PropertyUpdated;
     			this.oldValue = this.property.getValue();
@@ -91,12 +97,12 @@ public class SpecializationPropertyCommand extends Command {
     		}
     	}
     	
+        if ( this.adapter != null )
+            this.adapter.setTarget(this.eObject);
+    	
     	// if the eObject is an element or a relationship, then we reset their name to force the diagrams to refresh them
     	if ( this.eObject instanceof IArchimateElement || this.eObject instanceof IArchimateRelationship )
     	    ((INameable)this.eObject).setName(((INameable)this.eObject).getName());
-    	
-        if ( this.adapter != null )
-            this.adapter.setTarget(this.eObject);
     }
     
     @Override
@@ -105,10 +111,12 @@ public class SpecializationPropertyCommand extends Command {
     		case PropertyCreated:
     			// we remove the newly created property
     			this.eObject.getProperties().remove(this.property);
+    			this.property.eNotify(new ENotificationImpl((InternalEObject) this.property, Notification.REMOVE, EcorePackage.EATTRIBUTE, null, this.property.getValue()));
     			break;
     		case PropertyDeleted:
     			// we restore the deleted property
     			this.eObject.getProperties().add(this.propertyIndex, this.property);
+    			this.property.eNotify(new ENotificationImpl((InternalEObject) this.property, Notification.ADD, EcorePackage.EATTRIBUTE, this.property.getValue(), null));
     			break;
     		case PropertyUpdated:
     			// we restore the old value
