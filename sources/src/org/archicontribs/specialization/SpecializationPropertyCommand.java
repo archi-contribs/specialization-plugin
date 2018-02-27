@@ -5,6 +5,7 @@
  */
 package org.archicontribs.specialization;
 
+import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.gef.commands.Command;
 
 import com.archimatetool.model.IArchimateElement;
@@ -25,6 +26,8 @@ public class SpecializationPropertyCommand extends Command {
 	protected IProperty   property;
 	protected String      oldValue;
 	protected int         propertyIndex;
+	
+	protected Adapter adapter;
 		
 	/*
 	 * Creates a new property
@@ -33,8 +36,20 @@ public class SpecializationPropertyCommand extends Command {
 	    this.eObject = eObject;
 	    this.key = key;
 	    this.value = value;
+	    this.adapter = null;
 	    setLabel("set property "+key);
 	}
+	
+	/*
+     * Creates a new property and set the concept's adapter
+     */
+    public SpecializationPropertyCommand(IProperties eObject, String key, String value, Adapter adapter) {
+        this.eObject = eObject;
+        this.key = key;
+        this.value = value;
+        this.adapter = adapter;
+        setLabel("set property "+key);
+    }
 	
     @Override
     public void execute() {
@@ -79,6 +94,9 @@ public class SpecializationPropertyCommand extends Command {
     	// if the eObject is an element or a relationship, then we reset their name to force the diagrams to refresh them
     	if ( this.eObject instanceof IArchimateElement || this.eObject instanceof IArchimateRelationship )
     	    ((INameable)this.eObject).setName(((INameable)this.eObject).getName());
+    	
+        if ( this.adapter != null )
+            this.adapter.setTarget(this.eObject);
     }
     
     @Override
