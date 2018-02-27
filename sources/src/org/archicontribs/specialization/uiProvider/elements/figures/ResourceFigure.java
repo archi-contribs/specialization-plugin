@@ -21,7 +21,7 @@ public class ResourceFigure extends com.archimatetool.editor.diagram.figures.ele
     
     @Override
     protected void drawIcon(Graphics graphics) {
-        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, bounds);
+        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
     }
     
     @Override

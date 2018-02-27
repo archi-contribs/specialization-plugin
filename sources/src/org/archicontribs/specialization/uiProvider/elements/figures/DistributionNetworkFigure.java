@@ -20,7 +20,7 @@ public class DistributionNetworkFigure extends com.archimatetool.editor.diagram.
     
     @Override
     protected void drawIcon(Graphics graphics) {
-        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, bounds);
+        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
     }
     
     @Override

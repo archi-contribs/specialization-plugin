@@ -21,7 +21,7 @@ public class AssessmentFigure extends com.archimatetool.editor.diagram.figures.e
     
     @Override
     protected void drawIcon(Graphics graphics) {
-        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, bounds);
+        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
     }
     
     @Override

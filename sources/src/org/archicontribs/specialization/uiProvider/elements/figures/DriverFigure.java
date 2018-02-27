@@ -21,7 +21,7 @@ public class DriverFigure extends com.archimatetool.editor.diagram.figures.eleme
     
     @Override
     protected void drawIcon(Graphics graphics) {
-        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, bounds);
+        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
     }
     
     @Override

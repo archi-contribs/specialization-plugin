@@ -9,7 +9,6 @@ import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.text.TextFlow;
-import com.archimatetool.model.IDiagramModelArchimateObject;
 
 /**
  * Figure for a Node
@@ -20,7 +19,7 @@ public class NodeFigure extends com.archimatetool.editor.diagram.figures.element
     
     @Override
     protected void drawIcon(Graphics graphics) {
-        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, bounds);
+        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
     }
     
     @Override
@@ -28,7 +27,7 @@ public class NodeFigure extends com.archimatetool.editor.diagram.figures.element
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
-            labelName = SpecializationPlugin.getLabelName(((IDiagramModelArchimateObject)getDiagramModelObject()).getArchimateElement());
+            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject().getArchimateElement());
         
         if ( labelName==null )
             super.setText();
