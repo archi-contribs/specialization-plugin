@@ -33,6 +33,7 @@ public class SpecializationPropertyCommand extends Command {
 	    this.eObject = eObject;
 	    this.key = key;
 	    this.value = value;
+	    setLabel("set property "+key);
 	}
 	
     @Override
