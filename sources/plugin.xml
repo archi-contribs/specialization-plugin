@@ -339,7 +339,13 @@
          <propertyTab
                afterTab="specialization.tab"
                category="appearance.category"
-               id="replaceLabel.tab"
+               id="replaceElementLabel.tab"
+               label="Replace label">
+         </propertyTab>
+         <propertyTab
+               afterTab="specialization.tab"
+               category="appearance.category"
+               id="replaceRelationshipLabel.tab"
                label="Replace label">
          </propertyTab>
       </propertyTabs>
@@ -376,13 +382,13 @@
                class="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection$Filter"
                id="specializationSection"
-               tab="replaceLabel.tab">
+               tab="replaceElementLabel.tab">
          </propertySection>
          <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection"
                filter="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection$Filter"
                id="specializationSection"
-               tab="replaceLabel.tab">
+               tab="replaceRelationshipLabel.tab">
          </propertySection>
       </propertySections>
    </extension>
