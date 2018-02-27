@@ -10,10 +10,9 @@ import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.SpecializationPropertyCommand;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.impl.AdapterImpl;
+import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.gef.commands.CommandStack;
-import org.eclipse.gef.commands.CompoundCommand;
+import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -33,10 +32,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
-import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.IArchimateElement;
-import com.archimatetool.model.IArchimatePackage;
+import com.archimatetool.model.IDiagramModelArchimateObject;
+import com.archimatetool.model.IProperty;
 
 public class SpecializationElementLabelSection extends AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationElementLabelSection.class);
@@ -45,7 +44,7 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 
     private Composite compoLabel;
     private Composite compoNoLabel;
-	private Text txtLabelName;
+	Text txtLabelName;
 	
     boolean mouseOverHelpButton = false;
     
@@ -57,7 +56,7 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 	public static class Filter extends ObjectFilter {
 		@Override
 		protected boolean isRequiredType(Object object) {
-            if ( object != null && object instanceof IArchimateElement ) {
+            if ( object != null && object instanceof ArchimateElementEditPart ) {
                 logger.trace("showing label tab as the element has got a label");
                 return true;
             }
@@ -66,23 +65,9 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 
 		@Override
 		protected Class<?> getAdaptableType() {
-			return IArchimateElement.class;
+			return ArchimateElementEditPart.class;
 		}
 	}
-	
-    /**
-     * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
-     */
-    private Adapter eAdapter = new AdapterImpl() {
-        @Override
-        public void notifyChanged(Notification msg) {
-            Object feature = msg.getFeature();
-            // Diagram Name event (Undo/Redo and here!)
-            if(feature == IArchimatePackage.Literals.PROPERTIES__PROPERTIES) {
-                refreshControls();
-            }
-        }
-    };
     
     @Override
     protected void setLayout(Composite parent) {
@@ -209,52 +194,84 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
     /**
      * Called when the label name is changed in the txtLabelName text widget
      */
-    private ModifyListener labelModifyListener = new ModifyListener() {
+    ModifyListener labelModifyListener = new ModifyListener() {
+        @SuppressWarnings("synthetic-access")
         @Override
         public void modifyText(ModifyEvent event) {
             IArchimateElement concept = SpecializationElementLabelSection.this.elementEditPart.getModel().getArchimateConcept();
             String value = ((Text)event.widget).getText();
             if ( value.isEmpty() ) value = null;        // null value allows to delete the property
-            
-            SpecializationPropertyCommand command = new SpecializationPropertyCommand(concept, "label", value);
-
-            if ( command.canExecute() ) {
-                CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
-                compoundCommand.add(command);
-
-                CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
-                stack.execute(compoundCommand);
-            }
+            getCommandStack().execute(new SpecializationPropertyCommand(concept, "label", value, SpecializationElementLabelSection.this.eAdapter));
         }
     };
-	
+    
 	@Override
 	protected Adapter getECoreAdapter() {
+	    logger.trace("Returning eAdapter");
 		return this.eAdapter;
 	}
+	   
+    /**
+     * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
+     * This one is a EContentAdapter to listen to child IProperty changes
+     */
+    private Adapter eAdapter = new EContentAdapter() {
+        @Override
+        public void notifyChanged(Notification msg) {
+            if ( msg.getNotifier() instanceof IProperty ) {
+                logger.trace("***** msg = "+msg);
+                IProperty property = (IProperty)msg.getNotifier();
+                if( property.getKey().equals("label") )
+                    refreshControls();
+            }
+        }
+        
+        @Override
+        public void setTarget(Notifier n) {
+            if ( n instanceof IDiagramModelArchimateObject)
+                super.setTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
+            else
+                super.setTarget(n);
+        }
+        
+        @Override
+        public void unsetTarget(Notifier n) {
+            if ( n instanceof IDiagramModelArchimateObject)
+                super.unsetTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
+            else
+                super.unsetTarget(n);
+        }
+    };
 
 	@Override
 	protected EObject getEObject() {
         if ( this.elementEditPart == null ) {
-            logger.error("elementEditPart is null"); //$NON-NLS-1$
+            logger.trace("elementEditPart is null"); //$NON-NLS-1$
             return null;
         }
-        return (EObject) this.elementEditPart;
+        logger.trace("elementEditPart is "+this.elementEditPart); //$NON-NLS-1$
+        return this.elementEditPart.getModel();
 	}
 
 	@Override
     protected void setElement(Object element) {
         this.elementEditPart = (ArchimateElementEditPart)new Filter().adaptObject(element);
-        if(this.elementEditPart == null) {
-            logger.error("failed to get elementEditPart for " + element); //$NON-NLS-1$
-        }
+
+        logger.trace("Setting element to "+this.elementEditPart);
+
+        refreshControls();
 	}
 	
 	void refreshControls() {
-	    logger.trace("Refreshing controls");
-        
-        if ( this.elementEditPart == null )
+        if ( this.elementEditPart == null ) {
+            logger.trace("Not refreshing controls as elementEditPart is null");
+            this.txtLabelName.removeModifyListener(this.labelModifyListener);
+            this.txtLabelName.setText("");
+            this.txtLabelName.addModifyListener(this.labelModifyListener);
             return;
+        }
+
+        logger.trace("Refreshing controls");
         
         if ( !SpecializationPlugin.mustReplaceLabel(this.elementEditPart.getModel()) ) {
             this.compoNoLabel.setVisible(true);
@@ -265,9 +282,15 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         this.compoNoLabel.setVisible(false);
         this.compoLabel.setVisible(true);
         
-        this.txtLabelName.removeModifyListener(this.labelModifyListener);
         String labelName = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel(), "label");
-        this.txtLabelName.setText(labelName == null ? "" : labelName);
-        this.txtLabelName.addModifyListener(this.labelModifyListener);
+        if ( labelName == null ) labelName = "";
+        
+        if ( !this.txtLabelName.getText().equals(labelName) ) {
+            this.txtLabelName.removeModifyListener(this.labelModifyListener);
+            this.txtLabelName.setText(labelName);
+            this.txtLabelName.addModifyListener(this.labelModifyListener);
+            // we reset the element's name to force the diagram to refresh it
+            this.elementEditPart.getModel().setName(this.elementEditPart.getModel().getName());
+        }
 	}
 }

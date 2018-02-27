@@ -10,10 +10,9 @@ import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.SpecializationPropertyCommand;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.impl.AdapterImpl;
+import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.gef.commands.CommandStack;
-import org.eclipse.gef.commands.CompoundCommand;
+import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -33,10 +32,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateRelationshipEditPart;
-import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.IArchimatePackage;
 import com.archimatetool.model.IArchimateRelationship;
+import com.archimatetool.model.IDiagramModelArchimateObject;
 
 public class SpecializationRelationshipLabelSection extends AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationRelationshipLabelSection.class);
@@ -57,14 +56,11 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 	public static class Filter extends ObjectFilter {
 		@Override
 		protected boolean isRequiredType(Object object) {
-			if ( object == null )
-				return false;
-			
-            if ( !(object instanceof ArchimateRelationshipEditPart) )
-                return false;
-            
-            logger.trace("showing label tab as the relationship has got a label");
-            return true;
+			if ( object != null && object instanceof ArchimateRelationshipEditPart ) {
+	            logger.trace("showing label tab as the relationship has got a label");
+	            return true;
+			}
+            return false;
 		}
 
 		@Override
@@ -72,20 +68,6 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 			return ArchimateRelationshipEditPart.class;
 		}
 	}
-	
-    /**
-     * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
-     */
-    private Adapter eAdapter = new AdapterImpl() {
-        @Override
-        public void notifyChanged(Notification msg) {
-            Object feature = msg.getFeature();
-            // Diagram Name event (Undo/Redo and here!)
-            if(feature == IArchimatePackage.Literals.PROPERTIES__PROPERTIES) {
-                refreshControls();
-            }
-        }
-    };
     
     @Override
     protected void setLayout(Composite parent) {
@@ -214,21 +196,13 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
      * Called when the label name is changed in the txtLabelName text widget
      */
     private ModifyListener labelModifyListener = new ModifyListener() {
+        @SuppressWarnings("synthetic-access")
         @Override
         public void modifyText(ModifyEvent event) {
             IArchimateRelationship concept = SpecializationRelationshipLabelSection.this.relationshipEditPart.getModel().getArchimateConcept();
             String value = ((Text)event.widget).getText();
             if ( value.isEmpty() ) value = null;        // null value allows to delete the property
-            
-            SpecializationPropertyCommand command = new SpecializationPropertyCommand(concept, "label", value);
-
-            if ( command.canExecute() ) {
-                CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
-                compoundCommand.add(command);
-
-                CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
-                stack.execute(compoundCommand);
-            }
+            getCommandStack().execute(new SpecializationPropertyCommand(concept, "label", value, SpecializationRelationshipLabelSection.this.eAdapter));
         }
     };
 	
@@ -236,32 +210,70 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 	protected Adapter getECoreAdapter() {
 		return this.eAdapter;
 	}
+	   
+    /**
+     * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
+     * This one is a EContentAdapter to listen to child IProperty changes
+     */
+    private Adapter eAdapter = new EContentAdapter() {
+        @Override
+        public void notifyChanged(Notification msg) {
+            Object feature = msg.getFeature();
+            // Diagram Name event (Undo/Redo and here!)
+            if(feature == IArchimatePackage.Literals.PROPERTIES__PROPERTIES) {
+                refreshControls();
+            }
+            logger.trace("***** feature = "+feature);
+            logger.trace("***** msg = "+msg);
+        }
+        
+        @Override
+        public void setTarget(Notifier n) {
+            if ( n instanceof IDiagramModelArchimateObject)
+                super.setTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
+            else
+                super.setTarget(n);
+        }
+        
+        @Override
+        public void unsetTarget(Notifier n) {
+            if ( n instanceof IDiagramModelArchimateObject)
+                super.unsetTarget(((IDiagramModelArchimateObject)n).getArchimateConcept());
+            else
+                super.unsetTarget(n);
+        }
+    };
 
 	@Override
 	protected EObject getEObject() {
         if ( this.relationshipEditPart == null ) {
-            logger.error("relationshipEditPart is null"); //$NON-NLS-1$
+            logger.trace("relationshipEditPart is null"); //$NON-NLS-1$
             return null;
         }
 
+        logger.trace("relationshipEditPart is "+this.relationshipEditPart); //$NON-NLS-1$
         return this.relationshipEditPart.getModel();
 	}
 
 	@Override
     protected void setElement(Object element) {
         this.relationshipEditPart = (ArchimateRelationshipEditPart)new Filter().adaptObject(element);
-        if(this.relationshipEditPart == null) {
-            logger.error("failed to get relationshipEditPart for " + element); //$NON-NLS-1$
-        }
 
+        logger.trace("Setting relationship to "+this.relationshipEditPart);
+        
         refreshControls();
 	}
 	
 	void refreshControls() {
-	    logger.trace("Refreshing controls");
-        
-        if ( this.relationshipEditPart == null )
+        if ( this.relationshipEditPart == null ) {
+            logger.trace("Not refreshing controls as relationshipEditPart is null");
+            this.txtLabelName.removeModifyListener(this.labelModifyListener);
+            this.txtLabelName.setText("");
+            this.txtLabelName.addModifyListener(this.labelModifyListener);
             return;
+        }
+
+        logger.trace("Refreshing controls");
         
         if ( !SpecializationPlugin.mustReplaceLabel(this.relationshipEditPart.getModel()) ) {
             this.compoNoLabel.setVisible(true);
@@ -272,9 +284,15 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         this.compoNoLabel.setVisible(false);
         this.compoLabel.setVisible(true);
         
-        this.txtLabelName.removeModifyListener(this.labelModifyListener);
-        String labelName = SpecializationPlugin.getPropertyValue(this.relationshipEditPart.getModel().getArchimateConcept(), "label");
-        this.txtLabelName.setText(labelName == null ? "" : labelName);
-        this.txtLabelName.addModifyListener(this.labelModifyListener);
+        String labelName = SpecializationPlugin.getPropertyValue(this.relationshipEditPart.getModel(), "label");
+        if ( labelName == null ) labelName = "";
+        
+        if ( !this.txtLabelName.getText().equals(labelName) ) {
+            this.txtLabelName.removeModifyListener(this.labelModifyListener);
+            this.txtLabelName.setText(labelName);
+            this.txtLabelName.addModifyListener(this.labelModifyListener);
+            // we reset the element's name to force the diagram to refresh it
+            this.relationshipEditPart.getModel().setName(this.relationshipEditPart.getModel().getName());
+        }
 	}
 }
