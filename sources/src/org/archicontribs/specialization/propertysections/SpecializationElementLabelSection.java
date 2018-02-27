@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
+import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
 import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.IArchimateElement;
@@ -40,8 +41,7 @@ import com.archimatetool.model.IArchimatePackage;
 public class SpecializationElementLabelSection extends AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationElementLabelSection.class);
 
-	//ArchimateElementEditPart elementEditPart = null;
-	IArchimateElement element;
+	ArchimateElementEditPart elementEditPart = null;
 
     private Composite compoLabel;
     private Composite compoNoLabel;
@@ -212,17 +212,17 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
     private ModifyListener labelModifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent event) {
-            //IArchimateElement concept = SpecializationElementLabelSection.this.elementEditPart.getModel().getArchimateConcept();
+            IArchimateElement concept = SpecializationElementLabelSection.this.elementEditPart.getModel().getArchimateConcept();
             String value = ((Text)event.widget).getText();
             if ( value.isEmpty() ) value = null;        // null value allows to delete the property
             
-            SpecializationPropertyCommand command = new SpecializationPropertyCommand(SpecializationElementLabelSection.this.element, "label", value);
+            SpecializationPropertyCommand command = new SpecializationPropertyCommand(concept, "label", value);
 
             if ( command.canExecute() ) {
                 CompoundCommand compoundCommand = new NonNotifyingCompoundCommand();
                 compoundCommand.add(command);
 
-                CommandStack stack = (CommandStack) SpecializationElementLabelSection.this.element.getArchimateModel().getAdapter(CommandStack.class);
+                CommandStack stack = (CommandStack) concept.getArchimateModel().getAdapter(CommandStack.class);
                 stack.execute(compoundCommand);
             }
         }
@@ -235,31 +235,28 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
 
 	@Override
 	protected EObject getEObject() {
-        //if ( this.elementEditPart == null ) {
-        //    logger.error("elementEditPart is null"); //$NON-NLS-1$
-        //    return null;
-        //}
-
-        return this.element;
+        if ( this.elementEditPart == null ) {
+            logger.error("elementEditPart is null"); //$NON-NLS-1$
+            return null;
+        }
+        return (EObject) this.elementEditPart;
 	}
 
 	@Override
     protected void setElement(Object element) {
-        //this.elementEditPart = (ArchimateElementEditPart)new Filter().adaptObject(element);
-        //if(this.elementEditPart == null) {
-        //    logger.error("failed to get elementEditPart for " + element); //$NON-NLS-1$
-        //}
-	    this.element = (IArchimateElement) element;
-        refreshControls();
+        this.elementEditPart = (ArchimateElementEditPart)new Filter().adaptObject(element);
+        if(this.elementEditPart == null) {
+            logger.error("failed to get elementEditPart for " + element); //$NON-NLS-1$
+        }
 	}
 	
 	void refreshControls() {
 	    logger.trace("Refreshing controls");
         
-        if ( this.element == null )
+        if ( this.elementEditPart == null )
             return;
         
-        if ( !SpecializationPlugin.mustReplaceLabel(this.element.getArchimateModel()) ) {
+        if ( !SpecializationPlugin.mustReplaceLabel(this.elementEditPart.getModel()) ) {
             this.compoNoLabel.setVisible(true);
             this.compoLabel.setVisible(false);
             return;
@@ -269,7 +266,7 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         this.compoLabel.setVisible(true);
         
         this.txtLabelName.removeModifyListener(this.labelModifyListener);
-        String labelName = SpecializationPlugin.getPropertyValue(this.element, "label");
+        String labelName = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel(), "label");
         this.txtLabelName.setText(labelName == null ? "" : labelName);
         this.txtLabelName.addModifyListener(this.labelModifyListener);
 	}
