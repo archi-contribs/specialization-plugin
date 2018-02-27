@@ -737,7 +737,7 @@ public class SpecializationIconSection extends AbstractArchimatePropertySection 
     @Override
     protected EObject getEObject() {
         if ( this.elementEditPart == null ) {
-            logger.error("elementEditPart is null"); //$NON-NLS-1$
+            logger.trace("elementEditPart is null"); //$NON-NLS-1$
             return null;
         }
 
