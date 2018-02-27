@@ -1,3 +1,8 @@
+* v1.0.2 (27/02/2017)
+  * Use CompoundCommands to change property values to allow undo/redo
+  * Manage adapters (notifications) to trap property update
+  * Changing the label of an element or a relationship now sets the model's dirty flag 
+
 * v1.0.1 (08/01/2017)
   * Replace "\n" string by newline in labels
   * Expand variables ${name}, ${id}, ${property:xxx}; ...
