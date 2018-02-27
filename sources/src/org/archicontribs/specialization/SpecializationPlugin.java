@@ -114,7 +114,7 @@ import com.archimatetool.model.IProperty;
  *
  * v1.0.2       27/02/2018      Use CompoundCommands to change property values to allow undo/redo
  * 								Manage adapters (notifications) to trap property update
- * 								Changing the label of an element or a relationship or a relationships now sets the model's dirty flag 
+ * 								Changing the label of an element or a relationship now sets the model's dirty flag 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
