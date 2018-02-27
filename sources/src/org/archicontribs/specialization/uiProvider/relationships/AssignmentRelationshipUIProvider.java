@@ -17,10 +17,11 @@ import com.archimatetool.model.IArchimatePackage;
 /**
  * Assignment Relationship UI Provider
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class AssignmentRelationshipUIProvider extends com.archimatetool.editor.ui.factory.relationships.AssignmentRelationshipUIProvider {
 
+    @Override
     public EClass providerFor() {
         return IArchimatePackage.eINSTANCE.getAssignmentRelationship();
     }

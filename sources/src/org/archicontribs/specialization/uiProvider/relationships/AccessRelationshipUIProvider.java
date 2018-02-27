@@ -15,10 +15,11 @@ import com.archimatetool.model.IArchimatePackage;
 /**
  * Access Relationship UI Provider
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class AccessRelationshipUIProvider extends com.archimatetool.editor.ui.factory.relationships.AccessRelationshipUIProvider {
 
+    @Override
     public EClass providerFor() {
         return IArchimatePackage.eINSTANCE.getAccessRelationship();
     }

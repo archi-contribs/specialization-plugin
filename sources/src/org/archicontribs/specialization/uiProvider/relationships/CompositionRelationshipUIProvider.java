@@ -17,10 +17,11 @@ import com.archimatetool.model.IArchimatePackage;
 /**
  * Composition Relationship UI Provider
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class CompositionRelationshipUIProvider extends com.archimatetool.editor.ui.factory.relationships.CompositionRelationshipUIProvider {
 
+    @Override
     public EClass providerFor() {
         return IArchimatePackage.eINSTANCE.getCompositionRelationship();
     }

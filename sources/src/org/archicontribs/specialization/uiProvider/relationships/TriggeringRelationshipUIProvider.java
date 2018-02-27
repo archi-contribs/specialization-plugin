@@ -17,10 +17,11 @@ import com.archimatetool.model.IArchimatePackage;
 /**
  * Triggering Relationship UI Provider
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class TriggeringRelationshipUIProvider extends com.archimatetool.editor.ui.factory.relationships.TriggeringRelationshipUIProvider {
 
+    @Override
     public EClass providerFor() {
         return IArchimatePackage.eINSTANCE.getTriggeringRelationship();
     }

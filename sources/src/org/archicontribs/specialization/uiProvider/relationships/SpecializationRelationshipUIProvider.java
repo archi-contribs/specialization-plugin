@@ -17,10 +17,11 @@ import com.archimatetool.model.IArchimatePackage;
 /**
  * Specialization Relationship UI Provider
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class SpecializationRelationshipUIProvider extends com.archimatetool.editor.ui.factory.relationships.SpecializationRelationshipUIProvider {
 
+    @Override
     public EClass providerFor() {
         return IArchimatePackage.eINSTANCE.getSpecializationRelationship();
     }

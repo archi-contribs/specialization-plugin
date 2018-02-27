@@ -17,10 +17,11 @@ import com.archimatetool.model.IArchimatePackage;
 /**
  * Flow Relationship UI Provider
  * 
- * @author Hervé Jouin
+ * @author Herve Jouin
  */
 public class FlowRelationshipUIProvider extends com.archimatetool.editor.ui.factory.relationships.FlowRelationshipUIProvider {
 
+    @Override
     public EClass providerFor() {
         return IArchimatePackage.eINSTANCE.getFlowRelationship();
     }
