@@ -23,7 +23,7 @@ public class StakeholderUIProvider extends com.archimatetool.editor.ui.factory.e
     
     @Override
     public EditPart createEditPart() {
-            // we override the standard method because we want our NodeFigure class to be called
+            // we override the standard method because we want our StakeholderFigure class to be called
         return new ArchimateElementEditPart(org.archicontribs.specialization.uiProvider.elements.figures.StakeholderFigure.class);
     }
     
@@ -32,15 +32,15 @@ public class StakeholderUIProvider extends com.archimatetool.editor.ui.factory.e
      */
     @Override
     public Image getImage() {
-    	if ( SpecializationPlugin.mustReplaceIcon(instance) ) {
-    	    Image image = SpecializationPlugin.getImage(instance);
+    	if ( SpecializationPlugin.mustReplaceIcon(this.instance) ) {
+    	    Image image = SpecializationPlugin.getImage(this.instance);
             if ( image != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(instance)+": Displaying custom icon");
+                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(this.instance)+": Displaying custom icon");
                 return image;
             }
     	}
     	
-        logger.trace(SpecializationPlugin.getFullName(instance)+": Displaying default icon");        	
+        logger.trace(SpecializationPlugin.getFullName(this.instance)+": Displaying default icon");        	
     	return super.getImage();
     }
 }
