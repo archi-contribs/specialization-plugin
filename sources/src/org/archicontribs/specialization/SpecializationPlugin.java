@@ -114,13 +114,16 @@ import com.archimatetool.model.IProperty;
  *
  * v1.0.2       27/02/2018      Use CompoundCommands to change property values to allow undo/redo
  * 								Manage adapters (notifications) to trap property update
- * 								Changing the label of an element or a relationship now sets the model's dirty flag 
+ * 								Changing the label of an element or a relationship now sets the model's dirty flag
+ * 
+ * v1.0.3       01/03/2018      Fix a bug in the relationship label update
+ *                              Replace "\t" string by a tab in labels       
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "1.0.2";
+	public static final String pluginVersion = "1.0.3";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
@@ -1106,9 +1109,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             if ( label != null )
                 label = SpecializationVariable.expand(label,obj);
             
-            // we replace "\n" string by new line if any
-            if ( label != null )
+            // we replace "\n" string by new line, and \t string by tabulation, if any
+            if ( label != null ) {
                 label = SpecializationVariable.expand(label,obj).replace("\\n","\n");
+                label = SpecializationVariable.expand(label,obj).replace("\\t","\t");
+            }
             
             return label;
         }
