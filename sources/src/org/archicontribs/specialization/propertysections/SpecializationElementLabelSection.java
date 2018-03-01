@@ -288,7 +288,7 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
         this.compoNoLabel.setVisible(false);
         this.compoLabel.setVisible(true);
         
-        String labelName = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel(), "label");
+        String labelName = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel().getArchimateConcept(), "label");
         if ( labelName == null ) labelName = "";
         
         if ( !this.txtLabelName.getText().equals(labelName) ) {
@@ -297,7 +297,7 @@ public class SpecializationElementLabelSection extends AbstractArchimateProperty
             this.txtLabelName.setSelection(labelName.length());
             this.txtLabelName.addModifyListener(this.labelModifyListener);
             // we reset the element's name to force the diagram to refresh it
-            this.elementEditPart.getModel().setName(this.elementEditPart.getModel().getName());
+            this.elementEditPart.getModel().getArchimateConcept().setName(this.elementEditPart.getModel().getArchimateConcept().getName());
         }
 	}
 }

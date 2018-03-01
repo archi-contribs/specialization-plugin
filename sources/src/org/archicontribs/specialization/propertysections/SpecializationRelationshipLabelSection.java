@@ -44,7 +44,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
 
     private Composite compoLabel;
     private Composite compoNoLabel;
-    private Text txtLabelName;
+    Text txtLabelName;
     
     boolean mouseOverHelpButton = false;
     
@@ -93,7 +93,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         this.compoNoLabel.setLayoutData(fd);
 
         Label lblNoLabel = new Label(this.compoNoLabel, SWT.NONE);
-        lblNoLabel.setText("You must configure the view to allow labels replacement.");
+        lblNoLabel.setText("You must configure the view or the model to allow labels replacement.");
         lblNoLabel.setForeground(parent.getForeground());
         lblNoLabel.setBackground(parent.getBackground());
         fd = new FormData();
@@ -130,7 +130,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         fd.top = new FormAttachment(btnHelp, 0, SWT.CENTER);
         fd.left = new FormAttachment(btnHelp, 5);
         helpLbl.setLayoutData(fd);
-        
+
         /* ********************************************************* */
         this.compoLabel = new Composite(parent, SWT.NONE);
         this.compoLabel.setForeground(parent.getForeground());
@@ -194,7 +194,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
     /**
      * Called when the label name is changed in the txtLabelName text widget
      */
-    private ModifyListener labelModifyListener = new ModifyListener() {
+    ModifyListener labelModifyListener = new ModifyListener() {
         @SuppressWarnings("synthetic-access")
         @Override
         public void modifyText(ModifyEvent event) {
@@ -288,7 +288,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
         this.compoNoLabel.setVisible(false);
         this.compoLabel.setVisible(true);
         
-        String labelName = SpecializationPlugin.getPropertyValue(this.relationshipEditPart.getModel(), "label");
+        String labelName = SpecializationPlugin.getPropertyValue(this.relationshipEditPart.getModel().getArchimateConcept(), "label");
         if ( labelName == null ) labelName = "";
         
         if ( !this.txtLabelName.getText().equals(labelName) ) {
@@ -297,7 +297,7 @@ public class SpecializationRelationshipLabelSection extends AbstractArchimatePro
             this.txtLabelName.setSelection(labelName.length());
             this.txtLabelName.addModifyListener(this.labelModifyListener);
             // we reset the element's name to force the diagram to refresh it
-            this.relationshipEditPart.getModel().setName(this.relationshipEditPart.getModel().getName());
+            this.relationshipEditPart.getModel().getArchimateConcept().setName(this.relationshipEditPart.getModel().getArchimateConcept().getName());
         }
 	}
 }
