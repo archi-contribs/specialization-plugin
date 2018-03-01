@@ -1,4 +1,8 @@
-* v1.0.2 (27/02/2017)
+* v1.0.3 (01/03/2018)
+  * fix an issue on the relationships labels
+  * replace "\t" string by a tab in labels
+
+* v1.0.2 (27/02/2018)
   * Use CompoundCommands to change property values to allow undo/redo
   * Manage adapters (notifications) to trap property update
   * Changing the label of an element or a relationship now sets the model's dirty flag 
