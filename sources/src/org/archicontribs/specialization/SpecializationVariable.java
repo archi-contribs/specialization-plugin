@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.emf.ecore.EObject;
+
+import com.archimatetool.model.IArchimateDiagramModel;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimateModelObject;
 import com.archimatetool.model.IArchimateRelationship;
@@ -181,6 +183,12 @@ public class SpecializationVariable {
                     if ( logger.isTraceEnabled() ) logger.trace("         --> itself");
                     return eObject;
                 }
+                
+                // check for ${sumx:xxx}
+            if ( variableName.toLowerCase().startsWith("sumx"+variableSeparator) ) {
+                if ( logger.isTraceEnabled() ) logger.trace("         --> itself");
+                return eObject;
+            }
         }
         throw new RuntimeException("Unknown variable \""+variableName+"\" ("+variable+")");
     }
@@ -391,9 +399,17 @@ public class SpecializationVariable {
                     // check for ${sum:xxx}
                  if ( variableName.toLowerCase().startsWith("sum"+variableSeparator)) {
                      int sumValue = 0;
-                     if ( eObject instanceof IDiagramModelContainer ) {
+                     if ( eObject instanceof IArchimateDiagramModel || eObject instanceof IDiagramModelContainer ) {
+                         String value = getVariable("${"+variableName.substring(3+variableSeparator.length())+"}", eObject);
+                         if ( value != null ) {
+                             try {
+                                 sumValue += Integer.parseInt(value);
+                             } catch ( @SuppressWarnings("unused") NumberFormatException ign ) {
+                                 // nothing to do
+                             }
+                         }
                          for ( IDiagramModelObject child: ((IDiagramModelContainer)eObject).getChildren() ) {
-                             String value = getVariable("${"+variableName.substring(3+variableSeparator.length())+"}", child);
+                             value = getVariable("${"+variableName+"}", child);
                              if ( value != null ) {
                                  try {
                                      sumValue += Integer.parseInt(value);
@@ -412,6 +428,33 @@ public class SpecializationVariable {
                      }
                      return String.valueOf(sumValue);
                  }
+                 
+                 
+                 // check for ${sumx:xxx} (same as sum, but exclusive
+              if ( variableName.toLowerCase().startsWith("sumx"+variableSeparator)) {
+                  int sumValue = 0;
+                  if ( eObject instanceof IArchimateDiagramModel || eObject instanceof IDiagramModelContainer ) {
+                      String value;
+                      for ( IDiagramModelObject child: ((IDiagramModelContainer)eObject).getChildren() ) {
+                          value = getVariable("${sum"+variableSeparator+variableName.substring(4+variableSeparator.length())+"}", child);
+                          if ( value != null ) {
+                              try {
+                                  sumValue += Integer.parseInt(value);
+                              } catch ( @SuppressWarnings("unused") NumberFormatException ign ) {
+                                  // nothing to do
+                              }
+                          }
+                      }
+                  } else {
+                      String value = getVariable("${"+variableName.substring(4+variableSeparator.length())+"}", eObject);
+                      try {
+                          sumValue += Integer.parseInt(value);
+                      } catch ( @SuppressWarnings("unused") NumberFormatException ign ) {
+                          // nothing to do
+                      }
+                  }
+                  return String.valueOf(sumValue);
+              }
         }
         logger.error("Unknown variable \""+variableName+"\" ("+variable+")");
         return "";
