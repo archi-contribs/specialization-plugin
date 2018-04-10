@@ -8,7 +8,6 @@ package org.archicontribs.specialization.uiProvider.elements.figures;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.text.TextFlow;
-import com.archimatetool.model.IDiagramModelArchimateObject;
 
 /**
  * Meaning Figure
@@ -21,7 +20,7 @@ public class MeaningFigure extends com.archimatetool.editor.diagram.figures.elem
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
-            labelName = SpecializationPlugin.getLabelName(((IDiagramModelArchimateObject)getDiagramModelObject()).getArchimateElement());
+            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )
             super.setText();

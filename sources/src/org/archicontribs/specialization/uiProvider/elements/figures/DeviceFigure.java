@@ -28,7 +28,7 @@ public class DeviceFigure extends com.archimatetool.editor.diagram.figures.eleme
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
-            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject().getArchimateElement());
+            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )
             super.setText();

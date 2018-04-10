@@ -9,7 +9,6 @@ import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.text.TextFlow;
-import com.archimatetool.model.IDiagramModelArchimateObject;
 
 /**
  * Material Figure
@@ -28,7 +27,7 @@ public class DistributionNetworkFigure extends com.archimatetool.editor.diagram.
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
-            labelName = SpecializationPlugin.getLabelName(((IDiagramModelArchimateObject)getDiagramModelObject()).getArchimateElement());
+            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )
             super.setText();

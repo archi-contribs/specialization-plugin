@@ -28,7 +28,7 @@ public class ServiceFigure extends com.archimatetool.editor.diagram.figures.elem
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
-            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject().getArchimateElement());
+            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )
             super.setText();
