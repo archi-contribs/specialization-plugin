@@ -13,6 +13,8 @@ import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateConnection;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IDiagramModelComponent;
+import com.archimatetool.model.IDiagramModelContainer;
+import com.archimatetool.model.IDiagramModelObject;
 import com.archimatetool.model.IDocumentable;
 import com.archimatetool.model.IIdentifier;
 import com.archimatetool.model.INameable;
@@ -74,14 +76,16 @@ public class SpecializationVariable {
             return null;
         }
         
+        // we calculate the variable name by removing the '${' prefix and '}' suffix
         String variableName = expand(variable.substring(2, variable.length()-1), eObject);
 
         //TODO : add a preference to choose between silently ignore or raise an error
         switch ( variableName.toLowerCase() ) {
-            case "class" :
-            case "documentation" :
-            case "id" :
-            case "name" :
+            case "class":
+            case "documentation":
+            case "purpose":
+            case "id":
+            case "name":
             	if ( logger.isTraceEnabled() ) logger.trace("         --> itself");
                 return eObject;
 
@@ -171,6 +175,12 @@ public class SpecializationVariable {
                     }
                     throw new RuntimeException("Cannot get variable \""+variable+"\" as the object is not a relationship.");
                 }
+                
+                    // check for ${sum:xxx}
+                if ( variableName.toLowerCase().startsWith("sum"+variableSeparator) ) {
+                    if ( logger.isTraceEnabled() ) logger.trace("         --> itself");
+                    return eObject;
+                }
         }
         throw new RuntimeException("Unknown variable \""+variableName+"\" ("+variable+")");
     }
@@ -186,17 +196,17 @@ public class SpecializationVariable {
         if ( !variable.startsWith("${") || !variable.endsWith("}") )
             return null;
         
+        // we calculate the variable name by removing the '${' prefix and '}' suffix
         String variableName = expand(variable.substring(2, variable.length()-1), eObject);
 
-	        // check for ${property:xxx}
 	    if ( variableName.toLowerCase().startsWith("view"+variableSeparator) )
-	    	return getUnscoppedVariable("${"+variableName.substring(5)+"}", eObject);
+	    	return getUnscoppedVariable("${"+variableName.substring(4+variableSeparator.length())+"}", eObject);
 	    else if ( variableName.toLowerCase().startsWith("model"+variableSeparator) )
-	    	return getUnscoppedVariable("${"+variableName.substring(6)+"}", eObject);
+	    	return getUnscoppedVariable("${"+variableName.substring(5+variableSeparator.length())+"}", eObject);
 	    else if ( variableName.toLowerCase().startsWith("source"+variableSeparator) )
-	    	return getUnscoppedVariable("${"+variableName.substring(7)+"}", eObject);
+	    	return getUnscoppedVariable("${"+variableName.substring(6+variableSeparator.length())+"}", eObject);
 	    else if ( variableName.toLowerCase().startsWith("target"+variableSeparator) )
-	    	return getUnscoppedVariable("${"+variableName.substring(7)+"}", eObject);
+	    	return getUnscoppedVariable("${"+variableName.substring(6+variableSeparator.length())+"}", eObject);
 	    else return "${"+variableName+"}";
     }
     
@@ -213,6 +223,7 @@ public class SpecializationVariable {
         if ( !variable.startsWith("${") || !variable.endsWith("}") )
             throw new RuntimeException("The expression \""+variable+"\" is not a variable (it should be enclosed between \"${\" and \"}\")");
         
+        // we check that the variable provided is a string enclosed between "${" and "}"
         String variableName = expand(variable.substring(2, variable.length()-1), eObject);
 
         //TODO : add a preference to choose between silently ignore or raise an error
@@ -234,7 +245,8 @@ public class SpecializationVariable {
                     if ( logger.isTraceEnabled() ) logger.trace("         ---> value is \""+ ((IIdentifier)eObject).getId() +"\"");
                     return ((IIdentifier)eObject).getId();
                 }
-                throw new RuntimeException("Cannot get variable \""+variable+"\" as the object does not an ID ("+eObject.getClass().getSimpleName()+").");
+                logger.error("Cannot get variable \""+variable+"\" as the object does not an ID ("+eObject.getClass().getSimpleName()+").");
+                return "";
 
             case "documentation" :
                 if (eObject instanceof IDiagramModelArchimateObject) {
@@ -249,7 +261,16 @@ public class SpecializationVariable {
                     if ( logger.isTraceEnabled() ) logger.trace("         ---> value is \""+ ((IDocumentable)eObject).getDocumentation() +"\"");
                     return ((IDocumentable)eObject).getDocumentation();
                 }
-                throw new RuntimeException("Cannot get variable \""+variable+"\" as the object does not have a documentation ("+eObject.getClass().getSimpleName()+").");
+                logger.error("Cannot get variable \""+variable+"\" as the object does not have a documentation ("+eObject.getClass().getSimpleName()+").");
+                return "";
+                
+            case "purpose" :
+                if (eObject instanceof IArchimateModel) {
+                    if ( logger.isTraceEnabled() ) logger.trace("         ---> value is \""+ ((IArchimateModel)eObject).getPurpose() +"\"");
+                    return ((IArchimateModel)eObject).getPurpose();
+                }
+                logger.error("Cannot get variable \""+variable+"\" as the object does not have a purpose ("+eObject.getClass().getSimpleName()+").");
+                return "";
 
             case "void":
                 if ( logger.isTraceEnabled() ) logger.trace("         ---> value is \"\"");
@@ -260,7 +281,8 @@ public class SpecializationVariable {
                     if ( logger.isTraceEnabled() ) logger.trace("         ---> value is \""+ ((INameable)eObject).getName() +"\"");
                     return ((INameable)eObject).getName();
                 }
-                throw new RuntimeException("cannot get variable \""+variable+"\" as the object does not have a name ("+eObject.getClass().getSimpleName()+").");
+                logger.error("cannot get variable \""+variable+"\" as the object does not have a name ("+eObject.getClass().getSimpleName()+").");
+                return "";
 
             case "username":
             	return System.getProperty("user.name");
@@ -275,7 +297,7 @@ public class SpecializationVariable {
             default :
             		// check for ${date:format}
             	if ( variableName.toLowerCase().startsWith("date"+variableSeparator)) {
-            		String format = variableName.substring(5);
+            		String format = variableName.substring(4+variableSeparator.length());
             		DateFormat df = new SimpleDateFormat(format);
             		Date now = Calendar.getInstance().getTime();
             		return df.format(now);
@@ -288,7 +310,7 @@ public class SpecializationVariable {
                     if ( eObject instanceof IDiagramModelArchimateConnection )
                         eObject = ((IDiagramModelArchimateConnection)eObject).getArchimateRelationship();
                     if ( eObject instanceof IProperties ) {
-                        String propertyName = variableName.substring(9);
+                        String propertyName = variableName.substring(8+variableSeparator.length());
                         for ( IProperty property: ((IProperties)eObject).getProperties() ) {
                             if ( SpecializationPlugin.areEqual(property.getKey(),propertyName) ) {
                                 if ( logger.isTraceEnabled() ) logger.trace("         ---> value is \""+ property.getValue() +"\"");
@@ -298,33 +320,36 @@ public class SpecializationVariable {
                         if ( logger.isTraceEnabled() ) logger.trace("         ---> value is null");
                         return null;
                     }
-                    throw new RuntimeException("Cannot get variable \""+variable+"\" as the object does not have properties ("+eObject.getClass().getSimpleName()+").");
+                    logger.error("Cannot get variable \""+variable+"\" as the object does not have properties ("+eObject.getClass().getSimpleName()+").");
+                    return "";
                 }
 
                     // check for ${view:xxx}
                 else if ( variableName.toLowerCase().startsWith("view"+variableSeparator) ) {
                     if ( eObject instanceof IDiagramModel ) {
-                        return getVariable("${"+variableName.substring(5)+"}", eObject);
+                        return getVariable("${"+variableName.substring(4+variableSeparator.length())+"}", eObject);
                     }
                     else if ( eObject instanceof IDiagramModelArchimateObject ) {
-                        return getVariable("${"+variableName.substring(5)+"}", ((IDiagramModelArchimateObject)eObject).getDiagramModel());
+                        return getVariable("${"+variableName.substring(4+variableSeparator.length())+"}", ((IDiagramModelArchimateObject)eObject).getDiagramModel());
                     }
-                    throw new RuntimeException("Cannot get variable \""+variable+"\" as the object is not part of a DiagramModel ("+eObject.getClass().getSimpleName()+").");
+                    logger.error("Cannot get variable \""+variable+"\" as the object is not part of a DiagramModel ("+eObject.getClass().getSimpleName()+").");
+                    return "";
+                    
                 }
 
                     // check for ${model:xxx}
                 else if ( variableName.toLowerCase().startsWith("model"+variableSeparator) ) {
                     if ( eObject instanceof IArchimateModelObject ) {
-                        return getVariable("${"+variableName.substring(6)+"}", ((IArchimateModelObject)eObject).getArchimateModel());
+                        return getVariable("${"+variableName.substring(5+variableSeparator.length())+"}", ((IArchimateModelObject)eObject).getArchimateModel());
                     }
                     else if ( eObject instanceof IDiagramModelComponent ) {
-                        return getVariable("${"+variableName.substring(6)+"}", ((IDiagramModelComponent)eObject).getDiagramModel().getArchimateModel());
+                        return getVariable("${"+variableName.substring(5+variableSeparator.length())+"}", ((IDiagramModelComponent)eObject).getDiagramModel().getArchimateModel());
                     }
                     else if ( eObject instanceof IArchimateModel ) {
-                        return getVariable("${"+variableName.substring(6)+"}", eObject);
+                        return getVariable("${"+variableName.substring(5+variableSeparator.length())+"}", eObject);
                     }
-                    
-                    throw new RuntimeException("Cannot get variable \""+variable+"\" as we failed to get the object's model ("+eObject.getClass().getSimpleName()+").");
+                    logger.error("Cannot get variable \""+variable+"\" as we failed to get the object's model ("+eObject.getClass().getSimpleName()+").");
+                    return "";
                 }
                 
                     // check for ${source:xxx}
@@ -339,9 +364,10 @@ public class SpecializationVariable {
                     }
 
                     if ( obj instanceof IArchimateRelationship ) {
-                        return getVariable("${"+variableName.substring(7)+"}", ((IArchimateRelationship)obj).getSource());
+                        return getVariable("${"+variableName.substring(6+variableSeparator.length())+"}", ((IArchimateRelationship)obj).getSource());
                     }
-                    throw new RuntimeException("Cannot get variable \""+variable+"\" as the object is not a relationship.");
+                    logger.error("Cannot get variable \""+variable+"\" as the object is not a relationship.");
+                    return "";
                 }
                     
                     // check for ${target:xxx}
@@ -356,11 +382,38 @@ public class SpecializationVariable {
                     }
                     
                     if ( obj instanceof IArchimateRelationship ) {
-                        return getVariable("${"+variableName.substring(7)+"}", ((IArchimateRelationship)obj).getTarget());
+                        return getVariable("${"+variableName.substring(6+variableSeparator.length())+"}", ((IArchimateRelationship)obj).getTarget());
                     }
-                    throw new RuntimeException("Cannot get variable \""+variable+"\" as the object is not a relationship.");
+                    logger.error("Cannot get variable \""+variable+"\" as the object is not a relationship.");
+                    return "";
                 }
+            	
+                    // check for ${sum:xxx}
+                 if ( variableName.toLowerCase().startsWith("sum"+variableSeparator)) {
+                     int sumValue = 0;
+                     if ( eObject instanceof IDiagramModelContainer ) {
+                         for ( IDiagramModelObject child: ((IDiagramModelContainer)eObject).getChildren() ) {
+                             String value = getVariable("${"+variableName.substring(3+variableSeparator.length())+"}", child);
+                             if ( value != null ) {
+                                 try {
+                                     sumValue += Integer.parseInt(value);
+                                 } catch ( @SuppressWarnings("unused") NumberFormatException ign ) {
+                                     // nothing to do
+                                 }
+                             }
+                         }
+                     } else {
+                         String value = getVariable("${"+variableName.substring(3+variableSeparator.length())+"}", eObject);
+                         try {
+                             sumValue += Integer.parseInt(value);
+                         } catch ( @SuppressWarnings("unused") NumberFormatException ign ) {
+                             // nothing to do
+                         }
+                     }
+                     return String.valueOf(sumValue);
+                 }
         }
-        throw new RuntimeException("Unknown variable \""+variableName+"\" ("+variable+")");
+        logger.error("Unknown variable \""+variableName+"\" ("+variable+")");
+        return "";
     }
 }
