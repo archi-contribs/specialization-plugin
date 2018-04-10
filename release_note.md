@@ -1,3 +1,8 @@
+* v1.0.5 (10/04/2018)
+  * Fix ${sum:xxx} recursion
+  * Update ${sum:xxx} variable to include the selected object in the sum
+  * Add ${sumx:xxx} variable that exclude the selected object from the sum
+
 * v1.0.4 (10/04/2018)
   * Implement ${model:purpose} variable
   * Implement ${sum:xxx} variable which is able to recursively sum numeric value (like ${view:sum:property:cost})

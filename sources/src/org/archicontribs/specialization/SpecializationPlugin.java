@@ -123,6 +123,10 @@ import com.archimatetool.model.IProperty;
  *                              Implement ${sum:xxx} variable which is able to recursively sum numeric value (like ${view:sum:property:cost})
  *                              Replace exception by simple error messages in variable expansion to avoid generating Archi misbehavior
  *                              Fix ${view:xxx} variables
+ *                              
+ * v1.0.5       10/04/2018      Fix ${sum:xxx} recursion
+ *                              Update ${sum:xxx} variable to include the selected object in the sum
+ *                              Add ${sumx:xxx} variable that exclude the selected object from the sum
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
