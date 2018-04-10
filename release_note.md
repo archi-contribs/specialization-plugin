@@ -1,3 +1,9 @@
+* v1.0.4 (10/04/2018)
+  * Implement ${model:purpose} variable
+  * Implement ${sum:xxx} variable which is able to recursively sum numeric value (like ${view:sum:property:cost})
+  * Replace exception by simple error messages in variable expansion to avoid generating Archi misbehavior
+  * Fix ${view:xxx} variables
+
 * v1.0.3 (01/03/2018)
   * fix an issue on the relationships labels
   * replace "\t" string by a tab in labels

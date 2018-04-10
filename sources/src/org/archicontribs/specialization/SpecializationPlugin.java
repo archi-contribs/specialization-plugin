@@ -117,13 +117,18 @@ import com.archimatetool.model.IProperty;
  * 								Changing the label of an element or a relationship now sets the model's dirty flag
  * 
  * v1.0.3       01/03/2018      Fix a bug in the relationship label update
- *                              Replace "\t" string by a tab in labels       
+ *                              Replace "\t" string by a tab in labels    
+ *                              
+ * v1.0.4       10/04/2018      Implement ${model:purpose} variable
+ *                              Implement ${sum:xxx} variable which is able to recursively sum numeric value (like ${view:sum:property:cost})
+ *                              Replace exception by simple error messages in variable expansion to avoid generating Archi misbehavior
+ *                              Fix ${view:xxx} variables
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "1.0.3";
+	public static final String pluginVersion = "1.0.4";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
