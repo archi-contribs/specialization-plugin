@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 import com.archimatetool.model.IArchimateDiagramModel;
