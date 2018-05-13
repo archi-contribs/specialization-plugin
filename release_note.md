@@ -1,3 +1,6 @@
+* v1.0.6 (13/05/2018)
+  * Add ${properties:separator:regexp} and ${sortedproperties:separator:regexp} variables that concats properties
+
 * v1.0.5 (10/04/2018)
   * Fix ${sum:xxx} recursion
   * Update ${sum:xxx} variable to include the selected object in the sum
