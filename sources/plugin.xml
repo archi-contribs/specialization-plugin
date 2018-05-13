@@ -69,243 +69,243 @@
       point="com.archimatetool.editor.objectUIProvider">
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationCollaborationUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationCollaborationUIProvider">
+            id="com.archimatetool.editor.ApplicationCollaborationUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationComponentUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationComponentUIProvider">
+            id="com.archimatetool.editor.ApplicationComponentUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationEventUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationEventUIProvider">
+            id="com.archimatetool.editor.ApplicationEventUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationFunctionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationFunctionUIProvider">
+            id="com.archimatetool.editor.ApplicationFunctionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationInteractionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationInteractionUIProvider">
+            id="com.archimatetool.editor.ApplicationInteractionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationInterfaceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationInterfaceUIProvider">
+            id="com.archimatetool.editor.ApplicationInterfaceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationProcessUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationProcessUIProvider">
+            id="com.archimatetool.editor.ApplicationProcessUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ApplicationServiceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ApplicationServiceUIProvider">
+            id="com.archimatetool.editor.ApplicationServiceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ArtifactUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ArtifactUIProvider">
+            id="com.archimatetool.editor.ArtifactUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.AssessmentUIProvider"
-            id="org.archicontribs.specialization.uiProvider.AssessmentUIProvider">
+            id="com.archimatetool.editor.AssessmentUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessActorUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessActorUIProvider">
+            id="com.archimatetool.editor.BusinessActorUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessCollaborationUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessCollaborationUIProvider">
+            id="com.archimatetool.editor.BusinessCollaborationUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessEventUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessEventUIProvider">
+            id="com.archimatetool.editor.BusinessEventUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessFunctionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessFunctionUIProvider">
+            id="com.archimatetool.editor.BusinessFunctionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessInteractionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessInteractionUIProvider">
+            id="com.archimatetool.editor.BusinessInteractionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessInterfaceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessInterfaceUIProvider">
+            id="com.archimatetool.editor.BusinessInterfaceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessObjectUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessObjectUIProvider">
+            id="com.archimatetool.editor.BusinessObjectUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessProcessUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessProcessUIProvider">
+            id="com.archimatetool.editor.BusinessProcessUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessRoleUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessRoleUIProvider">
+            id="com.archimatetool.editor.BusinessRoleUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.BusinessServiceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.BusinessServiceUIProvider">
+            id="com.archimatetool.editor.BusinessServiceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.CapabilityUIProvider"
-            id="org.archicontribs.specialization.uiProvider.CapabilityUIProvider">
+            id="com.archimatetool.editor.CapabilityUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.CommunicationNetworkUIProvider"
-            id="org.archicontribs.specialization.uiProvider.CommunicationNetworkUIProvider">
+            id="com.archimatetool.editor.CommunicationNetworkUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ConstraintUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ConstraintUIProvider">
+            id="com.archimatetool.editor.ConstraintUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ContractUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ContractUIProvider">
+            id="com.archimatetool.editor.ContractUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.CourseOfActionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.CourseOfActionUIProvider">
+            id="com.archimatetool.editor.CourseOfActionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.DataObjectUIProvider"
-            id="org.archicontribs.specialization.uiProvider.DataObjectUIProvider">
+            id="com.archimatetool.editor.DataObjectUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.DeliverableUIProvider"
-            id="org.archicontribs.specialization.uiProvider.DeliverableUIProvider">
+            id="com.archimatetool.editor.DeliverableUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.DeviceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.DeviceUIProvider">
+            id="com.archimatetool.editor.DeviceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.DistributionNetworkUIProvider"
-            id="org.archicontribs.specialization.uiProvider.DistributionNetworkUIProvider">
+            id="com.archimatetool.editor.DistributionNetworkUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.DriverUIProvider"
-            id="org.archicontribs.specialization.uiProvider.DriverUIProvider">
+            id="com.archimatetool.editor.DriverUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.EquipmentUIProvider"
-            id="org.archicontribs.specialization.uiProvider.EquipmentUIProvider">
+            id="com.archimatetool.editor.EquipmentUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.FacilityUIProvider"
-            id="org.archicontribs.specialization.uiProvider.FacilityUIProvider">
+            id="com.archimatetool.editor.FacilityUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.GapUIProvider"
-            id="org.archicontribs.specialization.uiProvider.GapUIProvider">
+            id="com.archimatetool.editor.GapUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.GoalUIProvider"
-            id="org.archicontribs.specialization.uiProvider.GoalUIProvider">
+            id="com.archimatetool.editor.GoalUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.GroupingUIProvider"
-            id="org.archicontribs.specialization.uiProvider.GroupingUIProvider">
+            id="com.archimatetool.editor.GroupingUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ImplementationEventUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ImplementationEventUIProvider">
+            id="com.archimatetool.editor.ImplementationEventUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.JunctionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.JunctionUIProvider">
+            id="com.archimatetool.editor.JunctionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.LocationUIProvider"
-            id="org.archicontribs.specialization.uiProvider.LocationUIProvider">
+            id="com.archimatetool.editor.LocationUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.MaterialUIProvider"
-            id="org.archicontribs.specialization.uiProvider.MaterialUIProvider">
+            id="com.archimatetool.editor.MaterialUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.MeaningUIProvider"
-            id="org.archicontribs.specialization.uiProvider.MeaningUIProvider">
+            id="com.archimatetool.editor.MeaningUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.NodeUIProvider"
-            id="org.archicontribs.specialization.uiProvider.NodeUIProvider">
+            id="com.archimatetool.editor.NodeUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.OutcomeUIProvider"
-            id="org.archicontribs.specialization.uiProvider.OutcomeUIProvider">
+            id="com.archimatetool.editor.OutcomeUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.PathUIProvider"
-            id="org.archicontribs.specialization.uiProvider.PathUIProvider">
+            id="com.archimatetool.editor.PathUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.PlateauUIProvider"
-            id="org.archicontribs.specialization.uiProvider.PlateauUIProvider">
+            id="com.archimatetool.editor.PlateauUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.PrincipleUIProvider"
-            id="org.archicontribs.specialization.uiProvider.PrincipleUIProvider">
+            id="com.archimatetool.editor.PrincipleUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ProductUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ProductUIProvider">
+            id="com.archimatetool.editor.ProductUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.RepresentationUIProvider"
-            id="org.archicontribs.specialization.uiProvider.RepresentationUIProvider">
+            id="com.archimatetool.editor.RepresentationUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.RequirementUIProvider"
-            id="org.archicontribs.specialization.uiProvider.RequirementUIProvider">
+            id="com.archimatetool.editor.RequirementUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ResourceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ResourceUIProvider">
+            id="com.archimatetool.editor.ResourceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.StakeholderUIProvider"
-            id="org.archicontribs.specialization.uiProvider.StakeholderUIProvider">
+            id="com.archimatetool.editor.StakeholderUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.SystemSoftwareUIProvider"
-            id="org.archicontribs.specialization.uiProvider.SystemSoftwareUIProvider">
+            id="com.archimatetool.editor.SystemSoftwareUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.TechnologyCollaborationUIProvider"
-            id="org.archicontribs.specialization.uiProvider.TechnologyCollaborationUIProvider">
+            id="com.archimatetool.editor.TechnologyCollaborationUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.TechnologyEventUIProvider"
-            id="org.archicontribs.specialization.uiProvider.TechnologyEventUIProvider">
+            id="com.archimatetool.editor.TechnologyEventUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.TechnologyFunctionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.TechnologyFunctionUIProvider">
+            id="com.archimatetool.editor.TechnologyFunctionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.TechnologyInteractionUIProvider"
-            id="org.archicontribs.specialization.uiProvider.TechnologyInteractionUIProvider">
+            id="com.archimatetool.editor.TechnologyInteractionUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.TechnologyInterfaceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.TechnologyInterfaceUIProvider">
+            id="com.archimatetool.editor.TechnologyInterfaceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.TechnologyProcessUIProvider"
-            id="org.archicontribs.specialization.uiProvider.TechnologyProcessUIProvider">
+            id="com.archimatetool.editor.TechnologyProcessUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.TechnologyServiceUIProvider"
-            id="org.archicontribs.specialization.uiProvider.TechnologyServiceUIProvider">
+            id="com.archimatetool.editor.TechnologyServiceUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.ValueUIProvider"
-            id="org.archicontribs.specialization.uiProvider.ValueUIProvider">
+            id="com.archimatetool.editor.ValueUIProvider">
       </uiProvider>
       <uiProvider
             class="org.archicontribs.specialization.uiProvider.elements.WorkPackageUIProvider"
-            id="org.archicontribs.specialization.uiProvider.WorkPackageUIProvider">
+            id="com.archimatetool.editor.WorkPackageUIProvider">
       </uiProvider>
    </extension>
    <extension
@@ -391,5 +391,21 @@
                tab="replaceRelationshipLabel.tab">
          </propertySection>
       </propertySections>
+   </extension>
+  <extension
+     point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="true"
+            class="org.archicontribs.specialization.menu.SpecializationDiagramEditorContextMenu"
+            locationURI="popup:ArchimateDiagramEditorContextMenuProvider?after=additions">
+      </menuContribution>Contribution>
+   </extension>
+   <extension
+      point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
+            id="org.archicontribs.specialization.menu.SpecializationRefreshViewHandler"
+            name="SpecializationRefreshViewHandler">
+      </command>
    </extension>
 </plugin>

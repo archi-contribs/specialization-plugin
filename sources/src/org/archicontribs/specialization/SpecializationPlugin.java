@@ -127,12 +127,14 @@ import com.archimatetool.model.IProperty;
  * v1.0.5       10/04/2018      Fix ${sum:xxx} recursion
  *                              Update ${sum:xxx} variable to include the selected object in the sum
  *                              Add ${sumx:xxx} variable that exclude the selected object from the sum
+ * 
+ * v1.0.6       13/05/2018      Add ${properties:separator:regexp} and ${sortedproperties:separator:regexp} variable
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "1.0.5";
+	public static final String pluginVersion = "1.0.6";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
