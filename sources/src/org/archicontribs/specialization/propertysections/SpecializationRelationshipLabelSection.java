@@ -32,12 +32,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateRelationshipEditPart;
-import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.IArchimateRelationship;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IProperty;
 
-public class SpecializationRelationshipLabelSection extends AbstractArchimatePropertySection {
+public class SpecializationRelationshipLabelSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationRelationshipLabelSection.class);
 
 	ArchimateRelationshipEditPart relationshipEditPart = null;

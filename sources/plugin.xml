@@ -408,4 +408,14 @@
             name="SpecializationRefreshViewHandler">
       </command>
    </extension>
+   <extension
+      point="org.eclipse.ui.editors">
+      <editor
+            class="org.archicontribs.specialization.diagram.ArchimateDiagramEditor"
+            default="false"
+            icon="img/diagram.png"
+            id="com.archimatetool.editor.diagramEditor"
+            name="View">
+      </editor>
+   </extension>
 </plugin>

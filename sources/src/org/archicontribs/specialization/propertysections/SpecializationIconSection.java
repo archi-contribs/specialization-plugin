@@ -53,12 +53,11 @@ import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
-import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.*;
 import com.archimatetool.model.impl.Bounds;
 
 
-public class SpecializationIconSection extends AbstractArchimatePropertySection {
+public class SpecializationIconSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
     static final SpecializationLogger logger = new SpecializationLogger(SpecializationIconSection.class);
 
     ArchimateElementEditPart elementEditPart = null;

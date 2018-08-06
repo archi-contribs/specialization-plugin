@@ -34,11 +34,10 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.model.commands.NonNotifyingCompoundCommand;
-import com.archimatetool.editor.propertysections.AbstractArchimatePropertySection;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimatePackage;
 
-public class SpecializationModelSection extends AbstractArchimatePropertySection {
+public class SpecializationModelSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
 
 	IArchimateModel model;
