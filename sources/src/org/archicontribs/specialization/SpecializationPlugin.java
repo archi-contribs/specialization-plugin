@@ -562,7 +562,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 					if ( logger.isDebugEnabled() ) logger.debug("searching for plugins jar files");
 					Pattern p = Pattern.compile(pluginsPackage+"_v(.*).jar") ;
 
-					@SuppressWarnings("unchecked")
 					Iterator<JSONObject> iterator = result.iterator();
 					while (iterator.hasNext()) {
 						JSONObject file = iterator.next();
