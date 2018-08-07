@@ -110,8 +110,8 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
         this.comboDrilldown.setFont(new Font(this.comboDrilldown.getDisplay(), "consolas", this.compoDrilldown.getFont().getFontData()[0].getHeight(), SWT.NONE));
         fd = new FormData();
         fd.top = new FormAttachment(label, 0, SWT.CENTER);
-        fd.left = new FormAttachment(label, 35);
-        fd.right = new FormAttachment(0, 500);
+        fd.left = new FormAttachment(label, 20);
+        fd.right = new FormAttachment(100, -20);
         this.comboDrilldown.setLayoutData(fd);
         this.comboDrilldown.addModifyListener(this.comboModifyListener);
         
