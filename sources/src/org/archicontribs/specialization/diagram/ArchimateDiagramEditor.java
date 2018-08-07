@@ -1,41 +1,66 @@
 package org.archicontribs.specialization.diagram;
 
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.FigureCanvas;
+import org.archicontribs.specialization.SpecializationLogger;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.GraphicalViewer;
-import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import com.archimatetool.editor.ui.services.EditorManager;
 import com.archimatetool.model.IArchimateElement;
+import com.archimatetool.model.IArchimateModel;
+import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
-import com.archimatetool.model.IProperties;
 import com.archimatetool.model.IProperty;
 
 public class ArchimateDiagramEditor extends com.archimatetool.editor.diagram.ArchimateDiagramEditor {
+    static final SpecializationLogger logger = new SpecializationLogger(ArchimateDiagramEditor.class);
+    
+    static String propertyName = "drill down";
+    
     @Override
     protected void createRootEditPart(GraphicalViewer viewer) {
     	super.createRootEditPart(viewer);
     	viewer.getControl().addListener(SWT.MouseDoubleClick, new Listener() {
 			@Override public void handleEvent(Event event) {
+			    logger.trace("Double-click on "+event.widget);
 				EditPart editPart = viewer.findObjectAt(new Point(event.x, event.y));
-				Object component = editPart.getModel();
-				if ( component instanceof IDiagramModelArchimateObject ) {
-					IArchimateElement element = ((IDiagramModelArchimateObject) component).getArchimateConcept();
-					for ( IProperty prop: element.getProperties() ) {
-						if ( prop.getKey() != null && prop.getKey().equals("drill down to") ) {
-							String value = prop.getValue();
-							System.out.println("drill down to "+value);
-						}
-					}
+				if ( editPart != null ) {
+    				Object component = editPart.getModel();
+    				if ( component instanceof IDiagramModelArchimateObject ) {
+    					IArchimateElement element = ((IDiagramModelArchimateObject) component).getArchimateConcept();
+    					boolean propFound = false;
+    					for ( IProperty prop: element.getProperties() ) {
+    						if ( prop.getKey() != null && prop.getKey().equals(propertyName) ) {
+    						    propFound = true;
+    				            IArchimateModel model = element.getArchimateModel();
+    							String viewId = prop.getValue();
+    	                        if ( viewId == null ) {
+    	                            logger.debug("Property \""+propertyName+"\" = null");
+    	                        } else {
+    	                            logger.debug("Property \""+propertyName+"\" = \""+viewId+"\"");
+        							for ( IDiagramModel view: model.getDiagramModels() ) {
+        							    if ( view.getId().equals(viewId) ) {
+        							        logger.debug("Opening view \""+view.getName()+"\"");
+        							        EditorManager.openDiagramEditor(view);
+        							        return;
+        							    }
+        							}
+        							logger.error("Cannot find view with Id \""+viewId+"\"");
+    	                        }
+    						}
+    					}
+    					if ( !propFound ) logger.debug("The element does not have a property \"drill down\"");
+    				}
 				}
-				System.out.println("double click on "+event.widget);				
 			}
     		
     	});
+    }
+    
+    public static String getDrilldownPropertyName() {
+        return propertyName;
     }
 }

@@ -348,6 +348,12 @@
                id="replaceRelationshipLabel.tab"
                label="Replace label">
          </propertyTab>
+         <propertyTab
+               afterTab="specialization.tab"
+               category="appearance.category"
+               id="drilldown.tab"
+               label="Drill down">
+         </propertyTab>
       </propertyTabs>
    </extension>
    <extension
@@ -389,6 +395,12 @@
                filter="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection$Filter"
                id="specializationSection"
                tab="replaceRelationshipLabel.tab">
+         </propertySection>
+         <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationDrillDownSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationDrillDownSection$Filter"
+               id="specializationSection"
+               tab="drilldown.tab">
          </propertySection>
       </propertySections>
    </extension>
