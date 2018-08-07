@@ -424,6 +424,7 @@
       point="org.eclipse.ui.editors">
       <editor
             class="org.archicontribs.specialization.diagram.ArchimateDiagramEditor"
+            contributorClass="com.archimatetool.editor.diagram.ArchimateDiagramEditorActionBarContributor"
             default="false"
             icon="img/diagram.png"
             id="com.archimatetool.editor.diagramEditor"
