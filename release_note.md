@@ -1,3 +1,6 @@
+* v1.0.7.1 (07/08/2018)
+  * fix alignment and sizing options are missing in the action bar
+
 * v1.0.7 (07/08/2018)
   * Add drill down functionality (open a view when double-click on a view object)
 

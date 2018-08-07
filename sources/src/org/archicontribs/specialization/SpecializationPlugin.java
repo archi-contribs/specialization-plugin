@@ -131,12 +131,14 @@ import com.archimatetool.model.IProperty;
  * v1.0.6       13/05/2018      Add ${properties:separator:regexp} and ${sortedproperties:separator:regexp} variable
  * 
  * v1.0.7       07/08/2018      Add drill down functionality
+ * 
+ * v1.0.7.1		07/08/2018		fix alignment and sizing options are missing in the action bar
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 	
-	public static final String pluginVersion = "1.0.7";
+	public static final String pluginVersion = "1.0.7.1";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 	
