@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
+import com.archimatetool.model.IArchimateConcept;
 import com.archimatetool.model.IArchimateElement;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IDiagramModel;
@@ -241,9 +242,10 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
         }
 
         logger.trace("Refreshing controls");
+        IArchimateConcept concept = this.elementEditPart.getModel().getArchimateConcept();
+        IArchimateModel model = concept.getArchimateModel();
         
-        IArchimateModel model = this.elementEditPart.getModel().getArchimateModel();
-        String viewId = SpecializationPlugin.getPropertyValue(this.elementEditPart.getModel().getArchimateConcept(), ArchimateDiagramEditor.getDrilldownPropertyName());
+        String viewId = SpecializationPlugin.getPropertyValue(concept, ArchimateDiagramEditor.getDrilldownPropertyName());
         String selectedComboEntry = "";
         
         this.comboDrilldown.removeModifyListener(this.comboModifyListener);

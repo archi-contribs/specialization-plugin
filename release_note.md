@@ -1,3 +1,6 @@
+* v1.0.7 (07/08/2018)
+  * Add drill down functionality (open a view when double-click on a view object)
+
 * v1.0.6 (13/05/2018)
   * Add ${properties:separator:regexp} and ${sortedproperties:separator:regexp} variables that concats properties
 
