@@ -16,7 +16,7 @@ On Archi's preferences pages, you can:
 4. Create a log file for debugging purpose
 
 ### Changing components icons
-Create a property called **_icon_** for an element and set this property's value to the path of your image file using the locatin specified in your settings configuration. 
+Create a property called **_icon_** for an element and set this property's value to the path of your image file using the location specified in your settings configuration. 
 For instance, if you've got a file plugins/com.archimatetool.editor_4.0.3.201707201522/img/logistic/factory.png, simply write logistic/factory.png
 
 ![proof of concept](https://user-images.githubusercontent.com/9281982/29636398-b9bebcd6-8850-11e7-8abf-83915abdfde8.png) 
