@@ -1,3 +1,6 @@
+* v1.0.8 (19/09/2018)
+   * allow access to ${view:xxx} variables from connections
+
 * v1.0.7.1 (07/08/2018)
   * fix alignment and sizing options are missing in the action bar
 

@@ -8,7 +8,7 @@ public class AccessConnectionFigure extends com.archimatetool.editor.diagram.fig
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getModelConnection()) )
-            labelName = SpecializationPlugin.getLabelName(getModelConnection().getArchimateRelationship());
+            labelName = SpecializationPlugin.getLabelName(getModelConnection());
         
         if ( labelName==null )
             getConnectionLabel().setText(getModelConnection().getArchimateRelationship().getName());
