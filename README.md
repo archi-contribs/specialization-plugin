@@ -1,13 +1,13 @@
 # specialization-plugin
-The specialization plugin is designed to specialize concepts (figure, icon, etc.) inside Archi.
+The specialization plugin is designed to specialize concepts (figures, icons, etc.) inside Archi.
 
-It allows one to replace icons and labels of Archi components in a view and/or the model tree. This is done by configuring the properties of Archi elements. 
+ Icons and labels of Archi components can be replaced in a view and/or the model tree. This is done by configuring the properties of Archi elements. 
 
 This plugin is compatible with all my other plugins and with the GitHub persistence plugin. Archi users who open a model, but don't have the specialization images or plugin will just see the standard icons.
 
 ### Installation procedure
-To install the plugin, just download the .jar file to Archi's **_plugins_** folder and (re)start Archi.
-
+To install the plugin, download the .jar file to Archi's **_plugins_** folder and (re)start Archi. If you're using a Mac, this folder is located inside the 
+**_Contents_**  > **_Eclipse_** folder. 
 ### Configuring the plugin
 On Archi's preferences pages, you can:
 1. Check and automatically install new versions of the plugin
@@ -33,11 +33,11 @@ You may change the icon location using a property called **_icon location_** wit
 Note: Transparent colors are supported when one is specified in the image file.
 
 ### Changing component labels
-You can either enter the label variable you would like displayed in the "Replace Label" option when selecting an element that's in a view, or by creating a property called **_label_** and setting its value to the varible you would like to display. For example, ${name} will display the name of the element in a view, while ${documentation} will display the element's documentation in a view. 
+You can either enter the label variable you would like displayed in the "Replace Label" option when selecting an element that's in a view, or by creating a property called **_label_** and setting its value to the varible you would like to display. For example, ${name} will display the name of the element in a view, while ${documentation} will display the element's documentation. 
 
-You can chain together label variables as well, such as ${name}${documentation}.
+Chaining together label variables can be useful, such as ${name}${documentation}.
  If you would like to change the spacing and location of the label, use \n, \t, or spaces to do so in between property values.
- Additionally, you can display other property values by using ${property:YOUR_PROPERTY}, with YOUR_PROPERTY being another existing property for that element. It is possible to replace labels for relationships, not just elements, however this is treated the same way as setting element properties. 
+ Additionally, you can display other property values by using ${property:YOUR_PROPERTY}, with YOUR_PROPERTY being another existing property for that element. It is possible to replace labels and icons for relationships, and this is treated the same way as setting element properties. 
 
 ![proof of concept](sources/help/html/replaceLabelPropertiesWithVariables.png)
 
