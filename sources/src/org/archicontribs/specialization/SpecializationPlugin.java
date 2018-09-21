@@ -1115,7 +1115,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      */
     public static String getLabelName(EObject obj) {
         if ( obj != null ) {
-            EObject concept = obj; //(obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+            EObject concept = obj;
+            if ( obj instanceof IDiagramModelArchimateObject )
+            	concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
+            if ( obj instanceof IDiagramModelArchimateConnection )
+            	concept = ((IDiagramModelArchimateConnection)obj).getArchimateConcept();
+            
             if ( !(concept instanceof IProperties) ) {
                 // Should not happen, but just in case
                 logger.error(getFullName(obj) + " does not have properties");
