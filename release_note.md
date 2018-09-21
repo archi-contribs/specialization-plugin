@@ -1,3 +1,6 @@
+* v1.0.9 (21/09/2018)
+   * fix default icon location
+
 * v1.0.8 (19/09/2018)
    * allow access to ${view:xxx} variables from connections
 
