@@ -56,7 +56,7 @@ public class SpecializationRelationshipLabelSection extends org.archicontribs.sp
 		@Override
 		protected boolean isRequiredType(Object object) {
 			if ( object != null && object instanceof ArchimateRelationshipEditPart ) {
-	            logger.trace("showing label tab as the relationship has got a label");
+	            logger.trace("Showing label tab.");
 	            return true;
 			}
             return false;
@@ -248,10 +248,8 @@ public class SpecializationRelationshipLabelSection extends org.archicontribs.sp
 
 	@Override
 	protected EObject getEObject() {
-        if ( this.relationshipEditPart == null ) {
-            logger.trace("relationshipEditPart is null"); //$NON-NLS-1$
+        if ( this.relationshipEditPart == null )
             return null;
-        }
         return this.relationshipEditPart.getModel();
 	}
 

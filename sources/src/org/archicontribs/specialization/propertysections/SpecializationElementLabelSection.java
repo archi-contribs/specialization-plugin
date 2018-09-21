@@ -56,7 +56,7 @@ public class SpecializationElementLabelSection extends org.archicontribs.special
 		@Override
 		protected boolean isRequiredType(Object object) {
             if ( object != null && object instanceof ArchimateElementEditPart ) {
-                logger.trace("Showing label tab as the object is an element");
+                logger.trace("Showing label tab.");
                 return true;
             }
             return false;
@@ -248,10 +248,8 @@ public class SpecializationElementLabelSection extends org.archicontribs.special
 
 	@Override
 	protected EObject getEObject() {
-        if ( this.elementEditPart == null ) {
-            logger.trace("ElementEditPart is null"); //$NON-NLS-1$
+        if ( this.elementEditPart == null )
             return null;
-        }
         return this.elementEditPart.getModel();
 	}
 
