@@ -15,6 +15,8 @@ import org.eclipse.draw2d.text.TextFlow;
  * @author Herve Jouin
  */
 public class ObjectFigure extends com.archimatetool.editor.diagram.figures.elements.ObjectFigure {
+	// ObjectFigure do not have a drawIcon method
+	
     @Override
     protected void setText() {
         String labelName = null;

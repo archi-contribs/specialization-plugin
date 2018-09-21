@@ -15,6 +15,8 @@ import org.eclipse.draw2d.text.TextFlow;
  * @author Herve Jouin
  */
 public class GroupingFigure extends com.archimatetool.editor.diagram.figures.elements.GroupingFigure {
+	// GroupingFigure do not have a drawIcon method
+	
     @Override
     protected void setText() {
         String labelName = null;

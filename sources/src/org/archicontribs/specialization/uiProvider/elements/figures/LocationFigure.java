@@ -20,7 +20,10 @@ public class LocationFigure extends com.archimatetool.editor.diagram.figures.ele
     
     @Override
     protected void drawIcon(Graphics graphics) {
-        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
+    	if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) && (SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon") != null) )
+    		SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
+    	else
+    		super.drawIcon(graphics);
     }
     
     @Override
