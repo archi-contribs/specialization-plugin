@@ -139,12 +139,14 @@ import com.archimatetool.model.IProperty;
  * v1.0.8       19/09/2018      allow access to ${view:xxx} variables from connections
  * 
  * v1.0.9       21/09/2018      fix default icon location
+ * 
+ * v1.0.10      23/10/2018		fix compatibility issue with Archi 4.2
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.archicontribs.specialization";
     public static SpecializationPlugin INSTANCE;
     
-    public static final String pluginVersion = "1.0.9";
+    public static final String pluginVersion = "1.0.10";
     public static final String pluginName = "SpecializationPlugin";
     public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
     
@@ -779,7 +781,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         			break;
         		default:
         			// in this case, we check the model's properties
-        	        IArchimateModel model = ((IArchimateModelObject)obj).getArchimateModel();
+        	        IArchimateModel model;
+        	        if (  obj instanceof IDiagramModelArchimateObject )						// test is not necessary in Archi 4.3 but is mandatory in Archi 4.2
+        	        	model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
+        	        else if ( obj instanceof IArchimateModelObject )
+        	        	model = ((IArchimateModelObject)obj).getArchimateModel();
+        	        else
+        	        	return false;
         	        String propertyName = (container instanceof IDiagramModelArchimateObject) ? "must replace icons in views" : "must replace icons in tree";
         	        String propertyValue = getPropertyValue(model, propertyName);
         	        if ( propertyValue != null ) {
@@ -1061,7 +1069,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         			break;
         		default:
         			// in this case, we check the model's properties
-        	        IArchimateModel model = ((IArchimateModelObject)obj).getArchimateModel();
+        	        IArchimateModel model;
+        	        if (  obj instanceof IDiagramModelArchimateObject )						// test is not necessary in Archi 4.3 but is mandatory in Archi 4.2
+        	        	model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
+        	        else if ( obj instanceof IArchimateModelObject )
+        	        	model = ((IArchimateModelObject)obj).getArchimateModel();
+        	        else
+        	        	return false;
         	        String propertyValue = getPropertyValue(model, "must replace labels");
         	        if ( propertyValue != null ) {
         	            switch ( propertyValue.toLowerCase() ) {
