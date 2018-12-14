@@ -60,6 +60,7 @@ import org.json.simple.parser.JSONParser;
 import com.archimatetool.editor.ui.factory.ObjectUIFactory;
 import com.archimatetool.model.IArchimateElement;
 import com.archimatetool.model.IArchimateModel;
+import com.archimatetool.model.IArchimateModelObject;
 import com.archimatetool.model.IBounds;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateConnection;
@@ -136,12 +137,16 @@ import com.archimatetool.model.IProperty;
  * v1.0.7.1     07/08/2018      fix alignment and sizing options are missing in the action bar
  * 
  * v1.0.8       19/09/2018      allow access to ${view:xxx} variables from connections
+ * 
+ * v1.0.9       21/09/2018      fix default icon location
+ * 
+ * v1.0.10      23/10/2018		fix compatibility issue with Archi 4.2
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.archicontribs.specialization";
     public static SpecializationPlugin INSTANCE;
     
-    public static final String pluginVersion = "1.0.7.1";
+    public static final String pluginVersion = "1.0.10";
     public static final String pluginName = "SpecializationPlugin";
     public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
     
@@ -253,18 +258,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     
     public static int getIconMargin() {
         return preferenceStore.getInt("iconMargin");
-    }
-    
-    public static String mustReplaceIconsInViews() {
-        return preferenceStore.getString("mustReplaceIconsInViews");
-    }
-    
-    public static String mustReplaceIconsInTree() {
-        return preferenceStore.getString("mustReplaceIconsInTree");
-    }
-    
-    public static String mustReplaceLabelsInViews() {
-        return preferenceStore.getString("mustReplaceLabelsInViews");
     }
     
     public static boolean shouldShowImages() { return false; }
@@ -746,90 +739,89 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         return null;
     }
     
+    /**
+	 * This method calculates if the object's icon must me be replaced.
+     * @param obj
+     * @return
+     */
     public static boolean mustReplaceIcon(EObject obj) {
-        if ( obj != null ) {
-            // we do not change the icon of the element in the properties window
-            if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") ) {
-                logger.debug("we do not replace icon in the properties section.");
-                return false;
-            }
-            
-            // we determine if the object is in a view or in a folder
-            EObject container = obj;
-            while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
-                container = container.eContainer();
-            if ( container == null ) {
-                // Should not happen, but just in case
-                logger.error(getFullName(obj) + " is not in a container");
-                return false; 
-            }
-            
-            String containerType = null;
-            
-            // then we check the preference in case we should ALWAYS or NEVER replace the icons
-            String mustReplaceIcons;
-            if ( container instanceof IFolder ) {
-                mustReplaceIcons = mustReplaceIconsInTree();
-                containerType = "folder";
-            } else {
-                mustReplaceIcons =  mustReplaceIconsInViews();
-                containerType = "view";
-            }
-            
-            if ( mustReplaceIcons != null ) {
-                switch ( mustReplaceIcons ) {
-                    case "always":
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+": "+mustReplaceIcons);
-                        return true;
-                    case "never":  
-                        if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace icons in "+containerType+": "+mustReplaceIcons);
-                        return false;
-                    default: // should continue
-                        break;
-                }
-            }
-            
-            // the we check if the container has got a "must replace icons"
-            // At the moment, the check is not recursive, but I do not see why it may not be recursive in the future
-            String propertyValue = getPropertyValue(container, "must replace icons");
-            if ( propertyValue != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons = "+propertyValue);
-                switch ( propertyValue.toLowerCase() ) {
-                    case "yes":
-                        return true;
-                    case "no":
-                        return false;
-                    default: // we continue
-                        break;
-                }
-            }
-                        
-            // then we check if the model has got a "must replace icons in views" or "must replace icons in tree" 
-            IArchimateModel model;
-            if ( obj instanceof IDiagramModelArchimateObject ) {
-                model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
-                propertyValue = getPropertyValue(model, "must replace icons in views");
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons in views = "+propertyValue);
-            } else if ( obj instanceof IFolder ) {
-                model = ((IFolder)obj).getArchimateModel();
-                propertyValue = getPropertyValue(model, "must replace icons in tree");
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": "+containerType+" says must replace icons in tree = "+propertyValue);
-            }
-            if ( propertyValue != null ) {
-                switch ( propertyValue.toLowerCase() ) {
-                    case "yes":
-                        return true;
-                    case "no":
-                        return false;
-                    default: // we continue
-                        break;
-                }
-            }
-            
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": defaulting to not replacing the icon");
-        } else
-            logger.error("got null object parameter");
-        return false;
+       if ( obj == null ) {
+           logger.error("Got null object parameter");
+           return false;
+       }
+       
+        // we do not change the icon of the element in the properties window
+        if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") )
+            return false;
+        
+        // we determine if the object is in a view or in a folder
+        EObject container = obj;
+        while ( (container != null) && !(container instanceof IDiagramModel || container instanceof IFolder) )
+            container = container.eContainer();
+        if ( (container == null) || !(container instanceof IDiagramModel || container instanceof IFolder) ) {
+            // Should not happen, but just in case
+            logger.error(getFullName(obj) + " is not in a view not in a folder.");
+            return false; 
+        }
+        
+        // we calculate if the configuration states the icon should be replaced
+        
+        // at first, we determine if the object is in a view or a folder
+        //    - if view : we check the mustReplaceIconsInTree
+        //    - if folder : we check mustReplaceIconsInTree
+        String mustReplaceIcons = preferenceStore.getString((container instanceof IFolder) ? "mustReplaceIconsInTree" : "mustReplaceIconsInViews");
+        if ( mustReplaceIcons != null ) {
+        	switch ( mustReplaceIcons ) {
+        		case "never":
+        			// in this case, we do not replace the icon
+        			if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the plugin's preferences states the icon should never be replaced.");
+        			return false;
+        		case "always":
+        			// in this case, we do replace the icon
+        			break;
+        		default:
+        			// in this case, we check the model's properties
+        	        IArchimateModel model;
+        	        if (  obj instanceof IDiagramModelArchimateObject )						// test is not necessary in Archi 4.3 but is mandatory in Archi 4.2
+        	        	model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
+        	        else if ( obj instanceof IArchimateModelObject )
+        	        	model = ((IArchimateModelObject)obj).getArchimateModel();
+        	        else
+        	        	return false;
+        	        String propertyName = (container instanceof IDiagramModelArchimateObject) ? "must replace icons in views" : "must replace icons in tree";
+        	        String propertyValue = getPropertyValue(model, propertyName);
+        	        if ( propertyValue != null ) {
+        	            switch ( propertyValue.toLowerCase() ) {
+        	                case "no":
+        	                	// in this case, we do not replace the icon
+        	        			if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the model's property \""+propertyName+"\" states the icon should not be replaced.");
+        	                    return false;
+        	            	case "yes":
+        	            		// in this case, we do replace the icon
+        	            		break;
+        	                default: // we continue
+        	                    // in this case, we check the container's properties
+        	                    // At the moment, the check is not recursive, but I do not see why it may not be recursive in the future
+        	                	propertyValue = getPropertyValue(container, "must replace icons");
+			        			if ( propertyValue != null ) {
+			        				switch ( propertyValue ) {
+			        	        		case "no":
+			        	        			// in this case, we do not replace the icon
+			        	        			if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the container property \"must replace icons\" states the icon should not be replaced.");
+			        	        			return false;
+			        	        		case "yes":
+			        	        			// in this case, we do replace the icon
+			        	        			break;
+			        	        		default:
+			        	        			// in this case, we do replace the icon
+			        				}
+			        			}
+        	            }
+        			}
+        	}
+        }
+        
+        return true;
     }
     
     /**
@@ -1035,6 +1027,91 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         return image;
     }
     
+    /**
+	 * This method calculates if the object's label must me be replaced.
+     * @param obj
+     * @return
+     */
+    public static boolean mustReplaceLabel(EObject obj) {
+       if ( obj == null ) {
+           logger.error("Got null object parameter");
+           return false;
+       }
+       
+        // we do not change the icon of the element in the properties window
+        if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") )
+            return false;
+        
+        // we determine if the object is in a view or in a folder
+        EObject container = obj;
+        while ( (container != null) && !(container instanceof IDiagramModel || container instanceof IFolder) )
+            container = container.eContainer();
+        if ( (container == null) || !(container instanceof IDiagramModel || container instanceof IFolder) ) {
+            // Should not happen, but just in case
+            logger.error(getFullName(obj) + " is not in a view not in a folder.");
+            return false; 
+        }
+        
+        // if the object is in a folder, we do not change the label
+        if ( container instanceof IFolder )
+        	return false;
+        
+        // we calculate if the configuration states the label should be replaced
+        String mustReplaceLabels = preferenceStore.getString("mustReplaceLabelsInViews");
+        if ( mustReplaceLabels != null ) {
+        	switch ( mustReplaceLabels ) {
+        		case "never":
+        			// in this case, we do not replace the label
+        			if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the plugin's preferences states the label should never be replaced.");
+        			return false;
+        		case "always":
+        			// in this case, we do replace the label
+        			break;
+        		default:
+        			// in this case, we check the model's properties
+        	        IArchimateModel model;
+        	        if (  obj instanceof IDiagramModelArchimateObject )						// test is not necessary in Archi 4.3 but is mandatory in Archi 4.2
+        	        	model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
+        	        else if ( obj instanceof IArchimateModelObject )
+        	        	model = ((IArchimateModelObject)obj).getArchimateModel();
+        	        else
+        	        	return false;
+        	        String propertyValue = getPropertyValue(model, "must replace labels");
+        	        if ( propertyValue != null ) {
+        	            switch ( propertyValue.toLowerCase() ) {
+        	                case "no":
+        	                	// in this case, we do not replace the label
+        	        			if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the model's property \"must replace labels\" states the label should not be replaced.");
+        	                    return false;
+        	            	case "yes":
+        	            		// in this case, we do replace the label
+        	            		break;
+        	                default: // we continue
+        	                    // in this case, we check the container's properties
+        	                    // At the moment, the check is not recursive, but I do not see why it may not be recursive in the future
+        	                	propertyValue = getPropertyValue(container, "must replace labels");
+			        			if ( propertyValue != null ) {
+			        				switch ( propertyValue ) {
+			        	        		case "no":
+			        	        			// in this case, we do not replace the label
+			        	        			if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the container property \"must replace labels\" states the label should not be replaced.");
+			        	        			return false;
+			        	        		case "yes":
+			        	        			// in this case, we do replace the label
+			        	        			break;
+			        	        		default:
+			        	        			// in this case, we do replace the label
+			        				}
+			        			}
+        	            }
+        			}
+        	}
+        }
+        
+        return true;
+    }
+    
+    /*
     public static boolean mustReplaceLabel(EObject obj) {
         if ( obj != null ) {
             // we determine if the object is in a view or in a folder
@@ -1053,7 +1130,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
                 if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": we never change the label in the model tree");
                 return false;
             }
-            mustReplaceLabels =  mustReplaceLabelsInViews();
+            
+            mustReplaceLabels =  preferenceStore.getString("mustReplaceLabelsInViews");
             
             if ( mustReplaceLabels != null ) {
                 if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels: "+mustReplaceLabels);
@@ -1108,6 +1186,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         // so by default, we do not change the icon
         return false;
     }
+    */
     
     /**
      * Retrieves the label name from the EObject properties
@@ -1115,7 +1194,12 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      */
     public static String getLabelName(EObject obj) {
         if ( obj != null ) {
-            EObject concept = obj; //(obj instanceof IDiagramModelArchimateObject) ? ((IDiagramModelArchimateObject)obj).getArchimateConcept() : obj;
+            EObject concept = obj;
+            if ( obj instanceof IDiagramModelArchimateObject )
+            	concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
+            if ( obj instanceof IDiagramModelArchimateConnection )
+            	concept = ((IDiagramModelArchimateConnection)obj).getArchimateConcept();
+            
             if ( !(concept instanceof IProperties) ) {
                 // Should not happen, but just in case
                 logger.error(getFullName(obj) + " does not have properties");
@@ -1177,48 +1261,51 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      * @param obj
      * @param graphics
      * @param bounds
+     * @return true if the icon has been replaced, false if the icon has not been replaced
      */
-    public static void drawIcon(IDiagramModelObject obj, Graphics graphics, Rectangle bounds) {
+    public static boolean drawIcon(IDiagramModelObject obj, Graphics graphics, Rectangle bounds) {
         Image image = ObjectUIFactory.INSTANCE.getProvider(obj).getImage();
         
-        if ( image == null )
+        if ( image == null ) {
             logger.error("Image not found");
-        else {
-            String iconLocation = SpecializationPlugin.getPropertyValue(obj, "icon location");
-            
-            int defaultX = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
-            int defaultY = bounds.y + SpecializationPlugin.getIconMargin();
-            int x;
-            int y;
-            
-            if ( SpecializationPlugin.mustReplaceIcon(obj) && iconLocation != null && !iconLocation.isEmpty() ) {
-                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(obj)+": found icon location = "+iconLocation);
-                String[] parts = iconLocation.split(",");
-                try {
-                    if ( parts[0].equals("center") )
-                        x = bounds.x+(bounds.width-image.getBounds().width)/2;
-                    else if ( parts[0].startsWith("-") )
-                        x = bounds.x + bounds.width - image.getBounds().width + Integer.parseInt(parts[0]);
-                    else
-                        x = bounds.x + Integer.parseInt(parts[0].trim());
-                    
-                    if ( parts[1].equals("center") )
-                        y = bounds.y+(bounds.height-image.getBounds().height)/2;
-                    else if ( parts[1].startsWith("-") )
-                        y = bounds.y + bounds.height - image.getBounds().height + Integer.parseInt(parts[1]);
-                    else
-                        y = bounds.y + Integer.parseInt(parts[1].trim());
-                } catch ( @SuppressWarnings("unused") Exception ign) {
-                    logger.error("Malformed location. Should be under the form \"x,y\"");
-                    x=defaultX;
-                    y=defaultY;
-                }
-                if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(obj)+": setting image location to "+(x-bounds.x)+","+(y-bounds.y));
-            } else {
+            return false;
+        }
+        
+        String iconLocation = SpecializationPlugin.getPropertyValue(obj, "icon location");
+        
+        int defaultX = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
+        int defaultY = bounds.y + SpecializationPlugin.getIconMargin();
+        int x;
+        int y;
+        
+        if ( (iconLocation != null) && !iconLocation.isEmpty() ) {
+            if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(obj)+": found icon location = "+iconLocation);
+            String[] parts = iconLocation.split(",");
+            try {
+                if ( parts[0].equals("center") )
+                    x = bounds.x+(bounds.width-image.getBounds().width)/2;
+                else if ( parts[0].startsWith("-") )
+                    x = bounds.x + bounds.width - image.getBounds().width + Integer.parseInt(parts[0]);
+                else
+                    x = bounds.x + Integer.parseInt(parts[0].trim());
+                
+                if ( parts[1].equals("center") )
+                    y = bounds.y+(bounds.height-image.getBounds().height)/2;
+                else if ( parts[1].startsWith("-") )
+                    y = bounds.y + bounds.height - image.getBounds().height + Integer.parseInt(parts[1]);
+                else
+                    y = bounds.y + Integer.parseInt(parts[1].trim());
+            } catch ( @SuppressWarnings("unused") Exception ign) {
                 x=defaultX;
                 y=defaultY;
+                logger.error(getDebugName(obj)+": Malformed icon location (should be under the form \"x,y\"). Defaulting to "+x+","+y+".");
             }
-            graphics.drawImage(image, new Point(x, y));
+            if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(obj)+": setting image location to "+(x-bounds.x)+","+(y-bounds.y));
+        } else {
+            x=defaultX;
+            y=defaultY;
         }
+        graphics.drawImage(image, new Point(x, y));
+        return true;
     }
 }

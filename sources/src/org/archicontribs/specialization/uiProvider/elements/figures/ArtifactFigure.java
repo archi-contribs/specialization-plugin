@@ -16,6 +16,8 @@ import org.eclipse.draw2d.text.TextFlow;
  * @author Herve Jouin
  */
 public class ArtifactFigure extends com.archimatetool.editor.diagram.figures.elements.ArtifactFigure {
+	// ArtifactFigure do not have a drawIcon method
+	
     @Override
     protected void setText() {
         String labelName = null;

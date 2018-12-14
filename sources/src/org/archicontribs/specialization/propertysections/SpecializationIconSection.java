@@ -102,14 +102,14 @@ public class SpecializationIconSection extends org.archicontribs.specialization.
             try {
                 ((ArchimateElementEditPart)object).getFigure().getClass().getDeclaredMethod("drawIcon", Graphics.class);
             } catch (@SuppressWarnings("unused") NoSuchMethodException ign) {
-                logger.trace("Hiding icon tab as the element has not got any icon");
+                logger.trace("Hiding icon tab as the element as the element is not able to draw an icon.");
                 return false;
             } catch (SecurityException e) {
-                logger.error("Failed to check for \"drawIcon\" method", e);
+                logger.error("Failed to check for \"drawIcon()\" method", e);
                 return false;
             }
 
-            logger.trace("Showing icon tab as the element has got a icon");
+            logger.trace("Showing icon tab.");
             return true;
         }
 
@@ -735,10 +735,8 @@ public class SpecializationIconSection extends org.archicontribs.specialization.
 
     @Override
     protected EObject getEObject() {
-        if ( this.elementEditPart == null ) {
-            logger.trace("elementEditPart is null"); //$NON-NLS-1$
+        if ( this.elementEditPart == null )
             return null;
-        }
 
         return this.elementEditPart.getModel();
     }

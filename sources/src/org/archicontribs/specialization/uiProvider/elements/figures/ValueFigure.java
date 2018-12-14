@@ -15,6 +15,8 @@ import org.eclipse.draw2d.text.TextFlow;
  * @author Herve Jouin
  */
 public class ValueFigure extends com.archimatetool.editor.diagram.figures.elements.ValueFigure {
+	// ValueFigure do not have drawIcon method !!!
+	
     @Override
     protected void setText() {
         String labelName = null;

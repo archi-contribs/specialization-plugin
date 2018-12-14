@@ -16,6 +16,8 @@ import org.eclipse.draw2d.text.TextFlow;
  * @author Herve Jouin
  */
 public class DeliverableFigure extends com.archimatetool.editor.diagram.figures.elements.DeliverableFigure {
+	// DeliverableFigure do not have a drawIcon method
+	
     @Override
     protected void setText() {
         String labelName = null;

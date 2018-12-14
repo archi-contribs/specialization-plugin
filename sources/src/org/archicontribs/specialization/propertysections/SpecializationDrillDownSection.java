@@ -63,7 +63,7 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
 		@Override
 		protected boolean isRequiredType(Object object) {
             if ( object != null && object instanceof ArchimateElementEditPart ) {
-                logger.trace("Showing Drill down tab as the object is an element");
+                logger.trace("Showing Drill down tab.");
                 return true;
             }
             return false;
@@ -213,10 +213,9 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
 
 	@Override
 	protected EObject getEObject() {
-        if ( this.elementEditPart == null ) {
-            logger.trace("elementEditPart is null"); //$NON-NLS-1$
+        if ( this.elementEditPart == null )
             return null;
-        }
+
         return this.elementEditPart.getModel();
 	}
 

@@ -19,7 +19,10 @@ public class GapFigure extends com.archimatetool.editor.diagram.figures.elements
     
     @Override
     protected void drawIcon(Graphics graphics) {
-        SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
+    	if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) && (SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon") != null) )
+    		SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
+    	else
+    		super.drawIcon(graphics);
     }
     
     @Override
