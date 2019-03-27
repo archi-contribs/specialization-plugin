@@ -141,12 +141,15 @@ import com.archimatetool.model.IProperty;
  * v1.0.9       21/09/2018      fix default icon location
  * 
  * v1.0.10      23/10/2018		fix compatibility issue with Archi 4.2
+ * 
+ * v1.0.11      27/03/2019      fix exception when using magic connector to create new element
+ * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.archicontribs.specialization";
     public static SpecializationPlugin INSTANCE;
     
-    public static final String pluginVersion = "1.0.10";
+    public static final String pluginVersion = "1.0.11";
     public static final String pluginName = "SpecializationPlugin";
     public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
     
@@ -323,6 +326,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      * @return getclass().getSimpleName()+":\""+getName()+"\""
      */
     public static String getFullName(EObject obj) {
+        if ( obj == null )
+            return "";
         StringBuilder objName = new StringBuilder(obj.getClass().getSimpleName());
         objName.append(":\""+((INameable)obj).getName()+"\"");
         return objName.toString();
@@ -333,6 +338,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
      * @return getclass().getSimpleName()+":\""+getName()+"\"("+getId()+")"
      */
     public static String getDebugName(EObject obj) {
+        if ( obj == null )
+            return "";
         StringBuilder objName = new StringBuilder(getFullName(obj));
         objName.append("("+((IIdentifier)obj).getId()+")");
         return objName.toString();
