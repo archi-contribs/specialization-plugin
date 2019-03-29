@@ -46,8 +46,6 @@ public class SpecializationRelationshipLabelSection extends org.archicontribs.sp
     Text txtLabelName;
     
     boolean mouseOverHelpButton = false;
-    
-    static final Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 	
 	/**
 	 * Filter to show or reject this section depending on input value
@@ -116,7 +114,7 @@ public class SpecializationRelationshipLabelSection extends org.archicontribs.sp
             public void paintControl(PaintEvent e)
             {
                  if ( SpecializationRelationshipLabelSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
-                 e.gc.drawImage(HELP_ICON, 2, 2);
+                 e.gc.drawImage(SpecializationPlugin.HELP_ICON, 2, 2);
             }
         });
         btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });
@@ -175,7 +173,7 @@ public class SpecializationRelationshipLabelSection extends org.archicontribs.sp
             public void paintControl(PaintEvent e)
             {
                  if ( SpecializationRelationshipLabelSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
-                 e.gc.drawImage(HELP_ICON, 2, 2);
+                 e.gc.drawImage(SpecializationPlugin.HELP_ICON, 2, 2);
             }
         });
         btnHelp2.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });

@@ -82,7 +82,6 @@ public class SpecializationIconSection extends org.archicontribs.specialization.
     static final String[] validImageSuffixes = {"jpg", "png", "gif", "bmp", "ico"};
     static final Image    closedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/closedFolder.png"));
     static final Image    openedFolderImage  = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/16x16/openedFolder.png"));
-    static final Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 
     /**
      * Filter to show or reject this section depending on input value
@@ -193,7 +192,7 @@ public class SpecializationIconSection extends org.archicontribs.specialization.
             public void paintControl(PaintEvent e)
             {
                  if ( SpecializationIconSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
-                 e.gc.drawImage(HELP_ICON, 2, 2);
+                 e.gc.drawImage(SpecializationPlugin.HELP_ICON, 2, 2);
             }
         });
         btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); } });
@@ -404,7 +403,7 @@ public class SpecializationIconSection extends org.archicontribs.specialization.
             public void paintControl(PaintEvent e)
             {
                  if ( SpecializationIconSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
-                 e.gc.drawImage(HELP_ICON, 2, 2);
+                 e.gc.drawImage(SpecializationPlugin.HELP_ICON, 2, 2);
             }
         });
         btnHelp2.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceIcon.html"); } });

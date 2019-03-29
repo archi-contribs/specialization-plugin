@@ -316,7 +316,7 @@
                afterTab="figure.tab"
                category="appearance.category"
                id="specializeModel.tab"
-               label="Specialize model">
+               label="Specialization">
          </propertyTab>
          <propertyTab
                afterTab="figure.tab"

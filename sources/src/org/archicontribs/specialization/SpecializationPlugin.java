@@ -157,13 +157,30 @@ public class SpecializationPlugin extends AbstractUIPlugin {
     public static String pluginsPackage;
     public static String pluginsFilename;
     
-    protected static final Display  display           = Display.getCurrent();
+    public    static final Display  display           = Display.getCurrent();
     public    static final Cursor   CURSOR_WAIT       = new Cursor(null, SWT.CURSOR_WAIT);
     public    static final Cursor   CURSOR_ARROW      = new Cursor(null, SWT.CURSOR_ARROW);
     public    static final Color    BLACK_COLOR       = new Color(display, 0, 0, 0);
+    public    static final Color    GREY_COLOR        = new Color(display, 100, 100, 100);
     public    static final Color    COMPO_LEFT_COLOR  = new Color(display, 240, 248, 255);          // light blue
     public    static final FontData SYSTEM_FONT       = display.getSystemFont().getFontData()[0];
     public    static final Font     TITLE_FONT        = new Font(display, SYSTEM_FONT.getName(), SYSTEM_FONT.getHeight()+2, SWT.BOLD);
+    
+    public    static final Color    STRATEGY_COLOR    = new Color(display, 255, 222, 170);
+    public    static final Color    BUSINESS_COLOR    = new Color(display, 255, 255, 181);
+    public    static final Color    APPLICATION_COLOR = new Color(display, 181, 255, 255);
+    public    static final Color    TECHNOLOGY_COLOR  = new Color(display, 201, 231, 183);
+    public    static final Color    PHYSICAL_COLOR    = new Color(display, 201, 231, 183);
+    public    static final Color    IMPLEMENTATION_COLOR = new Color(display, 255, 224, 224);
+    public    static final Color    MOTIVATION_COLOR  = new Color(display, 204, 204, 255);
+    public    static final Color    OTHER_COLOR       = new Color(display, 204, 204, 204);
+    public    static final Color    PASSIVE_COLOR     = new Color(display, 255, 255, 240);
+    
+    public    static final Image    HELP_ICON         = new Image(display, SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
+    
+    public    static final Image    NEW_ICON          = new Image(display, SpecializationPlugin.class.getResourceAsStream("/img/16x16/zoomin.png"));
+    public    static final Image    EDIT_ICON         = new Image(display, SpecializationPlugin.class.getResourceAsStream("/img/16x16/note.png"));
+    public    static final Image    DELETE_ICON       = new Image(display, SpecializationPlugin.class.getResourceAsStream("/img/16x16/trash.png"));
     
     public static String storeFolderPrefix            = "folder";
     public static String storeLocationPrefix          = "location";
