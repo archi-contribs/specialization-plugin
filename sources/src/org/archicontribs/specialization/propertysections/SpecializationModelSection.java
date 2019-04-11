@@ -5,15 +5,32 @@
  */
 package org.archicontribs.specialization.propertysections;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
+import org.archicontribs.specialization.types.Property;
+import org.archicontribs.specialization.types.SpecializationType;
+import org.archicontribs.specialization.types.SpecializationsList;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
@@ -23,22 +40,82 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.archimatetool.editor.ArchiPlugin;
 import com.archimatetool.editor.ui.IArchiImages;
 import com.archimatetool.editor.ui.ImageFactory;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimatePackage;
+import com.archimatetool.model.IProperty;
+import com.archimatetool.model.impl.ApplicationCollaboration;
+import com.archimatetool.model.impl.ApplicationComponent;
+import com.archimatetool.model.impl.ApplicationEvent;
+import com.archimatetool.model.impl.ApplicationFunction;
+import com.archimatetool.model.impl.ApplicationInteraction;
+import com.archimatetool.model.impl.ApplicationInterface;
+import com.archimatetool.model.impl.ApplicationProcess;
+import com.archimatetool.model.impl.ApplicationService;
+import com.archimatetool.model.impl.Artifact;
+import com.archimatetool.model.impl.Assessment;
+import com.archimatetool.model.impl.BusinessActor;
+import com.archimatetool.model.impl.BusinessCollaboration;
+import com.archimatetool.model.impl.BusinessEvent;
+import com.archimatetool.model.impl.BusinessFunction;
+import com.archimatetool.model.impl.BusinessInteraction;
+import com.archimatetool.model.impl.BusinessInterface;
+import com.archimatetool.model.impl.BusinessObject;
+import com.archimatetool.model.impl.BusinessProcess;
+import com.archimatetool.model.impl.BusinessRole;
+import com.archimatetool.model.impl.BusinessService;
 import com.archimatetool.model.impl.Capability;
+import com.archimatetool.model.impl.CommunicationNetwork;
+import com.archimatetool.model.impl.Constraint;
+import com.archimatetool.model.impl.Contract;
 import com.archimatetool.model.impl.CourseOfAction;
+import com.archimatetool.model.impl.DataObject;
+import com.archimatetool.model.impl.Deliverable;
+import com.archimatetool.model.impl.Device;
+import com.archimatetool.model.impl.DistributionNetwork;
+import com.archimatetool.model.impl.Driver;
+import com.archimatetool.model.impl.Equipment;
+import com.archimatetool.model.impl.Facility;
+import com.archimatetool.model.impl.Gap;
+import com.archimatetool.model.impl.Goal;
+import com.archimatetool.model.impl.Grouping;
+import com.archimatetool.model.impl.ImplementationEvent;
+import com.archimatetool.model.impl.Junction;
+import com.archimatetool.model.impl.Location;
+import com.archimatetool.model.impl.Material;
+import com.archimatetool.model.impl.Meaning;
+import com.archimatetool.model.impl.Node;
+import com.archimatetool.model.impl.Outcome;
+import com.archimatetool.model.impl.Path;
+import com.archimatetool.model.impl.Plateau;
+import com.archimatetool.model.impl.Principle;
+import com.archimatetool.model.impl.Product;
+import com.archimatetool.model.impl.Representation;
+import com.archimatetool.model.impl.Requirement;
 import com.archimatetool.model.impl.Resource;
+import com.archimatetool.model.impl.Stakeholder;
+import com.archimatetool.model.impl.SystemSoftware;
+import com.archimatetool.model.impl.TechnologyCollaboration;
+import com.archimatetool.model.impl.TechnologyEvent;
+import com.archimatetool.model.impl.TechnologyFunction;
+import com.archimatetool.model.impl.TechnologyInteraction;
+import com.archimatetool.model.impl.TechnologyInterface;
+import com.archimatetool.model.impl.TechnologyProcess;
+import com.archimatetool.model.impl.TechnologyService;
+import com.archimatetool.model.impl.Value;
+import com.archimatetool.model.impl.WorkPackage;
 
 public class SpecializationModelSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
@@ -120,10 +197,19 @@ public class SpecializationModelSection extends org.archicontribs.specialization
     Composite implementationCanvas;
     Composite motivationCanvas;
     Composite otherCanvas;
+    
+    Button btnIcon = null;
+    Button btnNewSpecialization = null;
+    Combo comboSpecializationNames = null;
+    Text txtIconSize= null;
+    Text txtIconLocation = null;
+    TableViewer tblProperties = null;
 
 	IArchimateModel model;
 
 	boolean mouseOverHelpButton = false;
+	
+	SpecializationsList specializationsList;
 	
 	/**
 	 * Filter to show or reject this section depending on input value
@@ -148,153 +234,16 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	 */
 	@Override
 	protected void createControls(Composite parent) {
+	    // at this stage, this.model is not set as the setElement() method has not yet been called
+	    
 		parent.setLayout(new FormLayout());
 		
-		Label lblSpecializationName = new Label(parent, SWT.NONE);
-		lblSpecializationName.setForeground(parent.getForeground());
-		lblSpecializationName.setBackground(parent.getBackground());
-		lblSpecializationName.setText("Specialization name :");
-        FormData fd = new FormData();
-        fd.top = new FormAttachment(0, 10);
-        fd.left = new FormAttachment(0, 5);
-        lblSpecializationName.setLayoutData(fd);
-        
-        Combo comboSpecializationNames = new Combo(parent, SWT.NONE);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblSpecializationName, 10);
-        fd.right = new FormAttachment(lblSpecializationName, 350);
-        comboSpecializationNames.setLayoutData(fd);
-        //TODO : add existing names
-        
-        Button btnNewSpecialization = new Button(parent, SWT.PUSH);
-        btnNewSpecialization.setImage(SpecializationPlugin.NEW_ICON);
-        btnNewSpecialization.setToolTipText("New");
-        fd = new FormData();
-        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
-        fd.left = new FormAttachment(comboSpecializationNames, 10);
-        fd.right = new FormAttachment(comboSpecializationNames, 40, SWT.RIGHT);
-        btnNewSpecialization.setLayoutData(fd);
-        
-        Button btnEditSpecialization = new Button(parent, SWT.PUSH);
-        btnEditSpecialization.setImage(SpecializationPlugin.EDIT_ICON);
-        btnEditSpecialization.setToolTipText("Edit");
-        btnEditSpecialization.setEnabled(comboSpecializationNames.getItemCount()!=0);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
-        fd.left = new FormAttachment(btnNewSpecialization, 10);
-        fd.right = new FormAttachment(btnNewSpecialization, 40, SWT.RIGHT);
-        btnEditSpecialization.setLayoutData(fd);
-        
-        Button btnDeleteSpecialization = new Button(parent, SWT.PUSH);
-        btnDeleteSpecialization.setImage(SpecializationPlugin.DELETE_ICON);
-        btnDeleteSpecialization.setToolTipText("Delete");
-        btnDeleteSpecialization.setEnabled(comboSpecializationNames.getItemCount()!=0);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
-        fd.left = new FormAttachment(btnEditSpecialization, 10);
-        fd.right = new FormAttachment(btnEditSpecialization, 40, SWT.RIGHT);
-        btnDeleteSpecialization.setLayoutData(fd);
-        
-        Label lblIcon = new Label(parent, SWT.NONE);
-        lblIcon.setForeground(parent.getForeground());
-        lblIcon.setBackground(parent.getBackground());
-        lblIcon.setText("Icon:");
-        lblIcon.setEnabled(false);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblSpecializationName, 15);
-        fd.left = new FormAttachment(0, 30);
-        lblIcon.setLayoutData(fd);
-        
-        Button btnIcon = new Button(parent, SWT.PUSH);
-        btnIcon.setText("...");
-        btnIcon.setToolTipText("Assign icon");
-        btnIcon.setEnabled(false);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIcon, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblIcon, 5);
-        fd.right = new FormAttachment(lblIcon, 40, SWT.RIGHT);
-        btnIcon.setLayoutData(fd);
-        
-        Label lblIconSize = new Label(parent, SWT.NONE);
-        lblIconSize.setForeground(parent.getForeground());
-        lblIconSize.setBackground(parent.getBackground());
-        lblIconSize.setEnabled(false);
-        lblIconSize.setText("Size:");
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIcon, 0, SWT.CENTER);
-        fd.left = new FormAttachment(btnIcon, 20);
-        lblIconSize.setLayoutData(fd);
-        
-        Text txtIconSize = new Text(parent, SWT.BORDER);
-        txtIconSize.setToolTipText("Size of the icon");
-        txtIconSize.setEnabled(false);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIconSize, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblIconSize, 5);
-        fd.right = new FormAttachment(lblIconSize, 90, SWT.RIGHT);
-        txtIconSize.setLayoutData(fd);
-        
-        Label lblIconLocation = new Label(parent, SWT.NONE);
-        lblIconLocation.setForeground(parent.getForeground());
-        lblIconLocation.setBackground(parent.getBackground());
-        lblIconLocation.setEnabled(false);
-        lblIconLocation.setText("Location:");
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIcon, 0, SWT.CENTER);
-        fd.left = new FormAttachment(txtIconSize, 20);
-        lblIconLocation.setLayoutData(fd);
-        
-        Text txtIconLocation = new Text(parent, SWT.BORDER);
-        txtIconLocation.setToolTipText("Location of the icon");
-        txtIconLocation.setEnabled(false);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIconLocation, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblIconLocation, 5);
-        fd.right = new FormAttachment(lblIconLocation, 100, SWT.RIGHT);
-        txtIconLocation.setLayoutData(fd);
-        
-        Label lblProperties = new Label(parent, SWT.NONE);
-        lblProperties.setForeground(parent.getForeground());
-        lblProperties.setBackground(parent.getBackground());
-        lblProperties.setEnabled(false);
-        lblProperties.setText("Properties:");
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIcon, 15);
-        fd.left = new FormAttachment(lblIcon, 0, SWT.LEFT);
-        lblProperties.setLayoutData(fd);
-        
-        Table tblProperties = new Table(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-        tblProperties.setHeaderVisible(true);
-        tblProperties.setLinesVisible(true);
-        tblProperties.setEnabled(false);
-        TableColumn tblColumn = new TableColumn(tblProperties, SWT.NULL);
-        tblColumn.setText("Name");
-        tblColumn.setWidth(180);
-        tblColumn = new TableColumn(tblProperties, SWT.NULL);
-        tblColumn.setText("Default value");
-        tblColumn.setWidth(120);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblProperties, -5, SWT.TOP);
-        fd.left = new FormAttachment(lblProperties, 10);
-        fd.right = new FormAttachment(lblProperties, 370);
-        fd.bottom = new FormAttachment(lblProperties, 100, SWT.BOTTOM);
-        tblProperties.setLayoutData(fd);
-        
-        Label lblSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-        fd = new FormData();
-        fd.top = new FormAttachment(tblProperties, 10);
-        fd.left = new FormAttachment(0, 5);
-        fd.right = new FormAttachment(100, -5);
-        lblSeparator.setLayoutData(fd);
-        
-		/* **************************************************** */
-        Label lblChooseClass = new Label(parent, SWT.NONE);
+		Label lblChooseClass = new Label(parent, SWT.NONE);
         lblChooseClass.setForeground(parent.getForeground());
         lblChooseClass.setBackground(parent.getBackground());
         lblChooseClass.setText("Please choose the class of elements to specialize:");
-        fd = new FormData();
-        fd.top = new FormAttachment(lblSeparator, 5);
+        FormData fd = new FormData();
+        fd.top = new FormAttachment(0, 10);
         fd.left = new FormAttachment(0, 5);
         lblChooseClass.setLayoutData(fd);
         
@@ -330,11 +279,10 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
         Composite implementationCompo = new Composite(compoElements, SWT.TRANSPARENT);
 
-
         Composite motivationCompo = new Composite(compoElements, SWT.TRANSPARENT);
 
         Composite otherCompo = new Composite(compoElements, SWT.TRANSPARENT);
-
+        
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Strategy layer
         // Passive
@@ -346,87 +294,87 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
         // Business layer
         // Passive
-        this.productLabel = new ComponentLabel(businessPassiveCompo, "Product");
+        this.productLabel = new ComponentLabel(businessPassiveCompo, Product.class);
         // Behavior
-        this.businessProcessLabel = new ComponentLabel(businessBehaviorCompo, "Business Process");
-        this.businessFunctionLabel = new ComponentLabel(businessBehaviorCompo, "Business Function");
-        this.businessInteractionLabel = new ComponentLabel(businessBehaviorCompo, "Business Interaction");
-        this.businessEventLabel = new ComponentLabel(businessBehaviorCompo, "Business Event");
-        this.businessServiceLabel = new ComponentLabel(businessBehaviorCompo, "Business Service");
-        this.businessObjectLabel = new ComponentLabel(businessBehaviorCompo, "Business Object");
-        this.contractLabel = new ComponentLabel(businessBehaviorCompo, "Contract");
-        this.representationLabel = new ComponentLabel(businessBehaviorCompo, "Representation");
+        this.businessProcessLabel = new ComponentLabel(businessBehaviorCompo, BusinessProcess.class);
+        this.businessFunctionLabel = new ComponentLabel(businessBehaviorCompo, BusinessFunction.class);
+        this.businessInteractionLabel = new ComponentLabel(businessBehaviorCompo, BusinessInteraction.class);
+        this.businessEventLabel = new ComponentLabel(businessBehaviorCompo, BusinessEvent.class);
+        this.businessServiceLabel = new ComponentLabel(businessBehaviorCompo, BusinessService.class);
+        this.businessObjectLabel = new ComponentLabel(businessBehaviorCompo, BusinessObject.class);
+        this.contractLabel = new ComponentLabel(businessBehaviorCompo, Contract.class);
+        this.representationLabel = new ComponentLabel(businessBehaviorCompo, Representation.class);
         // Active
-        this.businessActorLabel = new ComponentLabel(businessActiveCompo, "Business Actor");
-        this.businessRoleLabel = new ComponentLabel(businessActiveCompo, "Business Role");
-        this.businessCollaborationLabel = new ComponentLabel(businessActiveCompo, "Business Collaboration");
-        this.businessInterfaceLabel = new ComponentLabel(businessActiveCompo, "Business Interface");
+        this.businessActorLabel = new ComponentLabel(businessActiveCompo, BusinessActor.class);
+        this.businessRoleLabel = new ComponentLabel(businessActiveCompo, BusinessRole.class);
+        this.businessCollaborationLabel = new ComponentLabel(businessActiveCompo, BusinessCollaboration.class);
+        this.businessInterfaceLabel = new ComponentLabel(businessActiveCompo, BusinessInterface.class);
 
         // Application layer
         //Passive
-        this.dataObjectLabel = new ComponentLabel(applicationPassiveCompo, "Data Object");
+        this.dataObjectLabel = new ComponentLabel(applicationPassiveCompo, DataObject.class);
         //Behavior
-        this.applicationFunctionLabel = new ComponentLabel(applicationBehaviorCompo, "Application Function");
-        this.applicationInteractionLabel = new ComponentLabel(applicationBehaviorCompo, "Application Interaction");
-        this.applicationEventLabel = new ComponentLabel(applicationBehaviorCompo, "Application Event");
-        this.applicationServiceLabel = new ComponentLabel(applicationBehaviorCompo, "Application Service");
-        this.applicationProcessLabel = new ComponentLabel(applicationBehaviorCompo, "Application Process");
+        this.applicationFunctionLabel = new ComponentLabel(applicationBehaviorCompo, ApplicationFunction.class);
+        this.applicationInteractionLabel = new ComponentLabel(applicationBehaviorCompo, ApplicationInteraction.class);
+        this.applicationEventLabel = new ComponentLabel(applicationBehaviorCompo, ApplicationEvent.class);
+        this.applicationServiceLabel = new ComponentLabel(applicationBehaviorCompo, ApplicationService.class);
+        this.applicationProcessLabel = new ComponentLabel(applicationBehaviorCompo, ApplicationProcess.class);
         //  Active      
-        this.applicationComponentLabel = new ComponentLabel(applicationActiveCompo, "Application Component");
-        this.applicationCollaborationLabel = new ComponentLabel(applicationActiveCompo, "Application Collaboration");
-        this.applicationInterfaceLabel = new ComponentLabel(applicationActiveCompo, "Application Interface");
+        this.applicationComponentLabel = new ComponentLabel(applicationActiveCompo, ApplicationComponent.class);
+        this.applicationCollaborationLabel = new ComponentLabel(applicationActiveCompo, ApplicationCollaboration.class);
+        this.applicationInterfaceLabel = new ComponentLabel(applicationActiveCompo, ApplicationInterface.class);
 
         // Technology layer
         // Passive
-        this.artifactLabel = new ComponentLabel(technologyPassiveCompo, "Artifact");
+        this.artifactLabel = new ComponentLabel(technologyPassiveCompo, Artifact.class);
         // Behavior
-        this.technologyFunctionLabel = new ComponentLabel(technologyBehaviorCompo, "Technology Function");
-        this.technologyProcessLabel = new ComponentLabel(technologyBehaviorCompo, "Technology Process");
-        this.technologyInteractionLabel = new ComponentLabel(technologyBehaviorCompo, "Technology Interaction");
-        this.technologyEventLabel = new ComponentLabel(technologyBehaviorCompo, "Technology Event");
-        this.technologyServiceLabel = new ComponentLabel(technologyBehaviorCompo, "Technology Service");
+        this.technologyFunctionLabel = new ComponentLabel(technologyBehaviorCompo, TechnologyFunction.class);
+        this.technologyProcessLabel = new ComponentLabel(technologyBehaviorCompo, TechnologyProcess.class);
+        this.technologyInteractionLabel = new ComponentLabel(technologyBehaviorCompo, TechnologyInteraction.class);
+        this.technologyEventLabel = new ComponentLabel(technologyBehaviorCompo, TechnologyEvent.class);
+        this.technologyServiceLabel = new ComponentLabel(technologyBehaviorCompo, TechnologyService.class);
         // Active
-        this.nodeLabel = new ComponentLabel(technologyActiveCompo, "Node");
-        this.deviceLabel = new ComponentLabel(technologyActiveCompo, "Device");
-        this.systemSoftwareLabel = new ComponentLabel(technologyActiveCompo, "System Software");
-        this.technologyCollaborationLabel = new ComponentLabel(technologyActiveCompo, "Technology Collaboration");
-        this.technologyInterfaceLabel = new ComponentLabel(technologyActiveCompo, "Technology Interface");
-        this.pathLabel = new ComponentLabel(technologyActiveCompo, "Path");
-        this.communicationNetworkLabel = new ComponentLabel(technologyActiveCompo, "Communication Network");
+        this.nodeLabel = new ComponentLabel(technologyActiveCompo, Node.class);
+        this.deviceLabel = new ComponentLabel(technologyActiveCompo, Device.class);
+        this.systemSoftwareLabel = new ComponentLabel(technologyActiveCompo, SystemSoftware.class);
+        this.technologyCollaborationLabel = new ComponentLabel(technologyActiveCompo, TechnologyCollaboration.class);
+        this.technologyInterfaceLabel = new ComponentLabel(technologyActiveCompo, TechnologyInterface.class);
+        this.pathLabel = new ComponentLabel(technologyActiveCompo, Path.class);
+        this.communicationNetworkLabel = new ComponentLabel(technologyActiveCompo, CommunicationNetwork.class);
 
         // Physical layer
         // Passive
         // Behavior
-        this.materialLabel = new ComponentLabel(physicalBehaviorCompo, "Material");
+        this.materialLabel = new ComponentLabel(physicalBehaviorCompo, Material.class);
         // Active
-        this.equipmentLabel = new ComponentLabel(physicalActiveCompo, "Equipment");
-        this.facilityLabel = new ComponentLabel(physicalActiveCompo, "Facility");
-        this.distributionNetworkLabel = new ComponentLabel(physicalActiveCompo, "Distribution Network");
+        this.equipmentLabel = new ComponentLabel(physicalActiveCompo, Equipment.class);
+        this.facilityLabel = new ComponentLabel(physicalActiveCompo, Facility.class);
+        this.distributionNetworkLabel = new ComponentLabel(physicalActiveCompo, DistributionNetwork.class);
 
         // Implementation layer
-        this.workpackageLabel = new ComponentLabel(implementationCompo, "Work Package");
-        this.deliverableLabel = new ComponentLabel(implementationCompo, "Deliverable");
-        this.implementationEventLabel = new ComponentLabel(implementationCompo, "Implementation Event");
-        this.plateauLabel = new ComponentLabel(implementationCompo, "Plateau");
-        this.gapLabel = new ComponentLabel(implementationCompo, "Gap");
+        this.workpackageLabel = new ComponentLabel(implementationCompo, WorkPackage.class);
+        this.deliverableLabel = new ComponentLabel(implementationCompo, Deliverable.class);
+        this.implementationEventLabel = new ComponentLabel(implementationCompo, ImplementationEvent.class);
+        this.plateauLabel = new ComponentLabel(implementationCompo, Plateau.class);
+        this.gapLabel = new ComponentLabel(implementationCompo, Gap.class);
 
         // Motivation layer
-        this.stakeholderLabel = new ComponentLabel(motivationCompo, "Stakeholder");
-        this.driverLabel = new ComponentLabel(motivationCompo, "Driver");
-        this.assessmentLabel = new ComponentLabel(motivationCompo, "Assessment");
-        this.goalLabel = new ComponentLabel(motivationCompo, "Goal");
-        this.outcomeLabel = new ComponentLabel(motivationCompo, "Outcome");
-        this.principleLabel = new ComponentLabel(motivationCompo, "Principle");
-        this.requirementLabel = new ComponentLabel(motivationCompo, "Requirement");
-        this.constaintLabel = new ComponentLabel(motivationCompo, "Constraint");
-        this.smeaningLabel = new ComponentLabel(motivationCompo, "Meaning");
-        this.valueLabel = new ComponentLabel(motivationCompo, "Value");
+        this.stakeholderLabel = new ComponentLabel(motivationCompo, Stakeholder.class);
+        this.driverLabel = new ComponentLabel(motivationCompo, Driver.class);
+        this.assessmentLabel = new ComponentLabel(motivationCompo, Assessment.class);
+        this.goalLabel = new ComponentLabel(motivationCompo, Goal.class);
+        this.outcomeLabel = new ComponentLabel(motivationCompo, Outcome.class);
+        this.principleLabel = new ComponentLabel(motivationCompo, Principle.class);
+        this.requirementLabel = new ComponentLabel(motivationCompo, Requirement.class);
+        this.constaintLabel = new ComponentLabel(motivationCompo, Constraint.class);
+        this.smeaningLabel = new ComponentLabel(motivationCompo, Meaning.class);
+        this.valueLabel = new ComponentLabel(motivationCompo, Value.class);
 
         // Containers !!!
         //
-        this.groupingLabel = new ComponentLabel(otherCompo, "Grouping");
-        this.locationLabel = new ComponentLabel(otherCompo, "Location");
-        this.junctionLabel = new ComponentLabel(otherCompo, "Junction");
+        this.groupingLabel = new ComponentLabel(otherCompo, Grouping.class);
+        this.locationLabel = new ComponentLabel(otherCompo, Location.class);
+        this.junctionLabel = new ComponentLabel(otherCompo, Junction.class);
         
         Label passiveLabel = new Label(compoElements, SWT.TRANSPARENT | SWT.CENTER);
         Composite passiveCanvas = new Composite(compoElements, SWT.TRANSPARENT | SWT.BORDER);
@@ -837,16 +785,202 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		
 		compoElements.layout();
 		
-		
-		
-		
-		
-		lblSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+		Label lblSpecializationName = new Label(parent, SWT.NONE);
+        lblSpecializationName.setForeground(parent.getForeground());
+        lblSpecializationName.setBackground(parent.getBackground());
+        lblSpecializationName.setText("Specializations:");
         fd = new FormData();
-        fd.top = new FormAttachment(compoElements, 25);
+        fd.top = new FormAttachment(compoElements, 30);
+        fd.left = new FormAttachment(0, 30);
+        lblSpecializationName.setLayoutData(fd);
+        
+        this.comboSpecializationNames = new Combo(parent, SWT.NONE | SWT.READ_ONLY);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
+        fd.left = new FormAttachment(lblSpecializationName, 10);
+        fd.right = new FormAttachment(lblSpecializationName, 350);
+        this.comboSpecializationNames.setLayoutData(fd);
+                
+        this.btnNewSpecialization = new Button(parent, SWT.PUSH);
+        this.btnNewSpecialization.setImage(SpecializationPlugin.NEW_ICON);
+        this.btnNewSpecialization.setToolTipText("New");
+        this.btnNewSpecialization.setEnabled(false);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
+        fd.left = new FormAttachment(this.comboSpecializationNames, 10);
+        fd.right = new FormAttachment(this.comboSpecializationNames, 40, SWT.RIGHT);
+        this.btnNewSpecialization.setLayoutData(fd);
+        this.btnNewSpecialization.addSelectionListener(new SelectionListener() {
+            @Override public void widgetSelected(SelectionEvent e) {
+                InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(), SpecializationPlugin.pluginTitle, "Specialization name:", "", new LengthValidator());
+                if (dlg.open() == Window.OK) {
+                    SpecializationModelSection.this.btnIcon.setEnabled(true);
+                    SpecializationModelSection.this.txtIconSize.setEnabled(true);
+                    SpecializationModelSection.this.txtIconLocation.setEnabled(true);
+                    SpecializationModelSection.this.tblProperties.getTable().setEnabled(true);
+                    
+                    // User clicked OK, we verify that the name does not already exists
+                    String newSpecializationName = dlg.getValue();
+                    for ( int index = 0; index < SpecializationModelSection.this.comboSpecializationNames.getItemCount(); ++index ) {
+                        if ( newSpecializationName.equals(SpecializationModelSection.this.comboSpecializationNames.getItem(index)) ) {
+                            SpecializationPlugin.popup(Level.WARN, "The specialization \""+newSpecializationName+"\" already exists.");
+                            SpecializationModelSection.this.comboSpecializationNames.select(index);
+                            return;
+                        }
+                    }
+                    SpecializationModelSection.this.comboSpecializationNames.add(newSpecializationName);
+                    for ( int index = 0; index < SpecializationModelSection.this.comboSpecializationNames.getItemCount(); ++index ) {
+                        if ( newSpecializationName.equals(SpecializationModelSection.this.comboSpecializationNames.getItem(index)) )
+                            SpecializationModelSection.this.comboSpecializationNames.select(index);
+                    }
+                }
+            }
+            @Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
+            
+            class LengthValidator implements IInputValidator {
+                @Override public String isValid(String newText) {
+                    // we check the string length
+                    int len = newText.length();
+                    if (len < 1) return " ";
+                    if (len > 50) return "Too long (50 chars max)";
+                    
+                    // we check that the string does not contain special chars
+                    if ( newText.contains("\n") ) return "Must not contain newline";
+                    if ( newText.contains("\t") ) return "Must not contain tab";
+                    
+                    return null;
+                }
+            }
+        });
+        
+        Button btnEditSpecialization = new Button(parent, SWT.PUSH);
+        btnEditSpecialization.setImage(SpecializationPlugin.EDIT_ICON);
+        btnEditSpecialization.setToolTipText("Edit");
+        btnEditSpecialization.setEnabled(this.comboSpecializationNames.getItemCount()!=0);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
+        fd.left = new FormAttachment(this.btnNewSpecialization, 10);
+        fd.right = new FormAttachment(this.btnNewSpecialization, 40, SWT.RIGHT);
+        btnEditSpecialization.setLayoutData(fd);
+        
+        Button btnDeleteSpecialization = new Button(parent, SWT.PUSH);
+        btnDeleteSpecialization.setImage(SpecializationPlugin.DELETE_ICON);
+        btnDeleteSpecialization.setToolTipText("Delete");
+        btnDeleteSpecialization.setEnabled(this.comboSpecializationNames.getItemCount()!=0);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
+        fd.left = new FormAttachment(btnEditSpecialization, 10);
+        fd.right = new FormAttachment(btnEditSpecialization, 40, SWT.RIGHT);
+        btnDeleteSpecialization.setLayoutData(fd);
+        
+        Label lblIcon = new Label(parent, SWT.NONE);
+        lblIcon.setForeground(parent.getForeground());
+        lblIcon.setBackground(parent.getBackground());
+        lblIcon.setText("Icon:");
+        lblIcon.setEnabled(false);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblSpecializationName, 15);
+        fd.left = new FormAttachment(0, 60);
+        lblIcon.setLayoutData(fd);
+        
+        this.btnIcon = new Button(parent, SWT.PUSH);
+        this.btnIcon.setText("...");
+        this.btnIcon.setToolTipText("Assign icon");
+        this.btnIcon.setEnabled(false);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIcon, 0, SWT.CENTER);
+        fd.left = new FormAttachment(lblIcon, 5);
+        fd.right = new FormAttachment(lblIcon, 40, SWT.RIGHT);
+        this.btnIcon.setLayoutData(fd);
+        
+        Label lblIconSize = new Label(parent, SWT.NONE);
+        lblIconSize.setForeground(parent.getForeground());
+        lblIconSize.setBackground(parent.getBackground());
+        lblIconSize.setEnabled(false);
+        lblIconSize.setText("Size:");
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIcon, 0, SWT.CENTER);
+        fd.left = new FormAttachment(this.btnIcon, 20);
+        lblIconSize.setLayoutData(fd);
+        
+        this.txtIconSize = new Text(parent, SWT.BORDER);
+        this.txtIconSize.setToolTipText("Size of the icon");
+        this.txtIconSize.setEnabled(false);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIconSize, 0, SWT.CENTER);
+        fd.left = new FormAttachment(lblIconSize, 5);
+        fd.right = new FormAttachment(lblIconSize, 90, SWT.RIGHT);
+        this.txtIconSize.setLayoutData(fd);
+        
+        Label lblIconLocation = new Label(parent, SWT.NONE);
+        lblIconLocation.setForeground(parent.getForeground());
+        lblIconLocation.setBackground(parent.getBackground());
+        lblIconLocation.setEnabled(false);
+        lblIconLocation.setText("Location:");
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIcon, 0, SWT.CENTER);
+        fd.left = new FormAttachment(this.txtIconSize, 20);
+        lblIconLocation.setLayoutData(fd);
+        
+        this.txtIconLocation = new Text(parent, SWT.BORDER);
+        this.txtIconLocation.setToolTipText("Location of the icon");
+        this.txtIconLocation.setEnabled(false);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIconLocation, 0, SWT.CENTER);
+        fd.left = new FormAttachment(lblIconLocation, 5);
+        fd.right = new FormAttachment(lblIconLocation, 100, SWT.RIGHT);
+        this.txtIconLocation.setLayoutData(fd);
+        
+        Label lblProperties = new Label(parent, SWT.NONE);
+        lblProperties.setForeground(parent.getForeground());
+        lblProperties.setBackground(parent.getBackground());
+        lblProperties.setEnabled(false);
+        lblProperties.setText("Properties:");
+        fd = new FormData();
+        fd.top = new FormAttachment(lblIcon, 15);
+        fd.left = new FormAttachment(lblIcon, 0, SWT.LEFT);
+        lblProperties.setLayoutData(fd);
+        
+        this.tblProperties = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        this.tblProperties.setContentProvider( new ArrayContentProvider());
+        Table table = this.tblProperties.getTable();
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+        table.setEnabled(false);
+        fd = new FormData();
+        fd.top = new FormAttachment(lblProperties, -5, SWT.TOP);
+        fd.left = new FormAttachment(lblProperties, 10);
+        fd.right = new FormAttachment(lblProperties, 370);
+        fd.bottom = new FormAttachment(lblProperties, 100, SWT.BOTTOM);
+        table.setLayoutData(fd);
+        
+        TableViewerColumn col = new TableViewerColumn(this.tblProperties, SWT.NONE);
+        col.getColumn().setText("Name");
+        col.getColumn().setWidth(120);
+        col.getColumn().setResizable(true);
+        col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((Property)element).getName(); }});
+
+        col = new TableViewerColumn(this.tblProperties, SWT.NONE);
+        col.getColumn().setText("Default value");
+        col.getColumn().setWidth(180);
+        col.getColumn().setResizable(true);
+        col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((Property)element).getValue(); }});
+        
+        CellEditor[] editors = new CellEditor[2];
+        editors[0] = new TextCellEditor(table);
+        editors[1] = new TextCellEditor(table);
+        this.tblProperties.setCellEditors(editors);
+        
+        /* **************************************************** */
+        
+        Label lblSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+        fd = new FormData();
+        fd.top = new FormAttachment(table, 10);
         fd.left = new FormAttachment(0, 5);
         fd.right = new FormAttachment(100, -5);
         lblSeparator.setLayoutData(fd);
+        
+        /* **************************************************** */
 		
 		Label btnHelp = new Label(parent, SWT.NONE);
         btnHelp.setForeground(parent.getForeground());
@@ -867,7 +1001,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                  e.gc.drawImage(SpecializationPlugin.HELP_ICON, 2, 2);
             }
         });
-        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeModel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeModel.html"); } });
+        btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help: /"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeModel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/specializeModel.html"); } });
         
         Label helpLbl = new Label(parent, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
@@ -903,39 +1037,60 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		return this.model;
 	}
 
-	@Override
+    @Override
     protected void setElement(Object element) {
 		this.model = (IArchimateModel)new Filter().adaptObject(element);
 		if(this.model == null) {
 			logger.error("failed to get element for " + element); //$NON-NLS-1$
+		} else {
+		    this.specializationsList = null;
+
+		    IProperty specializationsMetadata = this.model.getMetadata().getEntry("Specializations");
+		    if ( specializationsMetadata != null ) {
+		        JSONParser jsonParser = new JSONParser();
+		        try {
+		            this.specializationsList = (SpecializationsList) jsonParser.parse(specializationsMetadata.getValue());
+		        } catch (ParseException e1) {
+		            // TODO Auto-generated catch block
+		            e1.printStackTrace();
+		        }
+		    }
 		}
 		
 		refreshControls();
 	}
 	
 	void refreshControls() {
-        // TOTO
+        // TODO
 	}
 
 
 	private class ComponentLabel {
         Label label;
-
+        
         ComponentLabel(Composite parent, @SuppressWarnings("rawtypes") Class clazz) {
             this.label = new Label(parent, SWT.NONE);
             this.label.setSize(100,  100);
-            this.label.setToolTipText(clazz.getName().replaceAll(" ", ""));
+            this.label.setToolTipText(clazz.getSimpleName());
             this.label.setImage(getImage(getElementClassname()));
             this.label.addPaintListener(this.redraw);
             this.label.addListener(SWT.MouseUp, new Listener() {
                 @Override public void handleEvent(Event event) {
-                    setSelected(!isSelected());
+                    setSelected(true);
                     redraw();
                 }
             });
             setSelected(false);
+            
+            @SuppressWarnings("unchecked")
+            List<ComponentLabel> componentLabels = (List<ComponentLabel>)parent.getData("componentLabels");
+            if ( componentLabels == null ) {
+                componentLabels = new ArrayList<ComponentLabel>();
+                parent.setData("componentLabels", componentLabels);
+            }
+            componentLabels.add(this);
         }
-
+        
         private PaintListener redraw = new PaintListener() {
             @Override
             public void paintControl(PaintEvent event)
@@ -952,7 +1107,50 @@ public class SpecializationModelSection extends org.archicontribs.specialization
             return this.label.getToolTipText().replaceAll(" ",  "");
         }
 
+        @SuppressWarnings("unchecked")
         public void setSelected(boolean selected) {
+            if ( selected ) {
+                // Exclusive mode : we unselect all the lables
+                List<ComponentLabel> componentLabels = (List<ComponentLabel>)this.label.getParent().getData("componentLabels");
+                if ( componentLabels != null ) {
+                    for ( ComponentLabel lbl: componentLabels ) {
+                        if ( lbl.isSelected() ) {
+                            lbl.label.setData("isSelected", false);
+                            lbl.label.redraw();
+                        }
+                    }
+                }
+                
+                SpecializationModelSection.this.specializationsList = new SpecializationsList();
+                SpecializationModelSection.this.specializationsList.addSpecializationForClass("Node");
+                SpecializationType type = new SpecializationType("test");
+                type.getProperties().add(new Property("1","2"));
+                SpecializationModelSection.this.specializationsList.get("Node").add(type);
+                
+                if ( SpecializationModelSection.this.specializationsList != null ) {
+                    List<SpecializationType> specializationTypes = SpecializationModelSection.this.specializationsList.get(this.label.getToolTipText());
+                    boolean isFirst = true;
+                    for ( SpecializationType specializationType: specializationTypes ) {
+                        SpecializationModelSection.this.comboSpecializationNames.add(specializationType.getName());
+                        if ( isFirst ) {
+                            isFirst = false;
+                            SpecializationModelSection.this.comboSpecializationNames.select(0);
+                            SpecializationModelSection.this.txtIconSize.setText(specializationType.getIconSize());
+                            SpecializationModelSection.this.txtIconLocation.setText(specializationType.getIconLocation());
+                            SpecializationModelSection.this.tblProperties.setInput(specializationType.getProperties());
+                            SpecializationModelSection.this.tblProperties.refresh();
+
+                            SpecializationModelSection.this.btnIcon.setEnabled(true);
+                            SpecializationModelSection.this.txtIconSize.setEnabled(true);
+                            SpecializationModelSection.this.txtIconLocation.setEnabled(true);
+                            SpecializationModelSection.this.tblProperties.getTable().setEnabled(true);
+                        }
+                    }
+                }
+                
+                if ( SpecializationModelSection.this.btnNewSpecialization != null ) SpecializationModelSection.this.btnNewSpecialization.setEnabled(true);
+            }
+            
             this.label.setData("isSelected", selected);
         }
 
