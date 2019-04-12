@@ -23,7 +23,7 @@ public class SpecializationType {
     @Getter @Setter private Image icon = null;
     @Getter @Setter private String iconSize = "";
     @Getter @Setter private String iconLocation = "";
-    @Getter private List<Property> properties = new ArrayList<Property>();
+    @Getter private List<SpecializationProperty> properties = new ArrayList<SpecializationProperty>();
     
     public SpecializationType(String name) {
         this.name = name;
