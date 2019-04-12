@@ -10,13 +10,15 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.types.Property;
+import org.archicontribs.specialization.commands.SpecializationUpdateMetadataCommand;
+import org.archicontribs.specialization.types.SpecializationProperty;
 import org.archicontribs.specialization.types.SpecializationType;
 import org.archicontribs.specialization.types.SpecializationsMap;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -64,7 +66,6 @@ import com.archimatetool.model.impl.ApplicationInteraction;
 import com.archimatetool.model.impl.ApplicationInterface;
 import com.archimatetool.model.impl.ApplicationProcess;
 import com.archimatetool.model.impl.ApplicationService;
-import com.archimatetool.model.impl.ArchimateFactory;
 import com.archimatetool.model.impl.Artifact;
 import com.archimatetool.model.impl.Assessment;
 import com.archimatetool.model.impl.BusinessActor;
@@ -856,18 +857,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 					 SpecializationModelSection.this.tblProperties.refresh();
 					 SpecializationModelSection.this.specializationsMap.addSpecializationType((String)SpecializationModelSection.this.comboSpecializationNames.getData("componentLabel"), specializationType);
 					 
-					 Gson gson = new Gson();
-					 String jsonValue = gson.toJson(SpecializationModelSection.this.specializationsMap);
-					 
-					 IProperty specializationsMetadata = SpecializationModelSection.this.model.getMetadata().getEntry("Specializations");
-					 if ( specializationsMetadata == null )
-						 SpecializationModelSection.this.model.getMetadata().addEntry("Specializations", jsonValue);
-					 else
-					 	 specializationsMetadata.setValue(jsonValue);
-					 
-					 //TODO : sort the specialization names
-					 
-					 //TODO : use commands --> this will set the dirty flag and allow for ctrl-z
+					 setMetadata();
 				 }
 			 }
 			 
@@ -1007,17 +997,17 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		 col.getColumn().setText("Name");
 		 col.getColumn().setWidth(120);
 		 col.getColumn().setResizable(true);
-		 col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((Property)element).getName(); }});
+		 col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((SpecializationProperty)element).getName(); }});
 		 col.setEditingSupport(new EditingSupport(this.tblProperties) {
 			 private final CellEditor editor = new TextCellEditor(SpecializationModelSection.this.tblProperties.getTable());
 
 			 @Override protected void setValue(Object element, Object value) {
-				 ((Property)element).setName((String)value);
+				 ((SpecializationProperty)element).setName((String)value);
 				 SpecializationModelSection.this.tblProperties.update(element, null);
 			 }
 
 			 @Override protected Object getValue(Object element) {
-				 return ((Property)element).getName();
+				 return ((SpecializationProperty)element).getName();
 			 }
 
 			 @Override protected CellEditor getCellEditor(Object element) {
@@ -1033,17 +1023,17 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		 col.getColumn().setText("Default value");
 		 col.getColumn().setWidth(180);
 		 col.getColumn().setResizable(true);
-		 col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((Property)element).getValue(); }});
+		 col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((SpecializationProperty)element).getValue(); }});
 		 col.setEditingSupport(new EditingSupport(this.tblProperties) {
 			 private final CellEditor editor = new TextCellEditor(SpecializationModelSection.this.tblProperties.getTable());
 			 
 			 @Override protected void setValue(Object element, Object value) {
-				 ((Property)element).setValue((String)value);
+				 ((SpecializationProperty)element).setValue((String)value);
 				 SpecializationModelSection.this.tblProperties.update(element, null);
 			 }
 
 			 @Override protected Object getValue(Object element) {
-				 return ((Property)element).getValue();
+				 return ((SpecializationProperty)element).getValue();
 			 }
 
 			 @Override protected CellEditor getCellEditor(Object element) {
@@ -1457,5 +1447,15 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
 			 return null;
 		 }
+	 }
+	 
+	 void setMetadata() {
+		 SpecializationUpdateMetadataCommand command = new SpecializationUpdateMetadataCommand(this.model, this.specializationsMap);
+		 ((CommandStack)SpecializationModelSection.this.model.getAdapter(CommandStack.class)).execute(command);
+		 
+		 //TODO : sort the specialization names
+		 
+		 if ( command.getException() != null )
+			 SpecializationPlugin.popup(Level.ERROR, "Failed to save specializations to model's metadata.", command.getException());
 	 }
 }
