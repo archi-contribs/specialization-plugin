@@ -15,7 +15,7 @@ import java.util.Arrays;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.SpecializationPropertyCommand;
+import org.archicontribs.specialization.commands.SpecializationPropertyCommand;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.notify.Adapter;

@@ -9,7 +9,7 @@ import java.util.Comparator;
 
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.SpecializationPropertyCommand;
+import org.archicontribs.specialization.commands.SpecializationPropertyCommand;
 import org.archicontribs.specialization.diagram.ArchimateDiagramEditor;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;

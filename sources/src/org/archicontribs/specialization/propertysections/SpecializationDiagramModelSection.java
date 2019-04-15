@@ -7,7 +7,7 @@ package org.archicontribs.specialization.propertysections;
 
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.SpecializationPropertyCommand;
+import org.archicontribs.specialization.commands.SpecializationPropertyCommand;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.commands.CompoundCommand;
 import org.eclipse.emf.common.notify.Adapter;
