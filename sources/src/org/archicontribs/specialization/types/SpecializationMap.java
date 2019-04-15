@@ -15,10 +15,10 @@ import java.util.List;
  * 
  * @author Herve Jouin
  */
-public class SpecializationsMap extends HashMap<String, List<SpecializationType>> {
+public class SpecializationMap extends HashMap<String, List<SpecializationType>> {
     private static final long serialVersionUID = 1L;
     
-    public SpecializationsMap() {
+    public SpecializationMap() {
     	super();
     }
     
