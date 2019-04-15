@@ -19,7 +19,7 @@ import lombok.Setter;
  * @author Herve Jouin
  */
 public class SpecializationType {
-    @Getter private String name;
+    @Getter @Setter private String name;
     @Getter @Setter private Image icon = null;
     @Getter @Setter private String iconSize = "";
     @Getter @Setter private String iconLocation = "";

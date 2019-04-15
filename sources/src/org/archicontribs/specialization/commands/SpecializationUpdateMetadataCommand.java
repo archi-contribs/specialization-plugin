@@ -1,6 +1,6 @@
 package org.archicontribs.specialization.commands;
 
-import org.archicontribs.specialization.types.SpecializationsMap;
+import org.archicontribs.specialization.types.SpecializationMap;
 import org.eclipse.gef.commands.Command;
 
 import com.archimatetool.model.IArchimateModel;
@@ -9,10 +9,10 @@ import com.google.gson.Gson;
 
 public class SpecializationUpdateMetadataCommand extends Command {
 	IArchimateModel model;
-	SpecializationsMap specializationsMap;
+	SpecializationMap specializationsMap;
 	Exception exception;
 
-	public SpecializationUpdateMetadataCommand(IArchimateModel model, SpecializationsMap specializationsMap) {
+	public SpecializationUpdateMetadataCommand(IArchimateModel model, SpecializationMap specializationsMap) {
 		this.model = model;
 		this.specializationsMap = specializationsMap;
 		this.exception = null;
