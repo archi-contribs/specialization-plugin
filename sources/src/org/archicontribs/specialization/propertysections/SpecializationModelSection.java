@@ -15,6 +15,7 @@ import org.archicontribs.specialization.types.SpecializationType;
 import org.archicontribs.specialization.types.ComponentLabel;
 import org.archicontribs.specialization.types.ExclusiveComponentLabels;
 import org.archicontribs.specialization.types.SpecializationMap;
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -38,9 +39,13 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
@@ -55,6 +60,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.ArchiPlugin;
+import com.archimatetool.editor.ui.FigureImagePreviewFactory;
 import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimatePackage;
@@ -121,6 +127,8 @@ import com.archimatetool.model.impl.Value;
 import com.archimatetool.model.impl.WorkPackage;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
+//TODO: use commands everywhere to allow undo/redo
 
 public class SpecializationModelSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
     static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
@@ -217,6 +225,8 @@ public class SpecializationModelSection extends org.archicontribs.specialization
     Button btnNewProperty = null;
     Button btnDeleteProperty = null;
     Canvas canvasPreview = null;
+    ImageFigure figure1 = null;
+    ImageFigure figure2 = null;
 
     IArchimateModel model = null;
 
@@ -430,6 +440,15 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                             
                             if ( SpecializationModelSection.this.btnNewSpecialization != null )
                                 SpecializationModelSection.this.btnNewSpecialization.setEnabled(true);
+                            
+                            // we set the element figures
+                            Image image1 = FigureImagePreviewFactory.getPreviewImage(componentLabel.getEClass(), 0);
+                            SpecializationModelSection.this.figure1.setImage(image1);
+
+                            Image image2 = FigureImagePreviewFactory.getPreviewImage(componentLabel.getEClass(), 1);
+                            SpecializationModelSection.this.figure2.setImage(image2);
+                            
+                            SpecializationModelSection.this.canvasPreview.setBackgroundImage(image1);
                         } else
                             componentLabel.setSelected(false);
                     }
@@ -1238,12 +1257,26 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         fd.left = new FormAttachment(this.txtIconLocation, 0, SWT.LEFT);
         fd.right = new FormAttachment(this.txtIconLocation, 0, SWT.RIGHT);
         this.txtIconSize.setLayoutData(fd);
+        
+        this.figure1 = new ImageFigure(parent, 0);
+        fd = new FormData();
+        fd.top = new FormAttachment(this.canvasPreview, 10);
+        fd.left = new FormAttachment(this.canvasPreview, 10);
+        this.figure1.setLayoutData(fd);
+        
+        
+        
+        this.figure2 = new ImageFigure(parent, 1);
+        fd = new FormData();
+        fd.top = new FormAttachment(this.figure1, 10);
+        fd.left = new FormAttachment(this.canvasPreview, 10);
+        this.figure2.setLayoutData(fd);
 
         /* **************************************************** */
 
         Label lblSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
         fd = new FormData();
-        fd.top = new FormAttachment(this.canvasPreview, 10);
+        fd.top = new FormAttachment(this.figure2/*this.canvasPreview*/, 10);
         fd.left = new FormAttachment(0, 5);
         fd.right = new FormAttachment(100, -5);
         lblSeparator.setLayoutData(fd);
@@ -1377,6 +1410,47 @@ public class SpecializationModelSection extends org.archicontribs.specialization
             if ( newText.contains("\t") ) return "Must not contain tab";
 
             return null;
+        }
+    }
+    
+    private class ImageFigure extends Composite {
+        boolean selected;
+        Label label;
+    
+	    public ImageFigure(Composite parent, int value) {
+	        super(parent, SWT.NULL);
+	        setBackgroundMode(SWT.INHERIT_DEFAULT);
+	        GridLayout gridLayout = new GridLayout();
+	        gridLayout.marginWidth = 3;
+	        gridLayout.marginHeight = 3;
+	        setLayout(gridLayout);
+	        
+	        addPaintListener(new PaintListener() {
+	            @Override
+	            public void paintControl(PaintEvent e) {
+	                if(org.archicontribs.specialization.propertysections.SpecializationModelSection.ImageFigure.this.selected) {
+	                    GC graphics = e.gc;
+	                    graphics.setForeground(ColorConstants.blue);
+	                    graphics.setLineWidth(2);
+	                    Rectangle bounds = getBounds();
+	                    graphics.drawRectangle(1, 1, bounds.width - 2, bounds.height - 2);
+	                }
+	            }
+	        });
+	        
+	        this.label = new Label(this, SWT.NULL);
+	        getWidgetFactory().adapt(this);
+	    }
+	    
+        @SuppressWarnings("unused")
+		void setImage(Image image) {
+            this.label.setImage(image);
+        }
+        
+        @SuppressWarnings("unused")
+		void setSelected(boolean set) {
+            this.selected = set;
+            redraw();
         }
     }
 }

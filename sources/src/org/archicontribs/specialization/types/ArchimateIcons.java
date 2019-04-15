@@ -36,8 +36,8 @@ public class ArchimateIcons {
             case "BUSINESSSERVICE": return ImageFactory.getImage(IArchiImages.ICON_BUSINESS_SERVICE);
             case "CAPABILITY": return ImageFactory.getImage(IArchiImages.ICON_CAPABILITY);
             case "COMMUNICATIONNETWORK": return ImageFactory.getImage(IArchiImages.ICON_COMMUNICATION_NETWORK);
-            case "CONTRACT": return ImageFactory.getImage(IArchiImages.ICON_CONTRACT);
             case "CONSTRAINT": return ImageFactory.getImage(IArchiImages.ICON_CONSTRAINT);
+            case "CONTRACT": return ImageFactory.getImage(IArchiImages.ICON_CONTRACT);
             case "COURSEOFACTION": return ImageFactory.getImage(IArchiImages.ICON_COURSE_OF_ACTION);
             case "DATAOBJECT": return ImageFactory.getImage(IArchiImages.ICON_DATA_OBJECT);
             case "DELIVERABLE": return ImageFactory.getImage(IArchiImages.ICON_DELIVERABLE);
@@ -194,6 +194,97 @@ public class ArchimateIcons {
             case "SKETCHMODELACTOR": 
             case "MODEL":
                 return null;
+
+            default:
+                throw new IllegalArgumentException("The class '" + clazz + "' is not a valid class"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
+    
+    public static boolean canChangeIcon(String clazz) {
+        ImageFactory ImageFactory = new ImageFactory(ArchiPlugin.INSTANCE);
+        switch (clazz.toUpperCase()) {
+            case "FOLDER":
+            case "MODEL":
+            case "ACCESSRELATIONSHIP":
+            case "AGGREGATIONRELATIONSHIP":
+            case "ASSIGNMENTRELATIONSHIP":
+            case "ASSOCIATIONRELATIONSHIP":
+            case "COMPOSITIONRELATIONSHIP":
+            case "FLOWRELATIONSHIP":
+            case "INFLUENCERELATIONSHIP":
+            case "REALIZATIONRELATIONSHIP":
+            case "SERVINGRELATIONSHIP":
+            case "SPECIALIZATIONRELATIONSHIP":
+            case "TRIGGERINGRELATIONSHIP":
+            case "DIAGRAMMODELGROUP":
+            case "DIAGRAMMODELNOTE":
+            case "ARCHIMATEDIAGRAMMODEL":
+            case "SKETCHMODEL":
+            case "SKETCHMODELSTICKY":
+            case "SKETCHMODELACTOR":
+            	return false;
+            
+            case "APPLICATIONCOLLABORATION":
+            case "APPLICATIONCOMPONENT": 
+            case "APPLICATIONEVENT": 
+            case "APPLICATIONFUNCTION": 
+            case "APPLICATIONINTERACTION": 
+            case "APPLICATIONINTERFACE": 
+            case "APPLICATIONPROCESS": 
+            case "APPLICATIONSERVICE": 
+            case "ARTIFACT":
+            case "ASSESSMENT":
+            case "BUSINESSACTOR":
+            case "BUSINESSCOLLABORATION":
+            case "BUSINESSEVENT":
+            case "BUSINESSFUNCTION":
+            case "BUSINESSINTERACTION":
+            case "BUSINESSINTERFACE":
+            case "BUSINESSOBJECT":
+            case "BUSINESSPROCESS":
+            case "BUSINESSROLE":
+            case "BUSINESSSERVICE":
+            case "CAPABILITY":
+            case "COMMUNICATIONNETWORK":
+            case "CONSTRAINT":
+            case "CONTRACT":
+            case "COURSEOFACTION":
+            case "DATAOBJECT":
+            case "DELIVERABLE":
+            case "DEVICE":
+            case "DISTRIBUTIONNETWORK":
+            case "DRIVER":
+            case "EQUIPMENT":
+            case "FACILITY":
+            case "GAP":
+            case "GOAL":
+            case "GROUPING":
+            case "IMPLEMENTATIONEVENT":
+            case "JUNCTION":
+            case "LOCATION":
+            case "MATERIAL":
+            case "MEANING":
+            case "NODE":
+            case "OUTCOME":
+            case "PATH":
+            case "PLATEAU":
+            case "PRINCIPLE":
+            case "PRODUCT":
+            case "REPRESENTATION":
+            case "REQUIREMENT":
+            case "RESOURCE":
+            case "STAKEHOLDER":
+            case "SYSTEMSOFTWARE":
+            case "TECHNOLOGYCOLLABORATION":
+            case "TECHNOLOGYEVENT":
+            case "TECHNOLOGYFUNCTION":
+            case "TECHNOLOGYINTERFACE":
+            case "TECHNOLOGYINTERACTION":
+            case "TECHNOLOGYPROCESS":
+            case "TECHNOLOGYSERVICE":
+            case "VALUE":
+            case "WORKPACKAGE":
+            	return true;
 
             default:
                 throw new IllegalArgumentException("The class '" + clazz + "' is not a valid class"); //$NON-NLS-1$ //$NON-NLS-2$

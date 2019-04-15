@@ -3,6 +3,7 @@ package org.archicontribs.specialization.types;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.propertysections.SpecializationModelSection;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -10,6 +11,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+
+import com.archimatetool.model.IArchimatePackage;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -56,5 +59,9 @@ public class ComponentLabel {
 
     public void redraw() {
         this.label.redraw();
+    }
+    
+    public EClass getEClass() {
+    	return (EClass)IArchimatePackage.eINSTANCE.getEClassifier(this.label.getToolTipText());
     }
 }
