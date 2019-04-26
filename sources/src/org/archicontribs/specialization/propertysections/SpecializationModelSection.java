@@ -5,6 +5,7 @@
  */
 package org.archicontribs.specialization.propertysections;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
@@ -19,6 +20,7 @@ import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -35,20 +37,21 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -60,7 +63,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.editor.ArchiPlugin;
+import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
+import com.archimatetool.editor.diagram.figures.IDiagramModelObjectFigure;
+import com.archimatetool.editor.diagram.figures.RectangleFigureDelegate;
 import com.archimatetool.editor.ui.FigureImagePreviewFactory;
+import com.archimatetool.editor.ui.factory.ObjectUIFactory;
 import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimatePackage;
@@ -134,7 +141,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
     static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
 
     ExclusiveComponentLabels exclusiveComponentLabels = null;
-    
+
     ComponentLabel resourceLabel;
     ComponentLabel capabilityLabel;
     ComponentLabel courseOfActionLabel;
@@ -213,20 +220,14 @@ public class SpecializationModelSection extends org.archicontribs.specialization
     Composite motivationCanvas;
     Composite otherCanvas;
 
-    Button btnNewIcon = null;
-    Button btnDeleteIcon = null;
     Button btnNewSpecialization = null;
     Button btnEditSpecialization = null;
     Button btnDeleteSpecialization = null;
     Combo comboSpecializationNames = null;
-    Text txtIconSize= null;
-    Text txtIconLocation = null;
     TableViewer tblProperties = null;
     Button btnNewProperty = null;
     Button btnDeleteProperty = null;
-    Canvas canvasPreview = null;
-    ImageFigure figure1 = null;
-    ImageFigure figure2 = null;
+    ElementFigure elementFigure = null;
 
     IArchimateModel model = null;
 
@@ -307,7 +308,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         Composite otherCompo = new Composite(compoElements, SWT.TRANSPARENT);
 
         this.exclusiveComponentLabels = new ExclusiveComponentLabels();
-        
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Strategy layer
         // Passive
@@ -400,12 +401,16 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         this.groupingLabel = this.exclusiveComponentLabels.add(otherCompo, Grouping.class);
         this.locationLabel = this.exclusiveComponentLabels.add(otherCompo, Location.class);
         this.junctionLabel = this.exclusiveComponentLabels.add(otherCompo, Junction.class);
-        
+
         for ( ComponentLabel lbl: this.exclusiveComponentLabels.getAllComponentLabels() ) {
             lbl.getLabel().addListener(SWT.MouseUp, new Listener() {
                 @Override public void handleEvent(Event event) {
+                    //
+                    // This event is fired when an element class is selected in the componentLabels diagram
+                    //
+
                     SpecializationModelSection.this.comboSpecializationNames.removeAll();
-                    
+
                     // we search the ComponentLabel that fired the event
                     for ( ComponentLabel componentLabel: SpecializationModelSection.this.exclusiveComponentLabels.getAllComponentLabels() ) {
                         if ( componentLabel.getLabel().equals(event.widget) ) {
@@ -420,35 +425,22 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                                         if ( isFirst ) {
                                             isFirst = false;
                                             SpecializationModelSection.this.comboSpecializationNames.select(0);
-                                            SpecializationModelSection.this.txtIconSize.setText(specializationType.getIconSize());
-                                            SpecializationModelSection.this.txtIconLocation.setText(specializationType.getIconLocation());
+                                            SpecializationModelSection.this.elementFigure.setIconSize(specializationType.getIconSize());
+                                            SpecializationModelSection.this.elementFigure.setIconLocation(specializationType.getIconLocation());
                                             SpecializationModelSection.this.tblProperties.setInput(specializationType.getProperties());
                                             SpecializationModelSection.this.tblProperties.refresh();
-        
-                                            SpecializationModelSection.this.btnNewIcon.setEnabled(true);
-                                            SpecializationModelSection.this.btnDeleteIcon.setEnabled(true);
-                                            //TODO: reset icon in canvas
-                                            //TODO: set canvas background as default class color
-                                            //TODO: btnDeleteIcon.setEnabled(false) is no specific icon is selected
-                                            SpecializationModelSection.this.txtIconSize.setEnabled(true);
-                                            SpecializationModelSection.this.txtIconLocation.setEnabled(true);
+
                                             SpecializationModelSection.this.tblProperties.getTable().setEnabled(true);
                                         }
                                     }
                                 }
                             }
-                            
+
                             if ( SpecializationModelSection.this.btnNewSpecialization != null )
                                 SpecializationModelSection.this.btnNewSpecialization.setEnabled(true);
-                            
-                            // we set the element figures
-                            Image image1 = FigureImagePreviewFactory.getPreviewImage(componentLabel.getEClass(), 0);
-                            SpecializationModelSection.this.figure1.setImage(image1);
 
-                            Image image2 = FigureImagePreviewFactory.getPreviewImage(componentLabel.getEClass(), 1);
-                            SpecializationModelSection.this.figure2.setImage(image2);
-                            
-                            SpecializationModelSection.this.canvasPreview.setBackgroundImage(image1);
+                            // we set the element figures
+                            SpecializationModelSection.this.elementFigure.setEClass(componentLabel.getEClass());
                         } else
                             componentLabel.setSelected(false);
                     }
@@ -882,40 +874,42 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         this.comboSpecializationNames.setLayoutData(fd);
         this.comboSpecializationNames.addModifyListener(new ModifyListener() {
             @Override public void modifyText(ModifyEvent e) {
+                //
+                // This event is fired when a specialization is chosen in the combo list
+                //
+                
                 String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
                 boolean enableIcons = !specializationName.isEmpty();
                 
+                SpecializationModelSection.this.btnEditSpecialization.setEnabled(enableIcons);
+                SpecializationModelSection.this.btnDeleteSpecialization.setEnabled(enableIcons);
+                SpecializationModelSection.this.elementFigure.setEnabled(enableIcons);
+                SpecializationModelSection.this.tblProperties.getTable().setEnabled(enableIcons);
+                SpecializationModelSection.this.btnNewProperty.setEnabled(enableIcons);
+
                 if ( enableIcons ) {
                     String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelected().getLabel().getToolTipText();
                     SpecializationType specializationType = SpecializationModelSection.this.specializationMap.getSpecializationType(selectedClass, specializationName);
                     logger.debug("Specialization name = "+selectedClass+"/"+specializationName);
                     logger.trace("it has got "+specializationType.getProperties().size()+" properties.");
-                    
-                    SpecializationModelSection.this.txtIconSize.setText(specializationType.getIconSize());
-                    SpecializationModelSection.this.txtIconLocation.setText(specializationType.getIconLocation());
+
+                    SpecializationModelSection.this.elementFigure.setIconSize(specializationType.getIconSize());
+                    SpecializationModelSection.this.elementFigure.setIconLocation(specializationType.getIconLocation());
                     SpecializationModelSection.this.tblProperties.setInput(specializationType.getProperties());
                     SpecializationModelSection.this.tblProperties.refresh();
                     SpecializationModelSection.this.btnDeleteProperty.setEnabled(!specializationType.getProperties().isEmpty());
+                    
+                    SpecializationModelSection.this.elementFigure.select(specializationType.getFigure());
                 } else {
                     logger.debug("Specialization name is empty");
-                    SpecializationModelSection.this.txtIconSize.setText("");
-                    SpecializationModelSection.this.txtIconLocation.setText("");
+                    SpecializationModelSection.this.elementFigure.setIconSize("");
+                    SpecializationModelSection.this.elementFigure.setIconLocation("");
                     SpecializationModelSection.this.tblProperties.setInput(null);
                     SpecializationModelSection.this.tblProperties.refresh();
                     SpecializationModelSection.this.btnDeleteProperty.setEnabled(false);
+                    
+                    SpecializationModelSection.this.elementFigure.select(null);
                 }
-                
-                SpecializationModelSection.this.btnEditSpecialization.setEnabled(enableIcons);
-                SpecializationModelSection.this.btnDeleteSpecialization.setEnabled(enableIcons);
-                SpecializationModelSection.this.btnNewIcon.setEnabled(enableIcons);
-                SpecializationModelSection.this.btnDeleteIcon.setEnabled(enableIcons);
-                //TODO: reset icon in canvas
-                //TODO: set canvas background as default class color
-                //TODO: btnDeleteIcon.setEnabled(false) is no specific icon is selected
-                SpecializationModelSection.this.txtIconSize.setEnabled(enableIcons);
-                SpecializationModelSection.this.txtIconLocation.setEnabled(enableIcons);
-                SpecializationModelSection.this.tblProperties.getTable().setEnabled(enableIcons);
-                SpecializationModelSection.this.btnNewProperty.setEnabled(enableIcons);
             }
         });
 
@@ -945,7 +939,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                             break;
                         }
                     }
-                    
+
                     if ( !alreadyExists ) {
                         String clazz = SpecializationModelSection.this.exclusiveComponentLabels.getSelected().getLabel().getToolTipText();
                         SpecializationType specializationType = new SpecializationType(newSpecializationName);
@@ -954,7 +948,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
                     SpecializationModelSection.this.comboSpecializationNames.add(newSpecializationName);    // the line is added at the end
                     SpecializationModelSection.this.comboSpecializationNames.select(SpecializationModelSection.this.comboSpecializationNames.getItemCount()-1);
-                    
+
                     setMetadata();
                 }
             }
@@ -985,7 +979,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                             return;
                         }
                     }
-                    
+
                     int oldNameIndex = 0;
                     for ( int index = 0; index < SpecializationModelSection.this.comboSpecializationNames.getItemCount(); ++index ) {
                         if ( oldSpecializationName.equals(SpecializationModelSection.this.comboSpecializationNames.getItem(index)) ) {
@@ -998,11 +992,11 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                     logger.debug("Renaming "+selectedClass+"/"+oldSpecializationName+ " to "+selectedClass+"/"+newSpecializationName);
                     SpecializationType specializationType = SpecializationModelSection.this.specializationMap.getSpecializationType(selectedClass, oldSpecializationName);
                     specializationType.setName(newSpecializationName);
-                    
+
                     SpecializationModelSection.this.comboSpecializationNames.remove(oldSpecializationName);
                     SpecializationModelSection.this.comboSpecializationNames.add(newSpecializationName, oldNameIndex);
                     SpecializationModelSection.this.comboSpecializationNames.select(oldNameIndex);
-                    
+
                     setMetadata();
                 }
             }
@@ -1035,7 +1029,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                     else
                         SpecializationModelSection.this.comboSpecializationNames.select(selectionIndex-1);
                 }
-                
+
                 setMetadata();
             }
 
@@ -1050,7 +1044,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         lblProperties.setText("Properties:");
         fd = new FormData();
         fd.top = new FormAttachment(lblSpecializationName, 15);
-        fd.left = new FormAttachment(0, 60);
+        fd.left = new FormAttachment(lblSpecializationName, 0, SWT.LEFT);
         lblProperties.setLayoutData(fd);
 
         this.tblProperties = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -1061,14 +1055,14 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         table.setEnabled(false);
         fd = new FormData();
         fd.top = new FormAttachment(lblProperties, -5, SWT.TOP);
-        fd.left = new FormAttachment(this.comboSpecializationNames, 0, SWT.LEFT);
-        fd.right = new FormAttachment(lblProperties, 370);
+        fd.left = new FormAttachment(lblProperties, 5);
+        fd.right = new FormAttachment(lblProperties, 430);
         fd.bottom = new FormAttachment(lblProperties, 100, SWT.BOTTOM);
         table.setLayoutData(fd);
 
         TableViewerColumn col = new TableViewerColumn(this.tblProperties, SWT.NONE);
         col.getColumn().setText("Name");
-        col.getColumn().setWidth(120);
+        col.getColumn().setWidth(140);
         col.getColumn().setResizable(true);
         col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((SpecializationProperty)element).getName(); }});
         col.setEditingSupport(new EditingSupport(this.tblProperties) {
@@ -1077,7 +1071,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
             @Override protected void setValue(Object element, Object value) {
                 ((SpecializationProperty)element).setName((String)value);
                 SpecializationModelSection.this.tblProperties.update(element, null);
-                
+
                 setMetadata();
             }
 
@@ -1096,7 +1090,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
         col = new TableViewerColumn(this.tblProperties, SWT.NONE);
         col.getColumn().setText("Default value");
-        col.getColumn().setWidth(180);
+        col.getColumn().setWidth(220);
         col.getColumn().setResizable(true);
         col.setLabelProvider(new ColumnLabelProvider() { @Override public String getText(Object element) { return ((SpecializationProperty)element).getValue(); }});
         col.setEditingSupport(new EditingSupport(this.tblProperties) {
@@ -1105,7 +1099,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
             @Override protected void setValue(Object element, Object value) {
                 ((SpecializationProperty)element).setValue((String)value);
                 SpecializationModelSection.this.tblProperties.update(element, null);
-                
+
                 setMetadata();
             }
 
@@ -1137,16 +1131,16 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                 SpecializationType type = SpecializationModelSection.this.specializationMap.getSpecializationType(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getText());
                 type.getProperties().add(new SpecializationProperty("new property",""));
                 SpecializationModelSection.this.tblProperties.refresh();
-                
+
                 SpecializationModelSection.this.tblProperties.getTable().setSelection(SpecializationModelSection.this.tblProperties.getTable().getItemCount()-1);
                 SpecializationModelSection.this.btnDeleteProperty.setEnabled(true);
-                
+
                 setMetadata();
             }
 
             @Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
         });
-        
+
         this.btnDeleteProperty = new Button(parent, SWT.PUSH);
         this.btnDeleteProperty.setImage(SpecializationPlugin.DELETE_ICON);
         this.btnDeleteProperty.setToolTipText("Delete property");
@@ -1163,7 +1157,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                 int selectionIndex = SpecializationModelSection.this.tblProperties.getTable().getSelectionIndex();
                 type.getProperties().remove(selectionIndex);
                 SpecializationModelSection.this.tblProperties.refresh();
-                
+
                 if ( SpecializationModelSection.this.tblProperties.getTable().getItemCount() == 0 )
                     SpecializationModelSection.this.btnDeleteProperty.setEnabled(false);
                 else {
@@ -1172,15 +1166,13 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                     else
                         SpecializationModelSection.this.tblProperties.getTable().setSelection(selectionIndex-1);
                 }
-                
+
                 setMetadata();
             }
 
             @Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
         });
-        
-        IPreferenceStore archiStore = ArchiPlugin.INSTANCE.getPreferenceStore();
-        
+
         Label lblIcon = new Label(parent, SWT.NONE);
         lblIcon.setForeground(parent.getForeground());
         lblIcon.setBackground(parent.getBackground());
@@ -1188,95 +1180,20 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         lblIcon.setEnabled(false);
         fd = new FormData();
         fd.top = new FormAttachment(table, 15);
-        fd.left = new FormAttachment(0, 55);
+        fd.left = new FormAttachment(lblSpecializationName, 0, SWT.LEFT);
         lblIcon.setLayoutData(fd);
-        
-        this.canvasPreview = new Canvas(parent, SWT.BORDER);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIcon, 0, SWT.TOP);
-        fd.width = archiStore.getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH);
-        fd.left = new FormAttachment(this.comboSpecializationNames, 0, SWT.LEFT);
-        fd.height = archiStore.getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT);
-        this.canvasPreview.setLayoutData(fd);
 
-        this.btnNewIcon = new Button(parent, SWT.PUSH);
-        this.btnNewIcon.setImage(SpecializationPlugin.NEW_ICON);
-        this.btnNewIcon.setToolTipText("set Icon");
-        this.btnNewIcon.setEnabled(false);
+        this.elementFigure = new ElementFigure(parent, SWT.NONE);
         fd = new FormData();
-        fd.top = new FormAttachment(this.canvasPreview, 0, SWT.TOP);
-        fd.left = new FormAttachment(this.canvasPreview, 5);
-        fd.right = new FormAttachment(this.canvasPreview, 40, SWT.RIGHT);
-        this.btnNewIcon.setLayoutData(fd);
+        fd.top = new FormAttachment(lblIcon, -5, SWT.TOP);
+        fd.left = new FormAttachment(lblIcon, 10);
+        this.elementFigure.setLayoutData(fd);
         
-        this.btnDeleteIcon = new Button(parent, SWT.PUSH);
-        this.btnDeleteIcon.setImage(SpecializationPlugin.DELETE_ICON);
-        this.btnDeleteIcon.setToolTipText("delete Icon");
-        this.btnDeleteIcon.setEnabled(false);
-        fd = new FormData();
-        fd.top = new FormAttachment(this.btnNewIcon, 5);
-        fd.left = new FormAttachment(this.canvasPreview, 5);
-        fd.right = new FormAttachment(this.canvasPreview, 40, SWT.RIGHT);
-        this.btnDeleteIcon.setLayoutData(fd);
-
-        Label lblIconSize = new Label(parent, SWT.NONE);
-        lblIconSize.setForeground(parent.getForeground());
-        lblIconSize.setBackground(parent.getBackground());
-        lblIconSize.setEnabled(false);
-        lblIconSize.setText("Size:");
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIcon, 8, SWT.TOP);
-        fd.left = new FormAttachment(this.btnNewIcon, 20);
-        lblIconSize.setLayoutData(fd);
-
-        this.txtIconSize = new Text(parent, SWT.BORDER);
-        this.txtIconSize.setToolTipText("Size of the icon");
-        this.txtIconSize.setEnabled(false);
-
-        Label lblIconLocation = new Label(parent, SWT.NONE);
-        lblIconLocation.setForeground(parent.getForeground());
-        lblIconLocation.setBackground(parent.getBackground());
-        lblIconLocation.setEnabled(false);
-        lblIconLocation.setText("Location:");
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIconSize, 10);
-        fd.left = new FormAttachment(lblIconSize, 0, SWT.LEFT);
-        lblIconLocation.setLayoutData(fd);
-
-        this.txtIconLocation = new Text(parent, SWT.BORDER);
-        this.txtIconLocation.setToolTipText("Location of the icon");
-        this.txtIconLocation.setEnabled(false);
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIconLocation, 0, SWT.CENTER);
-        fd.left = new FormAttachment(lblIconLocation, 5);
-        fd.right = new FormAttachment(lblIconLocation, 80, SWT.RIGHT);
-        this.txtIconLocation.setLayoutData(fd);
-        
-        fd = new FormData();
-        fd.top = new FormAttachment(lblIconSize, 0, SWT.CENTER);
-        fd.left = new FormAttachment(this.txtIconLocation, 0, SWT.LEFT);
-        fd.right = new FormAttachment(this.txtIconLocation, 0, SWT.RIGHT);
-        this.txtIconSize.setLayoutData(fd);
-        
-        this.figure1 = new ImageFigure(parent, 0);
-        fd = new FormData();
-        fd.top = new FormAttachment(this.canvasPreview, 10);
-        fd.left = new FormAttachment(this.canvasPreview, 10);
-        this.figure1.setLayoutData(fd);
-        
-        
-        
-        this.figure2 = new ImageFigure(parent, 1);
-        fd = new FormData();
-        fd.top = new FormAttachment(this.figure1, 10);
-        fd.left = new FormAttachment(this.canvasPreview, 10);
-        this.figure2.setLayoutData(fd);
-
         /* **************************************************** */
 
         Label lblSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
         fd = new FormData();
-        fd.top = new FormAttachment(this.figure2/*this.canvasPreview*/, 10);
+        fd.top = new FormAttachment(this.elementFigure, 10);
         fd.left = new FormAttachment(0, 5);
         fd.right = new FormAttachment(100, -5);
         lblSeparator.setLayoutData(fd);
@@ -1342,7 +1259,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
     protected void setElement(Object element) {
         IArchimateModel selectedModel = (IArchimateModel)new Filter().adaptObject(element);
         logger.debug("Setting element to "+SpecializationPlugin.getDebugName(selectedModel));
-        
+
         if(selectedModel == null) {
             logger.error("failed to get element for " + element); //$NON-NLS-1$
             this.specializationMap = null;
@@ -1365,29 +1282,29 @@ public class SpecializationModelSection extends org.archicontribs.specialization
                 }
             }
         }
-        
+
         // TODO: the rest of the code assumes the variable is not null ! add check for null everywhere
         if ( this.specializationMap == null )
             this.specializationMap = new SpecializationMap();
-        
+
         if ( selectedModel != this.model ) {
             if ( this.comboSpecializationNames != null && !this.comboSpecializationNames.isDisposed() )
                 this.comboSpecializationNames.removeAll();
-            
+
             if ( this.tblProperties != null && !this.tblProperties.getTable().isDisposed() ) {
                 this.tblProperties.setInput(null);
                 this.tblProperties.refresh();
             }
-            
+
             if ( this.exclusiveComponentLabels != null ) {
                 for ( ComponentLabel lbl: this.exclusiveComponentLabels.getAllComponentLabels() )
                     lbl.setSelected(false);
             }
-            
+
             this.model = selectedModel;
         }
     }
-    
+
     void setMetadata() {
         SpecializationUpdateMetadataCommand command = new SpecializationUpdateMetadataCommand(this.model, this.specializationMap);
         ((CommandStack)SpecializationModelSection.this.model.getAdapter(CommandStack.class)).execute(command);
@@ -1397,7 +1314,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
         if ( command.getException() != null )
             SpecializationPlugin.popup(Level.ERROR, "Failed to save specializations to model's metadata.", command.getException());
     }
-    
+
     class LengthValidator implements IInputValidator {
         @Override public String isValid(String newText) {
             // we check the string length
@@ -1410,47 +1327,6 @@ public class SpecializationModelSection extends org.archicontribs.specialization
             if ( newText.contains("\t") ) return "Must not contain tab";
 
             return null;
-        }
-    }
-    
-    private class ImageFigure extends Composite {
-        boolean selected;
-        Label label;
-    
-	    public ImageFigure(Composite parent, int value) {
-	        super(parent, SWT.NULL);
-	        setBackgroundMode(SWT.INHERIT_DEFAULT);
-	        GridLayout gridLayout = new GridLayout();
-	        gridLayout.marginWidth = 3;
-	        gridLayout.marginHeight = 3;
-	        setLayout(gridLayout);
-	        
-	        addPaintListener(new PaintListener() {
-	            @Override
-	            public void paintControl(PaintEvent e) {
-	                if(org.archicontribs.specialization.propertysections.SpecializationModelSection.ImageFigure.this.selected) {
-	                    GC graphics = e.gc;
-	                    graphics.setForeground(ColorConstants.blue);
-	                    graphics.setLineWidth(2);
-	                    Rectangle bounds = getBounds();
-	                    graphics.drawRectangle(1, 1, bounds.width - 2, bounds.height - 2);
-	                }
-	            }
-	        });
-	        
-	        this.label = new Label(this, SWT.NULL);
-	        getWidgetFactory().adapt(this);
-	    }
-	    
-        @SuppressWarnings("unused")
-		void setImage(Image image) {
-            this.label.setImage(image);
-        }
-        
-        @SuppressWarnings("unused")
-		void setSelected(boolean set) {
-            this.selected = set;
-            redraw();
         }
     }
 }

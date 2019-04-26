@@ -21,6 +21,7 @@ import lombok.Setter;
 public class SpecializationType {
     @Getter @Setter private String name;
     @Getter @Setter private Image icon = null;
+    @Getter @Setter private int figure = 0;       // 0 or 1 if the alternate figure is selected 
     @Getter @Setter private String iconSize = "";
     @Getter @Setter private String iconLocation = "";
     @Getter private List<SpecializationProperty> properties = new ArrayList<SpecializationProperty>();
