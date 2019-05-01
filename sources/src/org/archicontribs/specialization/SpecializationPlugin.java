@@ -782,9 +782,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         EObject container = obj;
         while ( (container != null) && !(container instanceof IDiagramModel || container instanceof IFolder) )
             container = container.eContainer();
+        
         if ( (container == null) || !(container instanceof IDiagramModel || container instanceof IFolder) ) {
-            // Should not happen, but just in case
-            logger.error(getFullName(obj) + " is not in a view not in a folder.");
+            // this may happen, for instance, in the SpecializationModelSection
             return false; 
         }
         
@@ -1066,20 +1066,14 @@ public class SpecializationPlugin extends AbstractUIPlugin {
         if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") )
             return false;
         
-        // we determine if the object is in a view or in a folder
+        // we determine if the object is in a view
         EObject container = obj;
         while ( (container != null) && !(container instanceof IDiagramModel || container instanceof IFolder) )
             container = container.eContainer();
-        if ( (container == null) || !(container instanceof IDiagramModel || container instanceof IFolder) ) {
-            // Should not happen, but just in case
-            logger.error(getFullName(obj) + " is not in a view not in a folder.");
-            return false; 
-        }
         
-        // if the object is in a folder, we do not change the label
-        if ( container instanceof IFolder )
+        if ( (container == null) || !(container instanceof IDiagramModel) )
         	return false;
-        
+        	
         // we calculate if the configuration states the label should be replaced
         String mustReplaceLabels = preferenceStore.getString("mustReplaceLabelsInViews");
         if ( mustReplaceLabels != null ) {

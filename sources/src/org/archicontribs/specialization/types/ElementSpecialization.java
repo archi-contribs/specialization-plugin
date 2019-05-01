@@ -18,7 +18,7 @@ import lombok.Setter;
  * 
  * @author Herve Jouin
  */
-public class SpecializationType {
+public class ElementSpecialization {
     @Getter @Setter private String name;
     @Getter @Setter private Image icon = null;
     @Getter @Setter private int figure = 0;       // 0 or 1 if the alternate figure is selected 
@@ -26,7 +26,7 @@ public class SpecializationType {
     @Getter @Setter private String iconLocation = "";
     @Getter private List<SpecializationProperty> properties = new ArrayList<SpecializationProperty>();
     
-    public SpecializationType(String name) {
+    public ElementSpecialization(String name) {
         this.name = name;
     }
 }

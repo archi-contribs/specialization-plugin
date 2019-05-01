@@ -15,15 +15,15 @@ import java.util.List;
  * 
  * @author Herve Jouin
  */
-public class SpecializationMap extends HashMap<String, List<SpecializationType>> {
+public class ElementSpecializationMap extends HashMap<String, List<ElementSpecialization>> {
     private static final long serialVersionUID = 1L;
     
-    public SpecializationMap() {
+    public ElementSpecializationMap() {
     	super();
     }
     
-    public SpecializationType getSpecializationType(String clazz, String name) {
-    	List<SpecializationType> types = get(clazz);
+    public ElementSpecialization getElementSpecialization(String clazz, String name) {
+    	List<ElementSpecialization> types = get(clazz);
     	if ( types != null ) {
     		for ( int index = 0 ; index < types.size() ; ++index ) {
     			if ( types.get(index).getName().equals(name) )
@@ -34,12 +34,28 @@ public class SpecializationMap extends HashMap<String, List<SpecializationType>>
     	return null;
     }
     
-    public void addSpecializationType(String clazz, SpecializationType specializationType) {
-    	List<SpecializationType> specializationTypes = get(clazz);
-    	if ( specializationTypes == null ) {
-    		specializationTypes = new ArrayList<SpecializationType>();
-    		put(clazz, specializationTypes);
+    public void addElementSpecialization(String clazz, ElementSpecialization elementSpecialization) {
+    	List<ElementSpecialization> elementSpecializationList = get(clazz);
+    	if ( elementSpecializationList == null ) {
+    		elementSpecializationList = new ArrayList<ElementSpecialization>();
+    		put(clazz, elementSpecializationList);
     	}
-    	specializationTypes.add(specializationType);
+    	elementSpecializationList.add(elementSpecialization);
+    }
+    
+    public void removeElementSpecialization(String clazz, ElementSpecialization elementSpecialization) {
+    	List<ElementSpecialization> elementSpecializationList = get(clazz);
+    	if ( elementSpecializationList != null ) {
+    		elementSpecializationList.remove(elementSpecialization);
+    	}
+    }
+    
+    public void removeElementSpecialization(String clazz, String elementName) {
+    	List<ElementSpecialization> elementSpecializationList = get(clazz);
+    	if ( elementSpecializationList != null ) {
+        	ElementSpecialization elementSpecialization = getElementSpecialization(clazz, elementName);
+        	if ( elementSpecialization != null )
+        		elementSpecializationList.remove(elementSpecialization);
+    	}
     }
 }

@@ -125,7 +125,6 @@ public class ElementFigure extends Composite {
         this.btnNewIcon = new Button(this, SWT.PUSH);
         this.btnNewIcon.setImage(SpecializationPlugin.NEW_ICON);
         this.btnNewIcon.setToolTipText("set Icon");
-        this.btnNewIcon.setEnabled(false);
         this.btnNewIcon.setVisible(false);
         fd = new FormData();
         fd.top = new FormAttachment(this.outerCompo2, 0, SWT.TOP);
@@ -148,23 +147,20 @@ public class ElementFigure extends Composite {
         this.lblIconSize.setForeground(this.getForeground());
         this.lblIconSize.setBackground(this.getBackground());
         this.lblIconSize.setText("Size:");
-        this.lblIconSize.setEnabled(false);
         this.lblIconSize.setVisible(false);
         fd = new FormData();
-        fd.top = new FormAttachment(0, 8);
+        fd.top = new FormAttachment(0, 5);
         fd.left = new FormAttachment(this.btnNewIcon, 5);
         this.lblIconSize.setLayoutData(fd);
 
         this.txtIconSize = new Text(this, SWT.BORDER);
         this.txtIconSize.setToolTipText("Size of the icon");
-        this.txtIconSize.setEnabled(false);
         this.txtIconSize.setVisible(false);
 
         this.lblIconLocation = new Label(this, SWT.NONE);
         this.lblIconLocation.setForeground(this.getForeground());
         this.lblIconLocation.setBackground(this.getBackground());
         this.lblIconLocation.setText("Location:");
-        this.lblIconLocation.setEnabled(false);
         this.lblIconLocation.setVisible(false);
         fd = new FormData();
         fd.top = new FormAttachment(this.lblIconSize, 5);
@@ -173,7 +169,6 @@ public class ElementFigure extends Composite {
 
         this.txtIconLocation = new Text(this, SWT.BORDER);
         this.txtIconLocation.setToolTipText("Location of the icon");
-        this.txtIconLocation.setEnabled(false);
         this.txtIconLocation.setVisible(false);
         fd = new FormData();
         fd.top = new FormAttachment(this.lblIconLocation, 0, SWT.CENTER);
@@ -189,9 +184,20 @@ public class ElementFigure extends Composite {
     }
 
     void reset() {
+    	this.outerCompo1.setBackground(this.outerCompo1.getParent().getBackground());
         this.figure1.setBackgroundImage(null);
+        
+        this.outerCompo2.setBackground(this.outerCompo2.getParent().getBackground());
         this.figure2.setBackgroundImage(null);
+        
         this.selectedFigure = null;
+        
+        this.btnNewIcon.setVisible(false);
+        this.btnDeleteIcon.setVisible(false);
+        this.lblIconSize.setVisible(false);
+        this.txtIconSize.setVisible(false);
+        this.lblIconLocation.setVisible(false);
+        this.txtIconLocation.setVisible(false);
     }
 
     public void setEClass(EClass eClass) {
@@ -234,11 +240,14 @@ public class ElementFigure extends Composite {
 	        if ( (this.selectedFigure != null) && (this.selectedFigure.getData(canChangeIconString) != null) ) {
 	            boolean canChangeIcon = (boolean)this.selectedFigure.getData(canChangeIconString);
 	            this.btnNewIcon.setVisible(canChangeIcon);
+	            
+	            this.btnDeleteIcon.setEnabled(this.iconName != null);
 	            this.btnDeleteIcon.setVisible(canChangeIcon);
-	            this.lblIconSize.setVisible(canChangeIcon);
-	            this.txtIconSize.setVisible(canChangeIcon);
-	            this.lblIconLocation.setVisible(canChangeIcon);
-	            this.txtIconLocation.setVisible(canChangeIcon);
+	            
+	            this.lblIconSize.setVisible(canChangeIcon && (this.iconName != null));
+	            this.txtIconSize.setVisible(canChangeIcon && (this.iconName != null));
+	            this.lblIconLocation.setVisible(canChangeIcon && (this.iconName != null));
+	            this.txtIconLocation.setVisible(canChangeIcon && (this.iconName != null));
 	            
 	            logger.trace("canChangeIcon = " + canChangeIcon);
 	        }
