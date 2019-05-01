@@ -194,7 +194,7 @@ public class ElementFigure extends Composite {
         this.selectedFigure = null;
     }
 
-    void setEClass(EClass eClass) {
+    public void setEClass(EClass eClass) {
         if ( eClass == null ) {
             reset();
         } else {
