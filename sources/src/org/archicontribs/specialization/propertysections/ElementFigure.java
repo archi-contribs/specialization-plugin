@@ -9,17 +9,13 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -42,6 +38,8 @@ public class ElementFigure extends Composite {
     Button btnDeleteIcon = null;
     Text txtIconSize= null;
     Text txtIconLocation = null;
+    
+    String iconName = null;
     
     Composite outerCompo1 = null;
     Composite innerCompo1 = null;
@@ -227,21 +225,25 @@ public class ElementFigure extends Composite {
     }
     
     void select(Composite figure) {
-        this.selectedFigure = figure;
+        if ( this.selectedFigure != figure ) {
+        	this.selectedFigure = figure;
         
-        this.outerCompo1.setBackground(figure == this.outerCompo1 ? ColorConstants.blue : this.outerCompo1.getParent().getBackground());
-        this.outerCompo2.setBackground(figure == this.outerCompo2 ? ColorConstants.blue : this.outerCompo2.getParent().getBackground());
-        
-        if ( (this.selectedFigure != null) && (this.selectedFigure.getData(canChangeIconString) != null) ) {
-            boolean canChangeIcon = (boolean)this.selectedFigure.getData(canChangeIconString);
-            this.btnNewIcon.setVisible(canChangeIcon);
-            this.btnDeleteIcon.setVisible(canChangeIcon);
-            this.lblIconSize.setVisible(canChangeIcon);
-            this.txtIconSize.setVisible(canChangeIcon);
-            this.lblIconLocation.setVisible(canChangeIcon);
-            this.txtIconLocation.setVisible(canChangeIcon);
-            
-            logger.trace("canchangeIcon = " + canChangeIcon);
+	        this.outerCompo1.setBackground(figure == this.outerCompo1 ? ColorConstants.blue : this.outerCompo1.getParent().getBackground());
+	        this.outerCompo2.setBackground(figure == this.outerCompo2 ? ColorConstants.blue : this.outerCompo2.getParent().getBackground());
+	        
+	        if ( (this.selectedFigure != null) && (this.selectedFigure.getData(canChangeIconString) != null) ) {
+	            boolean canChangeIcon = (boolean)this.selectedFigure.getData(canChangeIconString);
+	            this.btnNewIcon.setVisible(canChangeIcon);
+	            this.btnDeleteIcon.setVisible(canChangeIcon);
+	            this.lblIconSize.setVisible(canChangeIcon);
+	            this.txtIconSize.setVisible(canChangeIcon);
+	            this.lblIconLocation.setVisible(canChangeIcon);
+	            this.txtIconLocation.setVisible(canChangeIcon);
+	            
+	            logger.trace("canChangeIcon = " + canChangeIcon);
+	        }
+	        
+	        this.notifyListeners(SWT.Selection, new Event());		// indicates that an element has been selected
         }
     }
 
@@ -252,11 +254,37 @@ public class ElementFigure extends Composite {
             select(this.outerCompo2);
     }
     
-    void setIconSize(String iconSize) {
+    public int getSelectedFigure() {
+    	return ( (this.selectedFigure == null) || (this.selectedFigure == this.outerCompo1) ) ? 0 : 1;
+    }
+    
+    public boolean canChangeIcon() {
+    	return (this.selectedFigure != null) && (this.selectedFigure.getData(canChangeIconString) != null);
+    }
+    
+    public String getIconName() {
+    	if ( canChangeIcon() )
+    		return this.iconName;
+    	return null;
+    }
+    
+    public String getIconSize() {
+    	if ( canChangeIcon() )
+    		return this.txtIconSize.getText();
+    	return null;
+    }
+    
+    public String getIconLocation() {
+    	if ( canChangeIcon() )
+    		return this.txtIconLocation.getText();
+    	return null;
+    }
+    
+    public void setIconSize(String iconSize) {
         this.txtIconSize.setText(iconSize);
     }
     
-    void setIconLocation(String iconLocation) {
+    public void setIconLocation(String iconLocation) {
         this.txtIconLocation.setText(iconLocation);
     }
     
