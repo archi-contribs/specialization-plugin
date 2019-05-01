@@ -201,7 +201,6 @@ public class ArchimateIcons {
     }
     
     public static boolean canChangeIcon(String clazz) {
-        ImageFactory ImageFactory = new ImageFactory(ArchiPlugin.INSTANCE);
         switch (clazz.toUpperCase()) {
             case "FOLDER":
             case "MODEL":
