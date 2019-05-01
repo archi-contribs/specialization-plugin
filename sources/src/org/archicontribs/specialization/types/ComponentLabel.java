@@ -17,30 +17,29 @@ import com.archimatetool.model.IArchimatePackage;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ComponentLabel {
+public class ComponentLabel extends Label {
     static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
     
-    @Getter Label label;
     @Getter @Setter boolean selected;
 
-    ComponentLabel(Composite parent, @SuppressWarnings("rawtypes") Class clazz) {
-        this.label = new Label(parent, SWT.NONE);
-        this.label.setSize(100,  100);
-        this.label.setToolTipText(clazz.getSimpleName());
-        this.label.setImage(ArchimateIcons.getImage(getElementClassname()));
+    ComponentLabel(Composite parent, int type, @SuppressWarnings("rawtypes") Class clazz) {
+        super(parent,type);
+        this.setSize(100,  100);
+        this.setToolTipText(clazz.getSimpleName());
+        this.setImage(ArchimateIcons.getImage(getElementClassname()));
 
-        this.label.addPaintListener(new PaintListener() {
+        this.addPaintListener(new PaintListener() {
             @Override public void paintControl(PaintEvent event)
             {
                 if ( ComponentLabel.this.selected ) {
-                    ComponentLabel.this.label.setBackground(SpecializationPlugin.GREY_COLOR);
+                    ComponentLabel.this.setBackground(SpecializationPlugin.GREY_COLOR);
                     //event.gc.drawRoundRectangle(0, 0, 16, 16, 2, 2);
                 } else
-                    ComponentLabel.this.label.setBackground(ArchimateIcons.getColor(getElementClassname()));
+                    ComponentLabel.this.setBackground(ArchimateIcons.getColor(getElementClassname()));
             }
         });
         
-        this.label.addListener(SWT.MouseUp, new Listener() {
+        this.addListener(SWT.MouseUp, new Listener() {
             @Override public void handleEvent(Event event) {
                 ComponentLabel.this.selected = true;
                 redraw();
@@ -49,19 +48,15 @@ public class ComponentLabel {
     }
     
     public void select() {
-        this.label.notifyListeners(SWT.MouseUp, new Event());
+        this.notifyListeners(SWT.MouseUp, new Event());
     }
 
 
     public String getElementClassname() {
-        return this.label.getToolTipText().replaceAll(" ",  "");
-    }
-
-    public void redraw() {
-        this.label.redraw();
+        return this.getToolTipText().replaceAll(" ",  "");
     }
     
     public EClass getEClass() {
-    	return (EClass)IArchimatePackage.eINSTANCE.getEClassifier(this.label.getToolTipText());
+    	return (EClass)IArchimatePackage.eINSTANCE.getEClassifier(this.getToolTipText());
     }
 }

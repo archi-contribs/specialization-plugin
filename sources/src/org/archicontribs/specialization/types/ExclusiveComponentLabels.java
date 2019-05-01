@@ -18,15 +18,15 @@ public class ExclusiveComponentLabels {
     @Getter List<ComponentLabel> allComponentLabels = new ArrayList<ComponentLabel>();
     
     public ComponentLabel add(Composite parent, @SuppressWarnings("rawtypes") Class clazz) {
-        ComponentLabel componentLabel = new ComponentLabel(parent, clazz);
+        ComponentLabel componentLabel = new ComponentLabel(parent, SWT.NONE, clazz);
         this.allComponentLabels.add(componentLabel);
         
-        componentLabel.getLabel().addListener(SWT.MouseUp, new Listener() {
+        componentLabel.addListener(SWT.MouseUp, new Listener() {
             @Override public void handleEvent(Event event) {
                 for ( ComponentLabel lbl: ExclusiveComponentLabels.this.allComponentLabels ) {
-                    if ( lbl.isSelected() && !lbl.getLabel().equals(event.widget) ) {
+                    if ( lbl.isSelected() && !lbl.equals(event.widget) ) {
                         lbl.setSelected(false);
-                        lbl.label.redraw();
+                        lbl.redraw();
                     }
                 }
             }
@@ -40,5 +40,12 @@ public class ExclusiveComponentLabels {
             if ( lbl.isSelected() )
                 return lbl;
         return null;
+    }
+    
+    public boolean isDisposed() {
+    	for ( ComponentLabel lbl: this.allComponentLabels )
+            if ( lbl.isDisposed() )
+                return true;
+        return false;
     }
 }
