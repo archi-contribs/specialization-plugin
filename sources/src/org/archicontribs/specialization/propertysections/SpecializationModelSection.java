@@ -751,9 +751,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				SpecializationModelSection.this.btnNewProperty.setEnabled(false);
 				SpecializationModelSection.this.btnDeleteProperty.setEnabled(false);
 				
-				SpecializationModelSection.this.elementFigure.setEClass(null);
-				SpecializationModelSection.this.elementFigure.setIconSize("");
-				SpecializationModelSection.this.elementFigure.setIconLocation("");
+				SpecializationModelSection.this.elementFigure.reset();
 				SpecializationModelSection.this.elementFigure.setEnabled(false);
 
 				if ( event.widget == null ) {
@@ -767,7 +765,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 					List<ElementSpecialization> specialisationList = SpecializationModelSection.this.elementSpecializationMap.get(componentClass);
 					if ( specialisationList != null ) {
 						for (ElementSpecialization elementSpecialization: SpecializationModelSection.this.elementSpecializationMap.get(componentClass))
-							SpecializationModelSection.this.comboSpecializationNames.add(elementSpecialization.getName());
+							SpecializationModelSection.this.comboSpecializationNames.add(elementSpecialization.getSpecializationName());
 					}
 					
 					SpecializationModelSection.this.comboSpecializationNames.setEnabled(true);
@@ -818,7 +816,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 								// renamed specialization
 								logger.trace("Renaming specialization "+SpecializationModelSection.this.comboSpecializationNames.getPreviousValue()+" to "+specializationName);
 								elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
-								elementSpecialization.setName(specializationName);
+								elementSpecialization.setSpecializationName(specializationName);
 							}
 							setMetadata();
 						}
@@ -830,10 +828,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 						SpecializationModelSection.this.btnNewProperty.setEnabled(true);
 						SpecializationModelSection.this.btnDeleteProperty.setEnabled(!elementSpecialization.getProperties().isEmpty());
 						
-						SpecializationModelSection.this.elementFigure.setEClass(SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getEClass());
-						SpecializationModelSection.this.elementFigure.select(elementSpecialization.getFigure());
-						SpecializationModelSection.this.elementFigure.setIconSize(elementSpecialization.getIconSize());
-						SpecializationModelSection.this.elementFigure.setIconLocation(elementSpecialization.getIconLocation());
+						SpecializationModelSection.this.elementFigure.setEClass(SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getEClass(), elementSpecialization);
 						SpecializationModelSection.this.elementFigure.setEnabled(true);
 					}
 				}
@@ -997,6 +992,9 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
 				ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, specializationName);
 				elementSpecialization.setFigure(((ElementFigure)e.widget).getSelectedFigure());
+				elementSpecialization.setIconName(((ElementFigure)e.widget).getIconName());
+				elementSpecialization.setIconSize(((ElementFigure)e.widget).getIconSize());
+				elementSpecialization.setIconLocation(((ElementFigure)e.widget).getIconLocation());
 				
 				setMetadata();
 			}
@@ -1080,6 +1078,9 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
 			if ( this.exclusiveComponentLabels != null )
 				this.exclusiveComponentLabels.setModel(selectedModel);
+			
+			if ( this.elementFigure != null )
+				this.elementFigure.setModel(selectedModel);
 
 			if ( selectedModel.getMetadata() == null ) {
 				selectedModel.setMetadata(IArchimateFactory.eINSTANCE.createMetadata());
