@@ -26,7 +26,7 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
     	List<ElementSpecialization> types = get(clazz);
     	if ( types != null ) {
     		for ( int index = 0 ; index < types.size() ; ++index ) {
-    			if ( types.get(index).getName().equals(name) )
+    			if ( types.get(index).getSpecializationName().equals(name) )
     				return types.get(index);
     		}
     	}

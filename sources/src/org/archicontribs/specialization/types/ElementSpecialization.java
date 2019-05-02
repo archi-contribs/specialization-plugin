@@ -8,8 +8,6 @@ package org.archicontribs.specialization.types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.graphics.Image;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,14 +17,14 @@ import lombok.Setter;
  * @author Herve Jouin
  */
 public class ElementSpecialization {
-    @Getter @Setter private String name;
-    @Getter @Setter private Image icon = null;
-    @Getter @Setter private int figure = 0;       // 0 or 1 if the alternate figure is selected 
+    @Getter @Setter private String specializationName;
+    @Getter @Setter private int figure = 0;       // 0 or 1 if the alternate figure is selected
+    @Getter @Setter private String iconName = "";
     @Getter @Setter private String iconSize = "";
     @Getter @Setter private String iconLocation = "";
     @Getter private List<SpecializationProperty> properties = new ArrayList<SpecializationProperty>();
     
     public ElementSpecialization(String name) {
-        this.name = name;
+        this.specializationName = name;
     }
 }
