@@ -1,5 +1,6 @@
 package org.archicontribs.specialization.preferences;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
@@ -65,12 +66,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 	
 	private TabFolder tabFolder;
 	private Button btnCheckForUpdateAtStartupButton;
-	private Button btnAlwaysReplaceIconsInModelTree;
-	private Button btnNeverReplaceIconsInModelTree;
-	private Button btnAlwaysReplaceIconsInViews;
-	private Button btnNeverReplaceIconsInViews;
-    private Button btnAlwaysReplaceLabelsInViews;
-    private Button btnNeverReplaceLabelsInViews;
 	boolean mouseOverHelpButton = false;
 	private Composite loggerComposite;
 	private RadioGroupFieldEditor loggerModeRadioGroupEditor;
@@ -316,46 +311,14 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     	if ( logger.isTraceEnabled() ) logger.trace("   setting checkForUpdateAtStartup = "+this.btnCheckForUpdateAtStartupButton.getSelection());
     	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("checkForUpdateAtStartup", this.btnCheckForUpdateAtStartupButton.getSelection());
     	
-    	if ( logger.isTraceEnabled() ) logger.trace("   setting showImagesInView = "+this.btnAlwaysReplaceIconsInViews.getSelection());
-    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("showImagesInView", this.btnAlwaysReplaceIconsInViews.getSelection());
-    	
-    	String value;
-    	if ( this.btnAlwaysReplaceIconsInModelTree.getSelection() )
-    	    value = "always";
-    	else if ( this.btnNeverReplaceIconsInModelTree.getSelection() )
-            value = "never";
-    	else 
-    	    value = "";
-    	if ( logger.isTraceEnabled() ) logger.trace("   setting mustReplaceIconsInTree = "+value);
-    	SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceIconsInTree", value);
-    	
-        if ( this.btnAlwaysReplaceIconsInViews.getSelection() )
-            value = "always";
-        else if ( this.btnNeverReplaceIconsInViews.getSelection() )
-            value = "never";
-        else 
-            value = "";
-        if ( logger.isTraceEnabled() ) logger.trace("   setting mustReplaceIconsInViews = "+value);
-        SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceIconsInViews", value);
-        
-        
-        if ( this.btnAlwaysReplaceLabelsInViews.getSelection() )
-            value = "always";
-        else if ( this.btnNeverReplaceLabelsInViews.getSelection() )
-            value = "never";
-        else 
-            value = "";
-        if ( logger.isTraceEnabled() ) logger.trace("   setting mustReplaceLabelsInViews = "+value);
-        SpecializationPlugin.INSTANCE.getPreferenceStore().setValue("mustReplaceLabelsInViews", value);
-    	
     	// the loggerMode is a private property, so we use reflection to access it
 		try {
 			Field field = RadioGroupFieldEditor.class.getDeclaredField("value");
 			field.setAccessible(true);
 			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerMode = "+(String)field.get(this.loggerModeRadioGroupEditor));
 			field.setAccessible(false);
-		} catch (Exception err) {
-			logger.error("Failed to retrieve the \"loggerMode\" value from the preference page", err);
+		} catch (@SuppressWarnings("unused") Exception err) {
+			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerMode");
 		}
 		this.loggerModeRadioGroupEditor.store();
     	
@@ -364,13 +327,37 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 			Field field = RadioGroupFieldEditor.class.getDeclaredField("value");
 			field.setAccessible(true);
 			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerLevel = "+(String)field.get(this.loggerLevelRadioGroupEditor));
+			// if the logger is configured in simple mode, we check that the file is writable
+			if ( ((String)field.get(this.loggerLevelRadioGroupEditor)).equals("simple") ) {
+		    	File file = new File(this.filenameFileFieldEditor.getStringValue());
+		    	if ( !file.exists() ) {
+		    		try {
+		    			file.createNewFile();
+		    		} catch (IOException err) {
+		    			SpecializationPlugin.popup(Level.ERROR, "Cannot create file \""+this.filenameFileFieldEditor.getStringValue()+"\".", err);
+		    			return false;
+		    		}
+		    	}
+		    	try {
+			    	if ( !file.canWrite() ) {
+			    		SpecializationPlugin.popup(Level.ERROR, "Cannot write to file \""+this.filenameFileFieldEditor.getStringValue()+"\".");
+						return false;
+			    	}
+			    	if ( !file.canRead() ) {
+			    		SpecializationPlugin.popup(Level.ERROR, "Cannot read from file \""+this.filenameFileFieldEditor.getStringValue()+"\".");
+						return false;
+			    	}
+		    	} catch (SecurityException err) {
+		    		SpecializationPlugin.popup(Level.ERROR, "Cannot check if the file \""+this.filenameFileFieldEditor.getStringValue()+"\" can be written.", err);
+					return false;
+		    	}
+			}
 			field.setAccessible(false);
-		} catch (Exception err) {
-			logger.error("Failed to retrieve the \"loggerLevel\" value from the preference page", err);
+		} catch (@SuppressWarnings("unused") Exception err) {
+			if ( logger.isTraceEnabled() ) logger.trace("   setting loggerLevel");
 		}
 		this.loggerLevelRadioGroupEditor.store();
 		
-			//TODO : if we are in simple mode, check that is is a valid writable filename
 		if ( logger.isTraceEnabled() ) logger.trace("   setting loggerFilename = "+this.filenameFileFieldEditor.getStringValue());
 		this.filenameFileFieldEditor.store();
 		
@@ -378,16 +365,16 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		this.expertTextFieldEditor.store();
 		
         try {
-        	if ( logger.isDebugEnabled() ) logger.debug("setting Saving the preference store to disk.");
             ((IPersistentPreferenceStore)SpecializationPlugin.INSTANCE.getPreferenceStore()).save();
         } catch (IOException err) {
         	SpecializationPlugin.popup(Level.ERROR, "Failed to save the preference store to disk.", err);
+        	return false;
         }
 		
 		try {
 			logger.configure();
-		} catch (Exception e) {
-			SpecializationPlugin.popup(Level.ERROR, "Faied to configure logger", e);
+		} catch (Exception err) {
+			SpecializationPlugin.popup(Level.ERROR, "Failed to configure logger", err);
 		}
     	return true;
     }
