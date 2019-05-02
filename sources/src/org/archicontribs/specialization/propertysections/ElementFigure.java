@@ -57,6 +57,8 @@ public class ElementFigure extends Composite {
 	static final int figureMargin = 2;
 	static final String canChangeIconString = "canChangeIcon";
 	
+	static final String ID_PREFIX = "";
+	
 	IArchimateModel model = null;
 
 	Label lblIconSize = null;
@@ -380,7 +382,10 @@ public class ElementFigure extends Composite {
         }
         
         IDiagramModelArchimateObject dmo = IArchimateFactory.eINSTANCE.createDiagramModelArchimateObject();
-        dmo.setArchimateElement((IArchimateElement)IArchimateFactory.eINSTANCE.create(eClass));
+        IArchimateElement elm = (IArchimateElement)IArchimateFactory.eINSTANCE.create(eClass);
+        elm.setId(ID_PREFIX+type);
+        dmo.setId(ID_PREFIX+type+""+type);
+        dmo.setArchimateElement(elm);
         dmo.setName(provider.getDefaultName());
         dmo.setTextPosition(provider.getDefaultTextPosition());
         dmo.setTextAlignment(provider.getDefaultTextAlignment());
@@ -391,7 +396,7 @@ public class ElementFigure extends Composite {
         editPart.setModel(dmo);
         
         IDiagramModelObjectFigure figure = (IDiagramModelObjectFigure)editPart.getFigure();
-        figure.setSize(new Dimension(120, 55));
+        figure.setSize(new Dimension(SpecializationPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH), SpecializationPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT)));
         figure.refreshVisuals();
         figure.validate();
 

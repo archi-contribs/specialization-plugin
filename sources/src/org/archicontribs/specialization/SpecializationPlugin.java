@@ -766,38 +766,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * This method calculates if the object's icon must be replaced.
-	 * @param obj
-	 * @return
-	 */
-	public static boolean mustReplaceIcon(EObject obj) {
-		if ( obj == null )
-			return false;
-		
-		// we do not replace the icon if the figure is in the PropertiesLabelProvider
-		if ( "com.archimatetool.editor.propertysections.PropertiesLabelProvider".equals(new Exception().getStackTrace()[3].getClassName()) )
-			return false;
-		
-		// if the obj is in the model, we check that it is in a view
-		if ( obj.eContainer() != null ) {
-			EObject container = obj;
-			while ( (container != null) && !(container instanceof IDiagramModel) )
-				container = container.eContainer();
-
-			if ( container == null ) {
-				return false; 
-			}
-		}
-		
-		ElementSpecialization elementSpecialization = ElementSpecializationMap.getElementSpecialization(obj);
-		
-		if ( elementSpecialization != null )
-			return elementSpecialization.getIconName() != null;
-		
-		return false;
-	}
-
-	/**
 	 * Gets the Image from the icon name and icon size from the EObject properties
 	 * @param obj
 	 * @return
@@ -808,6 +776,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		
 		// we do not replace the icon if the figure is in the PropertiesLabelProvider
 		if ( "com.archimatetool.editor.propertysections.PropertiesLabelProvider".equals(new Exception().getStackTrace()[3].getClassName()) )
+			return null;
+		
+		// we do not replace the icon if the object has not got an ID
+		if ( ((IIdentifier)obj).getId() == null )
 			return null;
 		
 		// if the obj is in the model, we check that it is in a view
