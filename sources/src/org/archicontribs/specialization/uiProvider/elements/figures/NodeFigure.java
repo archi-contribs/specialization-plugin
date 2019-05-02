@@ -19,7 +19,7 @@ public class NodeFigure extends com.archimatetool.editor.diagram.figures.element
     
     @Override
     protected void drawIcon(Graphics graphics) {
-    	if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) && (SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon") != null) )
+    	if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) )
     		SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
     	else
     		super.drawIcon(graphics);

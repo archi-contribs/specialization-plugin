@@ -8,11 +8,16 @@ import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.types.ElementSpecialization;
 import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -24,15 +29,27 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.archimatetool.canvas.model.ICanvasModel;
 import com.archimatetool.editor.ArchiPlugin;
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 import com.archimatetool.editor.diagram.figures.IDiagramModelObjectFigure;
 import com.archimatetool.editor.diagram.figures.RectangleFigureDelegate;
+import com.archimatetool.editor.diagram.util.DiagramUtils;
 import com.archimatetool.editor.model.IArchiveManager;
 import com.archimatetool.editor.propertysections.ImageManagerDialog;
-import com.archimatetool.editor.ui.FigureImagePreviewFactory;
+import com.archimatetool.editor.ui.ColorFactory;
+import com.archimatetool.editor.ui.factory.IArchimateElementUIProvider;
+import com.archimatetool.editor.ui.factory.IGraphicalObjectUIProvider;
 import com.archimatetool.editor.ui.factory.ObjectUIFactory;
+import com.archimatetool.model.FolderType;
+import com.archimatetool.model.IArchimateElement;
+import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
+import com.archimatetool.model.IDiagramModel;
+import com.archimatetool.model.IDiagramModelArchimateObject;
+import com.archimatetool.model.IDiagramModelImage;
+import com.archimatetool.model.IDiagramModelObject;
+import com.archimatetool.model.util.IDAdapter;
 
 public class ElementFigure extends Composite {
 	static final SpecializationLogger logger = new SpecializationLogger(ElementFigure.class);
@@ -57,6 +74,8 @@ public class ElementFigure extends Composite {
 	Composite innerCompo2 = null;
 	Label figure1 = null;
 	Label figure2 = null;
+	
+	EClass eClass = null;
 
 	Composite selectedFigure = null;
 
@@ -97,6 +116,13 @@ public class ElementFigure extends Composite {
 		fd.width = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH);
 		fd.height = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT);
 		this.figure1.setLayoutData(fd);
+		this.figure1.addDisposeListener(new DisposeListener() {
+			@Override public void widgetDisposed(DisposeEvent e) {
+				Image oldImage = ((Label)e.widget).getBackgroundImage();
+				if ( oldImage != null )
+					oldImage.dispose();
+			}
+		});
 
 		// figure 2
 		this.outerCompo2 = new Composite(this, SWT.NONE);
@@ -129,6 +155,13 @@ public class ElementFigure extends Composite {
 		fd.width = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH);
 		fd.height = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT);
 		this.figure2.setLayoutData(fd);
+		this.figure2.addDisposeListener(new DisposeListener() {
+			@Override public void widgetDisposed(DisposeEvent e) {
+				Image oldImage = ((Label)e.widget).getBackgroundImage();
+				if ( oldImage != null )
+					oldImage.dispose();
+			}
+		});
 
 
 		// buttons icon
@@ -143,18 +176,62 @@ public class ElementFigure extends Composite {
 		this.btnNewIcon.setLayoutData(fd);
 		this.btnNewIcon.addListener(SWT.MouseUp, new Listener() {
 			@Override public void handleEvent(Event event) {
-				ImageManagerDialog dialog = new ImageManagerDialog(parent.getShell(), ElementFigure.this.model, null);
+				ImageManagerDialog dialog = new ImageManagerDialog(parent.getShell(), ElementFigure.this.model, ElementFigure.this.iconName);
 
 				if(dialog.open() == Window.OK) {
 					Object selectedObject = dialog.getSelectedObject();
 			        
 			        try {
 			            if ( selectedObject instanceof File )			// User selected a file
-		                	ElementFigure.this.iconName = ((IArchiveManager)ElementFigure.this.model.eAdapters().get(0)).addImageFromFile((File)selectedObject);
+		                	ElementFigure.this.iconName = ((IArchiveManager)ElementFigure.this.model.getAdapter(IArchiveManager.class)).addImageFromFile((File)selectedObject);
 			            else									// User selected an existing image from the model
 			            	ElementFigure.this.iconName = (String)selectedObject;
 		            } catch(Exception err) {
 			        	SpecializationPlugin.popup(Level.ERROR, "Cannot use file "+selectedObject, err);
+			        }
+			        
+			        // We check that the model contains a DiagramModelImage with the selected image
+			        IDiagramModel diagram = null; 
+			        for ( IDiagramModel d: ElementFigure.this.model.getDiagramModels() ) {
+			        	if ( (d instanceof ICanvasModel ) && (d.getName().equals("SpecializationsPluginCanvas")) ) {
+			        		logger.trace("diagram found !!!");
+			        		diagram = d;
+			        		break;
+			        	}
+			        }
+			        
+			        if ( diagram == null ) {
+			        	// we create a folder
+			        	diagram = IArchimateFactory.eINSTANCE.createArchimateDiagramModel();
+			        	diagram.setId(new IDAdapter().getNewID());
+			        	diagram.setName("SpecializationsPluginCanvas");
+			        	diagram.setDocumentation("This canvas is used by the Specialization Plugin to keep the images that are configured in the specializations.\n\nPlease do not modify nor delete it.");
+			        	ElementFigure.this.model.getFolder(FolderType.DIAGRAMS).getElements().add(diagram);
+			        }
+			        
+			        IDiagramModelImage diagramModelImage = null;
+			        for ( IDiagramModelObject d: diagram.getChildren() ) {
+			        	if ( d.getName().equals(ElementFigure.this.iconName) && (d instanceof IDiagramModelImage) ) {
+			        		diagramModelImage = (IDiagramModelImage)d;
+			        		break;
+			        	}
+			        }
+			        
+			        if ( diagramModelImage == null ) {
+			        	diagramModelImage = IArchimateFactory.eINSTANCE.createDiagramModelImage();
+			        	diagramModelImage.setId(new IDAdapter().getNewID());
+			        	diagramModelImage.setName(ElementFigure.this.iconName);
+			        	diagramModelImage.setDocumentation("This image stores the image required by the Specialization Plugin.");
+			        	diagramModelImage.setImagePath(ElementFigure.this.iconName);
+			        	try {
+			                Image image = ((IArchiveManager)ElementFigure.this.model.getAdapter(IArchiveManager.class)).createImage(ElementFigure.this.iconName);
+			                diagramModelImage.setBounds(image.getBounds().x, image.getBounds().y, image.getBounds().width, image.getBounds().height);
+			                image.dispose();
+			            }
+			            catch(@SuppressWarnings("unused") Exception err) {
+			            	diagramModelImage.setBounds(0, 0, 50, 50);
+			            }
+			        	diagram.getChildren().add(diagramModelImage);
 			        }
 			        
 			        if ( ElementFigure.this.iconName != null ) {
@@ -174,7 +251,7 @@ public class ElementFigure extends Composite {
 		fd.left = new FormAttachment(this.outerCompo2, 5);
 		fd.right = new FormAttachment(this.outerCompo2, 40, SWT.RIGHT);
 		this.btnDeleteIcon.setLayoutData(fd);
-		this.btnNewIcon.addListener(SWT.MouseUp, new Listener() {
+		this.btnDeleteIcon.addListener(SWT.MouseUp, new Listener() {
 			@Override public void handleEvent(Event event) {
 				ElementFigure.this.iconName = null;
 				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
@@ -223,10 +300,16 @@ public class ElementFigure extends Composite {
 
 	void reset() {
 		this.outerCompo1.setBackground(this.outerCompo1.getParent().getBackground());
+		Image oldImage = this.figure1.getBackgroundImage();
 		this.figure1.setBackgroundImage(null);
+		if ( oldImage != null )
+			oldImage.dispose();
 
 		this.outerCompo2.setBackground(this.outerCompo2.getParent().getBackground());
+		oldImage = this.figure2.getBackgroundImage();
 		this.figure2.setBackgroundImage(null);
+		if ( oldImage != null )
+			oldImage.dispose();
 
 		this.selectedFigure = null;
 
@@ -239,11 +322,12 @@ public class ElementFigure extends Composite {
 	}
 
 	public void setEClass(EClass eClass) {
+		this.eClass = eClass;
+		
 		if ( eClass == null ) {
 			reset();
 		} else {
-			this.figure1.setBackgroundImage(FigureImagePreviewFactory.getPreviewImage(eClass, 0));
-			this.figure2.setBackgroundImage(FigureImagePreviewFactory.getPreviewImage(eClass, 1));
+			resetPreviewImages();
 
 			IDiagramModelObjectFigure figure = ((ArchimateElementEditPart)ObjectUIFactory.INSTANCE.getProviderForClass(eClass).createEditPart()).getFigure();
 
@@ -264,9 +348,57 @@ public class ElementFigure extends Composite {
 				this.outerCompo1.setData(canChangeIconString, true);
 				this.outerCompo2.setData(canChangeIconString, true);
 			}
-
 		}
 	}
+	
+	void resetPreviewImages() {
+		Image oldImage = this.figure1.getBackgroundImage();
+		this.figure1.setBackgroundImage(getPreviewImage(this.eClass, 0));
+		if ( oldImage != null )
+			oldImage.dispose();
+		
+		oldImage = this.figure2.getBackgroundImage();
+		this.figure2.setBackgroundImage(getPreviewImage(this.eClass, 1));
+		if ( oldImage != null )
+			oldImage.dispose();
+	}
+	
+	static Image getPreviewImage(EClass eClass, int type) {
+        if(type < 0 || type > 1) {
+            return null;
+        }
+        
+        IGraphicalObjectUIProvider provider = (IGraphicalObjectUIProvider)ObjectUIFactory.INSTANCE.getProviderForClass(eClass);
+
+        if(!(provider instanceof IArchimateElementUIProvider)) {
+            return null;
+        }
+        
+        // No alternate figure
+        if(type > 0 && !((IArchimateElementUIProvider)provider).hasAlternateFigure()) {
+            return null;
+        }
+        
+        IDiagramModelArchimateObject dmo = IArchimateFactory.eINSTANCE.createDiagramModelArchimateObject();
+        dmo.setArchimateElement((IArchimateElement)IArchimateFactory.eINSTANCE.create(eClass));
+        dmo.setName(provider.getDefaultName());
+        dmo.setTextPosition(provider.getDefaultTextPosition());
+        dmo.setTextAlignment(provider.getDefaultTextAlignment());
+        ColorFactory.setDefaultColors(dmo);
+        dmo.setType(type);
+
+        GraphicalEditPart editPart = (GraphicalEditPart)provider.createEditPart();
+        editPart.setModel(dmo);
+        
+        IDiagramModelObjectFigure figure = (IDiagramModelObjectFigure)editPart.getFigure();
+        figure.setSize(new Dimension(120, 55));
+        figure.refreshVisuals();
+        figure.validate();
+
+        Image image = DiagramUtils.createImage(figure, 1, 0);
+        
+        return image;
+    }
 	
 	public void setEClass(EClass eClass, ElementSpecialization elementSpecialization) {
 		setEClass(eClass);
@@ -322,7 +454,7 @@ public class ElementFigure extends Composite {
 	}
 
 	public String getIconName() {
-		if ( canChangeIcon() )
+		if ( canChangeIcon() && (this.iconName != null) && !this.iconName.isEmpty() )
 			return this.iconName;
 		return null;
 	}
@@ -332,23 +464,29 @@ public class ElementFigure extends Composite {
 	}
 
 	public String getIconSize() {
-		if ( canChangeIcon() )
+		if ( canChangeIcon() && !this.txtIconSize.getText().isEmpty() )
 			return this.txtIconSize.getText();
-		return "";
-	}
-
-	public String getIconLocation() {
-		if ( canChangeIcon() )
-			return this.txtIconLocation.getText();
-		return "";
+		return null;
 	}
 
 	public void setIconSize(String iconSize) {
-		this.txtIconSize.setText(iconSize);
+		if ( iconSize == null )
+			this.txtIconSize.setText("");
+		else
+			this.txtIconSize.setText(iconSize);
+	}
+
+	public String getIconLocation() {
+		if ( canChangeIcon() && !this.txtIconLocation.getText().isEmpty() )
+			return this.txtIconLocation.getText();
+		return null;
 	}
 
 	public void setIconLocation(String iconLocation) {
-		this.txtIconLocation.setText(iconLocation);
+		if ( iconLocation == null )
+			this.txtIconLocation.setText("");
+		else
+			this.txtIconLocation.setText(iconLocation);
 	}
 
 	private MouseAdapter selectListener = new MouseAdapter() {

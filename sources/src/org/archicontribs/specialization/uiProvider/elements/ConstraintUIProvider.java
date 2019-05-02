@@ -33,7 +33,7 @@ public class ConstraintUIProvider extends com.archimatetool.editor.ui.factory.el
     @Override
     public Image getImage() {
     	if ( SpecializationPlugin.mustReplaceIcon(this.instance) ) {
-    	    Image image = SpecializationPlugin.getImage(this.instance);
+    	    Image image = SpecializationPlugin.getIcon(this.instance);
             if ( image != null ) {
                 if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(this.instance)+": Displaying custom icon");
                 return image;

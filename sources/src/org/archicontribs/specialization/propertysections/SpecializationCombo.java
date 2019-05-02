@@ -240,7 +240,10 @@ public class SpecializationCombo extends Composite {
 	}
 	
 	public void add(String string) {
-		this.combo.add(string);
+		if ( string == null )
+			this.combo.add("???");	// just in case, to avoid exception
+		else
+			this.combo.add(string);
 	}
 	
 	public void select(int index) {

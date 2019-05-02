@@ -11,11 +11,11 @@ import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.commands.SpecializationUpdateMetadataCommand;
-import org.archicontribs.specialization.types.SpecializationProperty;
-import org.archicontribs.specialization.types.ElementSpecialization;
 import org.archicontribs.specialization.types.ComponentLabel;
-import org.archicontribs.specialization.types.ExclusiveComponentLabels;
+import org.archicontribs.specialization.types.ElementSpecialization;
 import org.archicontribs.specialization.types.ElementSpecializationMap;
+import org.archicontribs.specialization.types.ExclusiveComponentLabels;
+import org.archicontribs.specialization.types.SpecializationProperty;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -47,10 +47,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.PlatformUI;
 
-import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimatePackage;
-import com.archimatetool.model.IProperty;
 import com.archimatetool.model.impl.ApplicationCollaboration;
 import com.archimatetool.model.impl.ApplicationComponent;
 import com.archimatetool.model.impl.ApplicationEvent;
@@ -111,13 +109,14 @@ import com.archimatetool.model.impl.TechnologyProcess;
 import com.archimatetool.model.impl.TechnologyService;
 import com.archimatetool.model.impl.Value;
 import com.archimatetool.model.impl.WorkPackage;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+import lombok.Getter;
 
 //TODO: use commands everywhere to allow undo/redo
 
 public class SpecializationModelSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
+	
+	public static SpecializationModelSection INSTANCE;
 
 	ExclusiveComponentLabels exclusiveComponentLabels = null;
 
@@ -136,7 +135,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	Button btnDeleteProperty = null;
 	ElementFigure elementFigure = null;
 
-	IArchimateModel model = null;
+	@Getter IArchimateModel currentModel = null;
 
 	boolean mouseOverHelpButton = false;
 
@@ -995,8 +994,11 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				elementSpecialization.setIconName(((ElementFigure)e.widget).getIconName());
 				elementSpecialization.setIconSize(((ElementFigure)e.widget).getIconSize());
 				elementSpecialization.setIconLocation(((ElementFigure)e.widget).getIconLocation());
-				
+
 				setMetadata();
+		        
+		        // we force the figures to be redrawn
+				((ElementFigure)e.widget).resetPreviewImages();
 			}
 		});
 
@@ -1063,12 +1065,14 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
 	@Override
 	protected EObject getEObject() {
-		return this.model;
+		return this.currentModel;
 	}
 
 	@Override
 	protected void setElement(Object element) {
 		IArchimateModel selectedModel = (IArchimateModel)new Filter().adaptObject(element);
+		
+		INSTANCE = this;
 
 		if(selectedModel == null) {
 			logger.error("Failed to get model from " + element); //$NON-NLS-1$
@@ -1082,30 +1086,14 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 			if ( this.elementFigure != null )
 				this.elementFigure.setModel(selectedModel);
 
-			if ( selectedModel.getMetadata() == null ) {
-				selectedModel.setMetadata(IArchimateFactory.eINSTANCE.createMetadata());
-				this.elementSpecializationMap = null;
-			}
-			else {
-				IProperty specializationsMetadata = selectedModel.getMetadata().getEntry("Specializations");
-				if ( specializationsMetadata != null ) {
-					try {
-						Gson gson = new Gson();
-						this.elementSpecializationMap = gson.fromJson(specializationsMetadata.getValue(), ElementSpecializationMap.class);
-					} catch (JsonSyntaxException e) {
-						SpecializationPlugin.popup(Level.FATAL, "An exception occured while retrieving the specialization metadata from the model.\n\nThe specialization plugin has been deactivated for this model.",e);
-						//TODO: store the exception in the model and deactivate the plugin for that model
-						//TODO: add an option to erase the specializations metadata and startup again from an empty configuration
-					}
-				}
-			}
+			this.elementSpecializationMap = ElementSpecializationMap.getFromArchimateModel(selectedModel);
 		}
 
 		// TODO: the rest of the code assumes the variable is not null ! add check for null everywhere
 		if ( this.elementSpecializationMap == null )
 			this.elementSpecializationMap = new ElementSpecializationMap();
 
-		if ( selectedModel != this.model ) {
+		if ( selectedModel != this.currentModel ) {
 			if ( this.comboSpecializationNames != null && !this.comboSpecializationNames.isDisposed() )
 				this.comboSpecializationNames.removeAll();
 
@@ -1119,13 +1107,31 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 					lbl.setSelected(false);
 			}
 
-			this.model = selectedModel;
+			this.currentModel = selectedModel;
 		}
+	}
+	
+	public static String getSelectedClass() {
+		if ( SpecializationModelSection.INSTANCE.exclusiveComponentLabels == null )
+			return null;
+		return SpecializationModelSection.INSTANCE.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
+	}
+	
+	public static String getSelectedSpecializationName() {
+		if ( SpecializationModelSection.INSTANCE.comboSpecializationNames == null )
+			return null;
+		return SpecializationModelSection.INSTANCE.comboSpecializationNames.getText();
+	}
+	
+	public static int getSelectedfigure() {
+		if ( SpecializationModelSection.INSTANCE.elementFigure == null )
+			return 0;
+		return SpecializationModelSection.INSTANCE.elementFigure.getSelectedFigure();
 	}
 
 	void setMetadata() {
-		SpecializationUpdateMetadataCommand command = new SpecializationUpdateMetadataCommand(this.model, this.elementSpecializationMap);
-		((CommandStack)SpecializationModelSection.this.model.getAdapter(CommandStack.class)).execute(command);
+		SpecializationUpdateMetadataCommand command = new SpecializationUpdateMetadataCommand(this.currentModel, this.elementSpecializationMap);
+		((CommandStack)SpecializationModelSection.this.currentModel.getAdapter(CommandStack.class)).execute(command);
 
 		//TODO : sort the specialization names
 
