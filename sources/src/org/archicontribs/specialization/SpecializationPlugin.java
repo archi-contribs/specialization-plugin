@@ -59,7 +59,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.archimatetool.editor.model.IArchiveManager;
-import com.archimatetool.editor.ui.factory.ObjectUIFactory;
 import com.archimatetool.model.IArchimateConcept;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimateModelObject;
@@ -966,83 +965,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		return true;
 	}
 
-	/*
-    public static boolean mustReplaceLabel(EObject obj) {
-        if ( obj != null ) {
-            // we determine if the object is in a view or in a folder
-            EObject container = obj;
-            while ( container!=null && !(container instanceof IDiagramModel || container instanceof IFolder) )
-                container = container.eContainer();
-            if ( container == null ) {
-                // Should not happen, but just in case
-                logger.error(getFullName(obj) + " is not in a container");
-                return false; 
-            }
-
-            // then we check the preference in case we should ALWAYS or NEVER replace the labels
-            String mustReplaceLabels;
-            if ( container instanceof IFolder ) {
-                if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": we never change the label in the model tree");
-                return false;
-            }
-
-            mustReplaceLabels =  preferenceStore.getString("mustReplaceLabelsInViews");
-
-            if ( mustReplaceLabels != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels: "+mustReplaceLabels);
-                switch ( mustReplaceLabels ) {
-                    case "always":
-                        return true;
-                    case "never":
-                        return false;
-                    default: // we continue
-                        break;
-                }
-            }
-
-            // the we check if the container has got a "must replace labels"
-            String propertyValue = getPropertyValue(container, "must replace labels");
-            if ( propertyValue != null ) {
-                if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": must replace labels: "+mustReplaceLabels);
-                switch ( propertyValue.toLowerCase() ) {
-                    case "yes":
-                        return true;
-                    case "no":
-                        return false;
-                    default: // we continue
-                        break;
-                }
-            }
-
-            // then we check if the model has got a "must replace labels"
-            IArchimateModel model;
-            if ( obj instanceof IDiagramModelArchimateObject )
-                model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
-            else
-                return false;
-            propertyValue = getPropertyValue(model, "must replace labels");
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": model says must replace labels = "+propertyValue);
-            if ( propertyValue != null ) {
-                switch ( propertyValue.toLowerCase() ) {
-                    case "yes": 
-                        return true;
-                    case "no":
-                        return false;
-                    default: // we continue
-                        break;
-                }
-            }
-
-            if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": defaulting to not replacing the label");
-        } else
-            logger.error("got null object parameter");
-
-        // if we're here, it means that we haven't seen any "must replace labels" property. 
-        // so by default, we do not change the icon
-        return false;
-    }
-	 */
-
 	/**
 	 * Retrieves the label name from the EObject properties
 	 * @param obj
@@ -1110,6 +1032,10 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		}
 		return false;
 	}
+	
+	public static boolean drawIcon(IDiagramModelObject obj, Graphics graphics, Rectangle bounds) {
+		return drawIcon((IDiagramModelArchimateObject)obj, graphics, bounds);
+	}
 
 	/**
 	 * draw an image in a IDiagramModelObject
@@ -1118,15 +1044,21 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	 * @param bounds
 	 * @return true if the icon has been replaced, false if the icon has not been replaced
 	 */
-	public static boolean drawIcon(IDiagramModelObject obj, Graphics graphics, Rectangle bounds) {
-		Image image = ObjectUIFactory.INSTANCE.getProvider(obj).getImage();
-
+	public static boolean drawIcon(IDiagramModelArchimateObject obj, Graphics graphics, Rectangle bounds) {
+		IArchimateConcept concept = obj.getArchimateConcept();
+		ElementSpecialization elementSpecialization = ElementSpecializationMap.getElementSpecialization(concept);
+		
+		if ( (elementSpecialization == null) || (elementSpecialization.getIconName() == null) || elementSpecialization.getIconName().isEmpty() )
+			return false;
+		
+		Image image = getIcon(obj);
+		
 		if ( image == null ) {
 			logger.error("Image not found");
 			return false;
 		}
 
-		String iconLocation = SpecializationPlugin.getPropertyValue(obj, "icon location");
+		String iconLocation = elementSpecialization.getIconLocation();
 
 		int defaultX = bounds.x + bounds.width - image.getBounds().width - SpecializationPlugin.getIconMargin();
 		int defaultY = bounds.y + SpecializationPlugin.getIconMargin();

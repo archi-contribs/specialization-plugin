@@ -19,10 +19,8 @@ public class PlateauFigure extends com.archimatetool.editor.diagram.figures.elem
     
     @Override
     protected void drawIcon(Graphics graphics) {
-    	if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) && (SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon") != null) )
-    		SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
-    	else
-    		super.drawIcon(graphics);
+    	if ( !SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds) )
+			super.drawIcon(graphics);
     }
     
     @Override

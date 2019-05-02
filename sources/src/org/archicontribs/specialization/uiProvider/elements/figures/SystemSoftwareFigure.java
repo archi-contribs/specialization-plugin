@@ -10,7 +10,6 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.text.TextFlow;
 
-
 /**
  * System Software Service Figure
  * 
@@ -20,10 +19,8 @@ public class SystemSoftwareFigure extends com.archimatetool.editor.diagram.figur
     
     @Override
     protected void drawIcon(Graphics graphics) {
-    	if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) && (SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon") != null) )
-    		SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
-    	else
-    		super.drawIcon(graphics);
+    	if ( !SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds) )
+			super.drawIcon(graphics);
     }
     
     @Override

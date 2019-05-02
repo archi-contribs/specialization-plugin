@@ -1114,7 +1114,10 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	public static String getSelectedClass() {
 		if ( SpecializationModelSection.INSTANCE.exclusiveComponentLabels == null )
 			return null;
-		return SpecializationModelSection.INSTANCE.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
+		Label label = SpecializationModelSection.INSTANCE.exclusiveComponentLabels.getSelectedComponentLabel();
+		if ( (label == null) || label.isDisposed() )
+			return null;
+		return label.getToolTipText();
 	}
 	
 	public static String getSelectedSpecializationName() {

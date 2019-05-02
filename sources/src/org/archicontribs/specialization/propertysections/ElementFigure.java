@@ -396,7 +396,7 @@ public class ElementFigure extends Composite {
         editPart.setModel(dmo);
         
         IDiagramModelObjectFigure figure = (IDiagramModelObjectFigure)editPart.getFigure();
-        figure.setSize(new Dimension(SpecializationPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH), SpecializationPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT)));
+        figure.setSize(new Dimension(ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH), ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT)));
         figure.refreshVisuals();
         figure.validate();
 
