@@ -198,7 +198,6 @@ public class ElementFigure extends Composite {
 			        ICanvasModel canvas = null; 
 			        for ( IDiagramModel d: ElementFigure.this.model.getDiagramModels() ) {
 			        	if ( (d instanceof ICanvasModel ) && (d.getName().equals(CANVAS_NAME)) ) {
-			        		logger.trace("diagram found !!!");
 			        		canvas = (ICanvasModel)d;
 			        		break;
 			        	}
