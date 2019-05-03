@@ -117,15 +117,16 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 			// no specialization for objects that do don have an id
 			if ( concept.getId() == null )
 				return null;
-				
+			
+			String traceMessage;
 			if ( concept.getArchimateModel() == null ) {
 				// if no object is provided, we return the icon name from the SpecializationModelSection page
-				logger.trace("getting the icon name from the SpecializationModelSection page");
+				traceMessage = "getting the icon name from the SpecializationModelSection page";
 				clazz = SpecializationModelSection.getSelectedClass();
 				specializationName = SpecializationModelSection.getSelectedSpecializationName();
 				elementSpecializationMap = getFromArchimateModel(SpecializationModelSection.INSTANCE.getCurrentModel());
 			} else {
-				logger.trace("getting the icon name from the concept properties");
+				traceMessage = "getting the icon name from the concept properties";
 				for ( IProperty prop: concept.getProperties() ) {
 					if ( prop.getKey().equals(SpecializationPlugin.PROPERTY_KEY) ) {
 						clazz = concept.getClass().getSimpleName().replaceAll(" ",  "");
@@ -136,8 +137,13 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 				}
 			}
 	
+			ElementSpecialization elementSpecialization = null;
 			if ( elementSpecializationMap != null )
-				return elementSpecializationMap.getElementSpecialization(clazz, specializationName);
+				elementSpecialization = elementSpecializationMap.getElementSpecialization(clazz, specializationName);
+			
+			logger.trace(traceMessage+" ("+(elementSpecialization == null ? "null" : elementSpecialization.getIconName())+")");
+			
+			return elementSpecialization;
 		}
 		return null;
 	}

@@ -434,8 +434,6 @@ public class ElementFigure extends Composite {
 
 				logger.trace("canChangeIcon = " + canChangeIcon);
 			}
-
-			this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
 		}
 	}
 
@@ -466,7 +464,6 @@ public class ElementFigure extends Composite {
 	
 	public void setIconName(String name) {
 		this.iconName = name;
-        ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
 	}
 
 	public String getIconSize() {
@@ -498,8 +495,12 @@ public class ElementFigure extends Composite {
 	private MouseAdapter selectListener = new MouseAdapter() {
 		@Override
 		public void mouseDown(MouseEvent e) {
-			if ( ((Label)e.widget).getBackgroundImage() != null )
-				select(((Label)e.widget).getParent().getParent());		// we select the outer composite
+			Composite outerComposite = ((Label)e.widget).getParent().getParent();
+			// if the outer composite is not yet selected, we select it
+			if ( outerComposite != ElementFigure.this.selectedFigure ) {
+				select(outerComposite);
+				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+			}
 		}
 	};
 }

@@ -25,8 +25,10 @@ public class SpecializationUpdateMetadataCommand extends Command {
 	boolean executed = false;
 	boolean metadataChanged = false;
 
-	public SpecializationUpdateMetadataCommand(IArchimateModel model, ElementSpecializationMap specializationsMap) {
+	public SpecializationUpdateMetadataCommand(IArchimateModel model, ElementSpecializationMap specializationsMap, String label) {
 		this.model = model;
+		
+		setLabel(label);
 		
 		this.oldMetadata = this.model.getMetadata();
 		if ( this.oldMetadata != null ) {

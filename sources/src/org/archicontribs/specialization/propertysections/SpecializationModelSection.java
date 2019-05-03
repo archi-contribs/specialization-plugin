@@ -789,7 +789,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 						else {
 							logger.trace("Specialization removed: "+SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
 							SpecializationModelSection.this.elementSpecializationMap.removeElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
-							setMetadata();
+							setMetadata("Remove specialization "+selectedClass+"/"+SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
 						}
 						
 						SpecializationModelSection.this.tblProperties.setInput(null);
@@ -811,13 +811,14 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 								logger.trace("Creating new specialization");
 								elementSpecialization = new ElementSpecialization(specializationName);
 								SpecializationModelSection.this.elementSpecializationMap.addElementSpecialization(selectedClass, elementSpecialization);
+								setMetadata("Create new specialization "+selectedClass+"/"+specializationName);
 							} else {
 								// renamed specialization
 								logger.trace("Renaming specialization "+SpecializationModelSection.this.comboSpecializationNames.getPreviousValue()+" to "+specializationName);
 								elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
 								elementSpecialization.setSpecializationName(specializationName);
+								setMetadata("Rename specialization "+selectedClass+"/"+SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
 							}
-							setMetadata();
 						}
 						logger.trace("it has got "+elementSpecialization.getProperties().size()+" properties.");
 
@@ -868,7 +869,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				((SpecializationProperty)element).setName((String)value);
 				SpecializationModelSection.this.tblProperties.update(element, null);
 
-				setMetadata();
+				setMetadata("Update specialization property");
 			}
 
 			@Override protected Object getValue(Object element) {
@@ -896,7 +897,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				((SpecializationProperty)element).setValue((String)value);
 				SpecializationModelSection.this.tblProperties.update(element, null);
 
-				setMetadata();
+				setMetadata("Update specialization property");
 			}
 
 			@Override protected Object getValue(Object element) {
@@ -931,7 +932,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				SpecializationModelSection.this.tblProperties.getTable().setSelection(SpecializationModelSection.this.tblProperties.getTable().getItemCount()-1);
 				SpecializationModelSection.this.btnDeleteProperty.setEnabled(true);
 
-				setMetadata();
+				setMetadata("New specialization property");
 			}
 
 			@Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
@@ -963,7 +964,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 						SpecializationModelSection.this.tblProperties.getTable().setSelection(selectionIndex-1);
 				}
 
-				setMetadata();
+				setMetadata("Delete specialization property");
 			}
 
 			@Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
@@ -985,8 +986,6 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		this.elementFigure.setLayoutData(fd);
 		this.elementFigure.addListener(SWT.Selection, new Listener() {
 			@Override public void handleEvent(Event e) {
-				logger.trace("figure selected = " + ((ElementFigure)e.widget).getSelectedFigure());
-				
 				String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
 				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
 				ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, specializationName);
@@ -995,7 +994,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				elementSpecialization.setIconSize(((ElementFigure)e.widget).getIconSize());
 				elementSpecialization.setIconLocation(((ElementFigure)e.widget).getIconLocation());
 
-				setMetadata();
+				setMetadata("Change figure for specialization "+selectedClass+"/"+specializationName);
 		        
 		        // we force the figures to be redrawn
 				((ElementFigure)e.widget).resetPreviewImages();
@@ -1132,11 +1131,11 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		return SpecializationModelSection.INSTANCE.elementFigure.getSelectedFigure();
 	}
 
-	void setMetadata() {
-		SpecializationUpdateMetadataCommand command = new SpecializationUpdateMetadataCommand(this.currentModel, this.elementSpecializationMap);
-		((CommandStack)SpecializationModelSection.this.currentModel.getAdapter(CommandStack.class)).execute(command);
-
-		//TODO : sort the specialization names
+	void setMetadata(String label) {
+		SpecializationUpdateMetadataCommand command = new SpecializationUpdateMetadataCommand(this.currentModel, this.elementSpecializationMap, label);
+		
+		if ( command.canExecute() )
+			((CommandStack)SpecializationModelSection.this.currentModel.getAdapter(CommandStack.class)).execute(command);
 
 		if ( command.getException() != null )
 			SpecializationPlugin.popup(Level.ERROR, "Failed to save specializations to model's metadata.", command.getException());
