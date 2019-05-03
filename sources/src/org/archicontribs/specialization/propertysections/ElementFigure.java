@@ -15,6 +15,12 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
@@ -272,8 +278,23 @@ public class ElementFigure extends Composite {
 		this.lblIconSize.setLayoutData(fd);
 
 		this.txtIconSize = new Text(this, SWT.BORDER);
-		this.txtIconSize.setToolTipText("Size of the icon");
+		this.txtIconSize.setToolTipText("Size of the icon under the form \"width x height\" or \"auto\"\n\n   if width == 0, then a ratio is done using the height\n   if height == 0, then a ratio is done using the width\n\n   auto allows to adapt the icon size to the figure size.");
 		this.txtIconSize.setVisible(false);
+		this.txtIconSize.addListener(SWT.DefaultSelection, new Listener() {
+			@Override public void handleEvent(Event e) {
+				setIconSize(((Text)e.widget).getText());
+				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+			}
+		});
+		this.txtIconSize.addFocusListener(new FocusListener() {
+			@Override public void focusLost(FocusEvent e) {
+				setIconSize(((Text)e.widget).getText());
+				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+			}
+			@Override public void focusGained(FocusEvent e) {
+				// nothing to do
+			}
+		});
 
 		this.lblIconLocation = new Label(this, SWT.NONE);
 		this.lblIconLocation.setForeground(this.getForeground());
@@ -286,13 +307,28 @@ public class ElementFigure extends Composite {
 		this.lblIconLocation.setLayoutData(fd);
 
 		this.txtIconLocation = new Text(this, SWT.BORDER);
-		this.txtIconLocation.setToolTipText("Location of the icon");
+		this.txtIconLocation.setToolTipText("Location of the icon under the form \"x , y\"\n\n   positive numbers mean from top or left border,\n   negative numbers mean from rigth/bottom border,\n   center keyword allows to center the object inside the figure.");
 		this.txtIconLocation.setVisible(false);
 		fd = new FormData();
 		fd.top = new FormAttachment(this.lblIconLocation, 0, SWT.CENTER);
 		fd.left = new FormAttachment(this.lblIconLocation, 5);
 		fd.right = new FormAttachment(this.lblIconLocation, 80, SWT.RIGHT);
 		this.txtIconLocation.setLayoutData(fd);
+		this.txtIconLocation.addListener(SWT.DefaultSelection, new Listener() {
+			@Override public void handleEvent(Event e) {
+				setIconLocation(((Text)e.widget).getText());
+				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+			}
+		});
+		this.txtIconLocation.addFocusListener(new FocusListener() {
+			@Override public void focusLost(FocusEvent e) {
+				setIconLocation(((Text)e.widget).getText());
+				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+			}
+			@Override public void focusGained(FocusEvent e) {
+				// nothing to do
+			}
+		});
 
 		fd = new FormData();
 		fd.top = new FormAttachment(this.lblIconSize, 0, SWT.CENTER);

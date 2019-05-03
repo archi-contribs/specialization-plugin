@@ -58,6 +58,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.archimatetool.editor.ArchiPlugin;
 import com.archimatetool.editor.model.IArchiveManager;
 import com.archimatetool.model.IArchimateConcept;
 import com.archimatetool.model.IArchimateModel;
@@ -826,9 +827,9 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 				}
 				
 				if ( iconSize != null ) {
-					if ( iconSize.equalsIgnoreCase("auto") ) {
-						width = INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH);
-						height = INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT);
+					if ( iconSize.trim().equalsIgnoreCase("auto") ) {
+						width = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH);
+						height = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT);
 					} else {
 						try {
 		                    String[] parts = iconSize.split("x");
@@ -857,13 +858,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 			// the figure is drawn in a view, and we do not manage the image disposal
 			// so to avoid too much memory leak, we store the images in a cache
 			if ( iconSize != null ) {
-				if ( iconSize.equalsIgnoreCase("auto") ) {
+				if ( iconSize.trim().equalsIgnoreCase("auto") ) {
 					if ( obj instanceof IDiagramModelArchimateObject ) {
 						width = ((IDiagramModelArchimateObject)obj).getBounds().getWidth();
 						height = ((IDiagramModelArchimateObject)obj).getBounds().getHeight();
 					} else {
-						width = INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH);
-						height = INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT);
+						width = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_WIDTH);
+						height = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT);
 					}
 				} else {
 					try {
@@ -1034,10 +1035,11 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	 * @return true if the icon has been replaced, false if the icon has not been replaced
 	 */
 	public static boolean drawIcon(IDiagramModelArchimateObject obj, Graphics graphics, Rectangle bounds) {
+		if ( obj.getId() == null )
+			return false;
+		
 		IArchimateConcept concept = obj.getArchimateConcept();
 		ElementSpecialization elementSpecialization = ElementSpecializationMap.getElementSpecialization(concept);
-		
-		//TODO: verifier si getId() commence par xxxxx-SpecializationPlugin-xxxxx
 		
 		if ( (elementSpecialization == null) || (elementSpecialization.getIconName() == null) || elementSpecialization.getIconName().isEmpty() )
 			return false;
@@ -1060,16 +1062,16 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 			if ( logger.isTraceEnabled() ) logger.trace(SpecializationPlugin.getFullName(obj)+": found icon location = "+iconLocation);
 			String[] parts = iconLocation.split(",");
 			try {
-				if ( parts[0].equals("center") )
+				if ( parts[0].trim().equals("center") )
 					x = bounds.x+(bounds.width-image.getBounds().width)/2;
-				else if ( parts[0].startsWith("-") )
+				else if ( parts[0].trim().startsWith("-") )
 					x = bounds.x + bounds.width - image.getBounds().width + Integer.parseInt(parts[0]);
 				else
 					x = bounds.x + Integer.parseInt(parts[0].trim());
 
-				if ( parts[1].equals("center") )
+				if ( parts[1].trim().equals("center") )
 					y = bounds.y+(bounds.height-image.getBounds().height)/2;
-				else if ( parts[1].startsWith("-") )
+				else if ( parts[1].trim().startsWith("-") )
 					y = bounds.y + bounds.height - image.getBounds().height + Integer.parseInt(parts[1]);
 				else
 					y = bounds.y + Integer.parseInt(parts[1].trim());
