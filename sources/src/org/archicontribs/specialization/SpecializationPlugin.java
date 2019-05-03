@@ -65,8 +65,6 @@ import com.archimatetool.model.IArchimateModelObject;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateConnection;
 import com.archimatetool.model.IDiagramModelArchimateObject;
-import com.archimatetool.model.IDiagramModelConnection;
-import com.archimatetool.model.IDiagramModelContainer;
 import com.archimatetool.model.IDiagramModelObject;
 import com.archimatetool.model.IFolder;
 import com.archimatetool.model.IIdentifier;
@@ -1017,41 +1015,19 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		return null;
 	}
 
-	public static void refreshIconsAndLabels(INameable obj) {
-		// we set the object name to force the framework to redraw the corresponding object in the current view 
-		obj.setName(obj.getName());
-		if ( obj instanceof IDiagramModelContainer ) {
-			for ( IDiagramModelObject child: ((IDiagramModelContainer)obj).getChildren() ) {
-				refreshIconsAndLabels(child);
-				for ( IDiagramModelConnection relation: child.getSourceConnections() ) {
-					refreshIconsAndLabels(relation);
-				}
-			}
-		}
-		if ( obj instanceof IDiagramModelObject ) {
-			for ( IDiagramModelConnection relation: ((IDiagramModelObject)obj).getSourceConnections() ) {
-				refreshIconsAndLabels(relation);
-			}
-		}
-	}
-
-	public static boolean inArray(String[] stringArray, String string) {
-		if ( string == null )
-			return true;
-
-		for (String s : stringArray) {
-			if (areEqual(s, string))
-				return true;
-		}
-		return false;
-	}
-	
+	/**
+	 * draw an image in a IDiagramModelObject
+	 * @param obj
+	 * @param graphics
+	 * @param bounds
+	 * @return true if the icon has been replaced, false if the icon has not been replaced
+	 */
 	public static boolean drawIcon(IDiagramModelObject obj, Graphics graphics, Rectangle bounds) {
 		return drawIcon((IDiagramModelArchimateObject)obj, graphics, bounds);
 	}
 
 	/**
-	 * draw an image in a IDiagramModelObject
+	 * draw an image in a IDiagramModelArchimateObject
 	 * @param obj
 	 * @param graphics
 	 * @param bounds
