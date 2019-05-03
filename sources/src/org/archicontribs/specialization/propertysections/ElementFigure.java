@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.archimatetool.canvas.model.ICanvasFactory;
 import com.archimatetool.canvas.model.ICanvasModel;
 import com.archimatetool.editor.ArchiPlugin;
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
@@ -58,6 +59,7 @@ public class ElementFigure extends Composite {
 	static final String canChangeIconString = "canChangeIcon";
 	
 	static final String ID_PREFIX = "SpecializationPlugin_";
+	static final String CANVAS_NAME = "SpecializationPluginCanvas";
 	
 	IArchimateModel model = null;
 
@@ -193,26 +195,26 @@ public class ElementFigure extends Composite {
 			        }
 			        
 			        // We check that the model contains a DiagramModelImage with the selected image
-			        IDiagramModel diagram = null; 
+			        ICanvasModel canvas = null; 
 			        for ( IDiagramModel d: ElementFigure.this.model.getDiagramModels() ) {
-			        	if ( (d instanceof ICanvasModel ) && (d.getName().equals("SpecializationsPluginCanvas")) ) {
+			        	if ( (d instanceof ICanvasModel ) && (d.getName().equals(CANVAS_NAME)) ) {
 			        		logger.trace("diagram found !!!");
-			        		diagram = d;
+			        		canvas = (ICanvasModel)d;
 			        		break;
 			        	}
 			        }
 			        
-			        if ( diagram == null ) {
+			        if ( canvas == null ) {
 			        	// we create a folder
-			        	diagram = IArchimateFactory.eINSTANCE.createArchimateDiagramModel();
-			        	diagram.setId(new IDAdapter().getNewID());
-			        	diagram.setName("SpecializationsPluginCanvas");
-			        	diagram.setDocumentation("This canvas is used by the Specialization Plugin to keep the images that are configured in the specializations.\n\nPlease do not modify nor delete it.");
-			        	ElementFigure.this.model.getFolder(FolderType.DIAGRAMS).getElements().add(diagram);
+			        	canvas = ICanvasFactory.eINSTANCE.createCanvasModel();
+			        	canvas.setId(new IDAdapter().getNewID());
+			        	canvas.setName(CANVAS_NAME);
+			        	canvas.setDocumentation("This canvas is used by the Specialization Plugin to keep the images that are configured in the specializations.\n\nPlease do not modify nor delete it.");
+			        	ElementFigure.this.model.getFolder(FolderType.DIAGRAMS).getElements().add(canvas);
 			        }
 			        
 			        IDiagramModelImage diagramModelImage = null;
-			        for ( IDiagramModelObject d: diagram.getChildren() ) {
+			        for ( IDiagramModelObject d: canvas.getChildren() ) {
 			        	if ( d.getName().equals(ElementFigure.this.iconName) && (d instanceof IDiagramModelImage) ) {
 			        		diagramModelImage = (IDiagramModelImage)d;
 			        		break;
@@ -233,7 +235,7 @@ public class ElementFigure extends Composite {
 			            catch(@SuppressWarnings("unused") Exception err) {
 			            	diagramModelImage.setBounds(0, 0, 50, 50);
 			            }
-			        	diagram.getChildren().add(diagramModelImage);
+			        	canvas.getChildren().add(diagramModelImage);
 			        }
 			        
 			        if ( ElementFigure.this.iconName != null ) {
@@ -323,35 +325,7 @@ public class ElementFigure extends Composite {
 		this.txtIconLocation.setVisible(false);
 	}
 
-	public void setEClass(EClass eClass) {
-		this.eClass = eClass;
-		
-		if ( eClass == null ) {
-			reset();
-		} else {
-			resetPreviewImages();
-
-			IDiagramModelObjectFigure figure = ((ArchimateElementEditPart)ObjectUIFactory.INSTANCE.getProviderForClass(eClass).createEditPart()).getFigure();
-
-			try {
-				// either the IDiagramModelObjectFigure delegates the drawing to a figure delegate,
-				// and in that case, we need to check if the figure delegate allows to change the icon
-				Field field = figure.getClass().getSuperclass().getDeclaredField("fFigureDelegate1");
-				field.setAccessible(true);
-				this.outerCompo1.setData(canChangeIconString, (field.get(figure) instanceof RectangleFigureDelegate));
-				field.setAccessible(false);
-
-				field = figure.getClass().getSuperclass().getDeclaredField("fFigureDelegate2");
-				field.setAccessible(true);
-				this.outerCompo2.setData(canChangeIconString, (field.get(figure) instanceof RectangleFigureDelegate));
-				field.setAccessible(false);
-			} catch (@SuppressWarnings("unused") Exception err) {
-				// either there is no figure delegate, and then the icon can be changed.
-				this.outerCompo1.setData(canChangeIconString, true);
-				this.outerCompo2.setData(canChangeIconString, true);
-			}
-		}
-	}
+	
 	
 	void resetPreviewImages() {
 		Image oldImage = this.figure1.getBackgroundImage();
@@ -406,11 +380,38 @@ public class ElementFigure extends Composite {
     }
 	
 	public void setEClass(EClass eClass, ElementSpecialization elementSpecialization) {
-		setEClass(eClass);
-		select(elementSpecialization.getFigure());
-		setIconName(elementSpecialization.getIconName());
-		setIconSize(elementSpecialization.getIconSize());
-		setIconLocation(elementSpecialization.getIconLocation());
+		this.eClass = eClass;
+		
+		if ( eClass == null ) {
+			reset();
+		} else {
+			resetPreviewImages();
+
+			IDiagramModelObjectFigure figure = ((ArchimateElementEditPart)ObjectUIFactory.INSTANCE.getProviderForClass(eClass).createEditPart()).getFigure();
+
+			try {
+				// either the IDiagramModelObjectFigure delegates the drawing to a figure delegate,
+				// and in that case, we need to check if the figure delegate allows to change the icon
+				Field field = figure.getClass().getSuperclass().getDeclaredField("fFigureDelegate1");
+				field.setAccessible(true);
+				this.outerCompo1.setData(canChangeIconString, (field.get(figure) instanceof RectangleFigureDelegate));
+				field.setAccessible(false);
+
+				field = figure.getClass().getSuperclass().getDeclaredField("fFigureDelegate2");
+				field.setAccessible(true);
+				this.outerCompo2.setData(canChangeIconString, (field.get(figure) instanceof RectangleFigureDelegate));
+				field.setAccessible(false);
+			} catch (@SuppressWarnings("unused") Exception err) {
+				// either there is no figure delegate, and then the icon can be changed.
+				this.outerCompo1.setData(canChangeIconString, true);
+				this.outerCompo2.setData(canChangeIconString, true);
+			}
+
+			select(elementSpecialization.getFigure());
+			setIconName(elementSpecialization.getIconName());
+			setIconSize(elementSpecialization.getIconSize());
+			setIconLocation(elementSpecialization.getIconLocation());
+		}
 	}
 
 	void select(Composite figure) {
@@ -466,6 +467,7 @@ public class ElementFigure extends Composite {
 	
 	public void setIconName(String name) {
 		this.iconName = name;
+        ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
 	}
 
 	public String getIconSize() {
