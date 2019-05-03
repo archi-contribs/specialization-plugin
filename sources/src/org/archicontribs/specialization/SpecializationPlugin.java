@@ -881,7 +881,20 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 				}
 			}
 				
-            return iconCache.get(iconName, width, height);
+            image = iconCache.get(iconName, width, height);
+            
+            //if the image does not exist in the cache, we add it
+            if ( image == null ) {
+				try {
+					iconCache.set(iconName, ((IArchiveManager)SpecializationModelSection.INSTANCE.getCurrentModel().getAdapter(IArchiveManager.class)).createImage(iconName));
+				} catch (Exception err) {
+					popup(Level.ERROR, "Failed to create image.", err);
+					return null;
+				}
+				image = iconCache.get(iconName, width, height);
+            }
+            
+            return image;
 		}
 		
 		return null;
@@ -1047,6 +1060,8 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	public static boolean drawIcon(IDiagramModelArchimateObject obj, Graphics graphics, Rectangle bounds) {
 		IArchimateConcept concept = obj.getArchimateConcept();
 		ElementSpecialization elementSpecialization = ElementSpecializationMap.getElementSpecialization(concept);
+		
+		//TODO: verifier si getId() commence par xxxxx-SpecializationPlugin-xxxxx
 		
 		if ( (elementSpecialization == null) || (elementSpecialization.getIconName() == null) || elementSpecialization.getIconName().isEmpty() )
 			return false;

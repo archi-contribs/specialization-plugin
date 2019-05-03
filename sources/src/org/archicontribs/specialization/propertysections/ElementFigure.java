@@ -57,7 +57,7 @@ public class ElementFigure extends Composite {
 	static final int figureMargin = 2;
 	static final String canChangeIconString = "canChangeIcon";
 	
-	static final String ID_PREFIX = "";
+	static final String ID_PREFIX = "SpecializationPlugin_";
 	
 	IArchimateModel model = null;
 

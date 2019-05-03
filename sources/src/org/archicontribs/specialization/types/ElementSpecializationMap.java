@@ -113,6 +113,10 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 				logger.error("Object should be an ArchimateConcept or an ArchimateObject !");
 				return null;
 			}
+			
+			// no specialization for objects that do don have an id
+			if ( concept.getId() == null )
+				return null;
 				
 			if ( concept.getArchimateModel() == null ) {
 				// if no object is provided, we return the icon name from the SpecializationModelSection page
