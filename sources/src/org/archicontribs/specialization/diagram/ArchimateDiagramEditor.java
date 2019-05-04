@@ -1,6 +1,7 @@
 package org.archicontribs.specialization.diagram;
 
 import org.archicontribs.specialization.SpecializationLogger;
+import org.archicontribs.specialization.SpecializationPlugin;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.GraphicalViewer;
@@ -18,7 +19,7 @@ import com.archimatetool.model.IProperty;
 public class ArchimateDiagramEditor extends com.archimatetool.editor.diagram.ArchimateDiagramEditor {
     static final SpecializationLogger logger = new SpecializationLogger(ArchimateDiagramEditor.class);
     
-    public static final String DRILLDOWN_PROPERY_NAME = "drill down";
+    
     
     @Override
     protected void createRootEditPart(GraphicalViewer viewer) {
@@ -33,14 +34,14 @@ public class ArchimateDiagramEditor extends com.archimatetool.editor.diagram.Arc
     					IArchimateElement element = ((IDiagramModelArchimateObject) component).getArchimateConcept();
     					boolean propFound = false;
     					for ( IProperty prop: element.getProperties() ) {
-    						if ( prop.getKey() != null && prop.getKey().equals(DRILLDOWN_PROPERY_NAME) ) {
+    						if ( SpecializationPlugin.DRILLDOWN_PROPERTY_KEY.equals(prop.getKey()) ) {
     						    propFound = true;
     				            IArchimateModel model = element.getArchimateModel();
     							String viewId = prop.getValue();
     	                        if ( viewId == null ) {
-    	                            logger.debug("Property \""+DRILLDOWN_PROPERY_NAME+"\" = null");
+    	                            logger.debug("Property \""+SpecializationPlugin.DRILLDOWN_PROPERTY_KEY+"\" = null");
     	                        } else {
-    	                            logger.debug("Property \""+DRILLDOWN_PROPERY_NAME+"\" = \""+viewId+"\"");
+    	                            logger.debug("Property \""+SpecializationPlugin.DRILLDOWN_PROPERTY_KEY+"\" = \""+viewId+"\"");
         							for ( IDiagramModel view: model.getDiagramModels() ) {
         							    if ( view.getId().equals(viewId) ) {
         							        logger.debug("Opening view \""+view.getName()+"\"");

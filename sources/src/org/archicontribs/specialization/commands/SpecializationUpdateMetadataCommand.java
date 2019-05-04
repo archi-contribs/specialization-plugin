@@ -33,7 +33,7 @@ public class SpecializationUpdateMetadataCommand extends Command {
 		this.oldMetadata = this.model.getMetadata();
 		if ( this.oldMetadata != null ) {
 			this.metadata = this.oldMetadata;
-			this.metadataProperty = this.metadata.getEntry(SpecializationPlugin.METADATA_KEY);
+			this.metadataProperty = this.metadata.getEntry(SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY);
 			if ( this.metadataProperty != null )
 				this.oldMetadataValue = this.metadataProperty.getValue();
 		} else {
@@ -60,7 +60,7 @@ public class SpecializationUpdateMetadataCommand extends Command {
 			this.model.setMetadata(this.metadata);
 		
 		if ( this.metadataProperty == null )
-			this.model.getMetadata().addEntry(SpecializationPlugin.METADATA_KEY, this.metadataValue);
+			this.model.getMetadata().addEntry(SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY, this.metadataValue);
 		else
 			this.metadataProperty.setValue(this.metadataValue);
 		
@@ -78,7 +78,7 @@ public class SpecializationUpdateMetadataCommand extends Command {
 		else {
 			if ( this.metadataProperty == null ) {
 				for (int i = 0 ; i < this.model.getMetadata().getEntries().size(); ++i ) {
-					if ( this.model.getMetadata().getEntries().get(i).getKey().equals(SpecializationPlugin.METADATA_KEY) ) {
+					if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(this.model.getMetadata().getEntries().get(i).getKey()) ) {
 						this.model.getMetadata().getEntries().remove(i);
 						break;
 					}

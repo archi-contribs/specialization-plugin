@@ -177,13 +177,13 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	public    static final Image    EDIT_ICON         = new Image(display, SpecializationPlugin.class.getResourceAsStream("/img/16x16/note.png"));
 	public    static final Image    DELETE_ICON       = new Image(display, SpecializationPlugin.class.getResourceAsStream("/img/16x16/trash.png"));
 
-	public    static final String   METADATA_KEY      = "specializations";
-	public    static final String   PROPERTY_KEY      = "specialization";
-	
 	public    static final SpecializationImageCache iconCache = new SpecializationImageCache();
 	
 	public    static final String   storeFolderPrefix   = "folder";
 	public    static final String   storeLocationPrefix = "location";
+	
+	public    static final String   DRILLDOWN_PROPERTY_KEY      = "drill down";
+	public    static final String   SPECIALIZATION_PROPERTY_KEY = "specialization";
 	
 	
 	/**

@@ -78,7 +78,7 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 		if ( model == null || model.getMetadata() == null)
 			return null;
 		
-		IProperty specializationsMetadata = model.getMetadata().getEntry(SpecializationPlugin.METADATA_KEY);
+		IProperty specializationsMetadata = model.getMetadata().getEntry(SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY);
 		if ( specializationsMetadata != null ) {
 			try {
 				Gson gson = new Gson();
@@ -128,7 +128,7 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 			} else {
 				traceMessage = "getting the icon name from the concept properties";
 				for ( IProperty prop: concept.getProperties() ) {
-					if ( prop.getKey().equals(SpecializationPlugin.PROPERTY_KEY) ) {
+					if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(prop.getKey()) ) {
 						clazz = concept.getClass().getSimpleName().replaceAll(" ",  "");
 						specializationName = prop.getValue();
 						elementSpecializationMap = getFromArchimateModel(concept.getArchimateModel());

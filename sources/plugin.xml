@@ -321,6 +321,12 @@
          <propertyTab
                afterTab="specialization.tab"
                category="appearance.category"
+               id="specializeElement.tab"
+               label="Specialization">
+         </propertyTab>
+         <propertyTab
+               afterTab="specializeElement.tab"
+               category="appearance.category"
                id="drilldown.tab"
                label="Drill down">
          </propertyTab>
@@ -335,6 +341,12 @@
                filter="org.archicontribs.specialization.propertysections.SpecializationModelSection$Filter"
                id="specializationSection"
                tab="specializeModel.tab">
+         </propertySection>
+         <propertySection
+               class="org.archicontribs.specialization.propertysections.SpecializationElementSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationElementSection$Filter"
+               id="specializationSection"
+               tab="specializeElement.tab">
          </propertySection>
          <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationDrillDownSection"
