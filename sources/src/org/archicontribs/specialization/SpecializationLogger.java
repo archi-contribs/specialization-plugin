@@ -30,7 +30,7 @@ public class SpecializationLogger {
 				configure();
 			} catch (Exception e) {
 				initialised = false;
-				SpecializationPlugin.popup(Level.ERROR, "Failed to configure logger", e);
+				e.printStackTrace();
 			}
 		}
 		this.logger = Logger.getLogger(clazz);
