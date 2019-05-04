@@ -61,6 +61,7 @@ import org.json.simple.parser.JSONParser;
 import com.archimatetool.editor.ArchiPlugin;
 import com.archimatetool.editor.model.IArchiveManager;
 import com.archimatetool.model.IArchimateConcept;
+import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IDiagramModelObject;
@@ -781,16 +782,22 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 			if ( (iconName == null) || iconName.isEmpty() )
 				return null;
 			
+			IArchimateModel model = concept.getArchimateModel();
 			String iconSize = elementSpecialization.getIconSize();
 			Image image = null;
 			int width = 0;
 			int height = 0;
 			
-			if ( concept.getArchimateModel() == null ) {
+			if ( model == null ) {
 				// the figure is drawn in the specializationModelSection where the image disposal is well managed
 				// so we can safely generate the image
+				if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.getCurrentModel() == null))
+					return null;
+				
+				model = SpecializationModelSection.INSTANCE.getCurrentModel();
+				
 				try {
-					image = ((IArchiveManager)SpecializationModelSection.INSTANCE.getCurrentModel().getAdapter(IArchiveManager.class)).createImage(iconName);
+					image = ((IArchiveManager)model.getAdapter(IArchiveManager.class)).createImage(iconName);
 				} catch (Exception err) {
 					popup(Level.ERROR, "Failed to create image.", err);
 					return null;
@@ -855,7 +862,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
             //if the image does not exist in the cache, we add it
             if ( image == null ) {
 				try {
-					iconCache.set(iconName, ((IArchiveManager)SpecializationModelSection.INSTANCE.getCurrentModel().getAdapter(IArchiveManager.class)).createImage(iconName));
+					iconCache.set(iconName, ((IArchiveManager)model.getAdapter(IArchiveManager.class)).createImage(iconName));
 				} catch (Exception err) {
 					popup(Level.ERROR, "Failed to create image.", err);
 					return null;
