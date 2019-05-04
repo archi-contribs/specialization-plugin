@@ -61,17 +61,11 @@ import org.json.simple.parser.JSONParser;
 import com.archimatetool.editor.ArchiPlugin;
 import com.archimatetool.editor.model.IArchiveManager;
 import com.archimatetool.model.IArchimateConcept;
-import com.archimatetool.model.IArchimateModel;
-import com.archimatetool.model.IArchimateModelObject;
 import com.archimatetool.model.IDiagramModel;
-import com.archimatetool.model.IDiagramModelArchimateConnection;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IDiagramModelObject;
-import com.archimatetool.model.IFolder;
 import com.archimatetool.model.IIdentifier;
 import com.archimatetool.model.INameable;
-import com.archimatetool.model.IProperties;
-import com.archimatetool.model.IProperty;
 
 /**
  * Specialization plugin for Archi, the Archimate modeler
@@ -159,6 +153,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	public    static final Display  display           = Display.getCurrent();
 	public    static final Cursor   CURSOR_WAIT       = new Cursor(null, SWT.CURSOR_WAIT);
 	public    static final Cursor   CURSOR_ARROW      = new Cursor(null, SWT.CURSOR_ARROW);
+	public    static final Color    WHITE_COLOR       = new Color(display, 255, 255, 255);
 	public    static final Color    BLACK_COLOR       = new Color(display, 0, 0, 0);
 	public    static final Color    GREY_COLOR        = new Color(display, 100, 100, 100);
 	public    static final Color    COMPO_LEFT_COLOR  = new Color(display, 240, 248, 255);          // light blue
@@ -738,31 +733,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		}.start();
 	}
 
-	public static String getPropertyValue(EObject obj, String propertyName) {
-		if ( obj == null )
-			return null;
-
-		EObject concept = obj;
-		if (obj instanceof IDiagramModelArchimateObject)
-			concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
-		if ( obj instanceof IDiagramModelArchimateConnection)
-			concept = ((IDiagramModelArchimateConnection)obj).getArchimateConcept();
-		if ( !(concept instanceof IProperties) ) {
-			// Should not happen, but just in case
-			logger.error(getFullName(obj) + " does not have properties");
-			return null;
-		}
-
-		for ( IProperty property:((IProperties)concept).getProperties() ) {
-			if ( areEqual(property.getKey(), propertyName) ) {
-				// we return the value of the first required key
-				return property.getValue();
-			}
-		}
-
-		return null;
-	}
-
 	/**
 	 * Gets the Image from the icon name and icon size from the EObject properties
 	 * @param obj
@@ -900,123 +870,6 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * This method calculates if the object's label must me be replaced.
-	 * @param obj
-	 * @return
-	 */
-	public static boolean mustReplaceLabel(EObject obj) {
-		if ( obj == null ) {
-			logger.error("Got null object parameter");
-			return false;
-		}
-
-		// we do not change the icon of the element in the properties window
-		if ( SpecializationPlugin.areEqual(new Exception().getStackTrace()[3].getClassName(), "com.archimatetool.editor.propertysections.PropertiesLabelProvider") )
-			return false;
-
-		// we determine if the object is in a view
-		EObject container = obj;
-		while ( (container != null) && !(container instanceof IDiagramModel || container instanceof IFolder) )
-			container = container.eContainer();
-
-		if ( (container == null) || !(container instanceof IDiagramModel) )
-			return false;
-
-		// we calculate if the configuration states the label should be replaced
-		String mustReplaceLabels = preferenceStore.getString("mustReplaceLabelsInViews");
-		if ( mustReplaceLabels != null ) {
-			switch ( mustReplaceLabels ) {
-				case "never":
-					// in this case, we do not replace the label
-					if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the plugin's preferences states the label should never be replaced.");
-					return false;
-				case "always":
-					// in this case, we do replace the label
-					break;
-				default:
-					// in this case, we check the model's properties
-					IArchimateModel model;
-					if (  obj instanceof IDiagramModelArchimateObject )						// test is not necessary in Archi 4.3 but is mandatory in Archi 4.2
-						model = ((IDiagramModelArchimateObject)obj).getArchimateConcept().getArchimateModel();
-					else if ( obj instanceof IArchimateModelObject )
-						model = ((IArchimateModelObject)obj).getArchimateModel();
-					else
-						return false;
-					String propertyValue = getPropertyValue(model, "must replace labels");
-					if ( propertyValue != null ) {
-						switch ( propertyValue.toLowerCase() ) {
-							case "no":
-								// in this case, we do not replace the label
-								if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the model's property \"must replace labels\" states the label should not be replaced.");
-								return false;
-							case "yes":
-								// in this case, we do replace the label
-								break;
-							default: // we continue
-								// in this case, we check the container's properties
-								// At the moment, the check is not recursive, but I do not see why it may not be recursive in the future
-								propertyValue = getPropertyValue(container, "must replace labels");
-								if ( propertyValue != null ) {
-									switch ( propertyValue ) {
-										case "no":
-											// in this case, we do not replace the label
-											if ( logger.isTraceEnabled() ) logger.trace(getFullName(obj) + ": the container property \"must replace labels\" states the label should not be replaced.");
-											return false;
-										case "yes":
-											// in this case, we do replace the label
-											break;
-										default:
-											// in this case, we do replace the label
-									}
-								}
-						}
-					}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Retrieves the label name from the EObject properties
-	 * @param obj
-	 */
-	public static String getLabelName(EObject obj) {
-		if ( obj != null ) {
-			EObject concept = obj;
-			if ( obj instanceof IDiagramModelArchimateObject )
-				concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
-			if ( obj instanceof IDiagramModelArchimateConnection )
-				concept = ((IDiagramModelArchimateConnection)obj).getArchimateConcept();
-
-			if ( !(concept instanceof IProperties) ) {
-				// Should not happen, but just in case
-				logger.error(getFullName(obj) + " does not have properties");
-				return null;
-			}
-
-			// Now we get the icon filename from the property
-			String label = getPropertyValue(concept, "label");
-			if ( logger.isDebugEnabled() ) logger.debug(getFullName(obj) + ": label is "+ label);
-
-			//we expand the variables in the label
-			if ( label != null )
-				label = SpecializationVariable.expand(label,obj);
-
-			// we replace "\n" string by new line, and \t string by tabulation, if any
-			if ( label != null ) {
-				label = SpecializationVariable.expand(label,obj).replace("\\n","\n");
-				label = SpecializationVariable.expand(label,obj).replace("\\t","\t");
-			}
-
-			return label;
-		}
-
-		logger.error("got null object parameter");
-		return null;
-	}
-
-	/**
 	 * draw an image in a IDiagramModelObject
 	 * @param obj
 	 * @param graphics
@@ -1087,5 +940,58 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		}
 		graphics.drawImage(image, new Point(x, y));
 		return true;
+	}
+	
+
+	/**
+	 * Retrieves the label name from the EObject properties
+	 * @param obj
+	 */
+	public static String getLabelName(EObject obj) {
+		if ( obj == null )
+			return null;
+		
+		// we do not replace the label if the figure is in the PropertiesLabelProvider
+		if ( "com.archimatetool.editor.propertysections.PropertiesLabelProvider".equals(new Exception().getStackTrace()[3].getClassName()) )
+			return null;
+		
+		// we do not replace the label if the object has not got an ID
+		if ( ((IIdentifier)obj).getId() == null )
+			return null;
+		
+		// if the obj is in the model, we check that it is in a view
+		if ( obj.eContainer() != null ) {
+			EObject container = obj;
+			while ( (container != null) && !(container instanceof IDiagramModel) )
+				container = container.eContainer();
+
+			if ( container == null ) {
+				return null; 
+			}
+		}
+		
+		IArchimateConcept concept = null;
+		
+		if ( obj instanceof IArchimateConcept )
+			concept = (IArchimateConcept)obj;
+		else if ( obj instanceof IDiagramModelArchimateObject )
+			concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
+		else {
+			logger.error("Object should be an ArchimateConcept or an ArchimateObject !");
+			return null;
+		}
+		
+		ElementSpecialization elementSpecialization = ElementSpecializationMap.getElementSpecialization(concept);
+		
+		String label = null;
+		if ( elementSpecialization != null )
+			label = SpecializationVariable.expand(elementSpecialization.getLabel(), obj);
+		
+		if ( label != null ) {
+			label = label.replace("\\n","\n");
+			label = label.replace("\\t","\t");
+		}
+		
+		return label;
 	}
 }

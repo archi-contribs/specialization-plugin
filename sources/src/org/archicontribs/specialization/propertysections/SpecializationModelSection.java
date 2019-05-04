@@ -29,6 +29,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -45,6 +47,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import com.archimatetool.model.IArchimateModel;
@@ -133,6 +136,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	TableViewer tblProperties = null;
 	Button btnNewProperty = null;
 	Button btnDeleteProperty = null;
+	Text txtElementLabel = null;
 	ElementFigure elementFigure = null;
 
 	@Getter IArchimateModel currentModel = null;
@@ -749,7 +753,8 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				SpecializationModelSection.this.tblProperties.getTable().setEnabled(false);
 				SpecializationModelSection.this.btnNewProperty.setEnabled(false);
 				SpecializationModelSection.this.btnDeleteProperty.setEnabled(false);
-				
+				SpecializationModelSection.this.txtElementLabel.setText("");
+				SpecializationModelSection.this.txtElementLabel.setEnabled(false);
 				SpecializationModelSection.this.elementFigure.reset();
 				SpecializationModelSection.this.elementFigure.setEnabled(false);
 
@@ -797,7 +802,8 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 						SpecializationModelSection.this.tblProperties.getTable().setEnabled(false);
 						SpecializationModelSection.this.btnNewProperty.setEnabled(false);
 						SpecializationModelSection.this.btnDeleteProperty.setEnabled(false);
-						
+						SpecializationModelSection.this.txtElementLabel.setEnabled(false);
+						SpecializationModelSection.this.txtElementLabel.setText("");
 						SpecializationModelSection.this.elementFigure.reset();
 						SpecializationModelSection.this.elementFigure.setEnabled(false);
 					} else {
@@ -827,7 +833,8 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 						SpecializationModelSection.this.tblProperties.getTable().setEnabled(true);
 						SpecializationModelSection.this.btnNewProperty.setEnabled(true);
 						SpecializationModelSection.this.btnDeleteProperty.setEnabled(!elementSpecialization.getProperties().isEmpty());
-						
+						SpecializationModelSection.this.txtElementLabel.setEnabled(true);
+						SpecializationModelSection.this.txtElementLabel.setText(elementSpecialization.getLabel());
 						SpecializationModelSection.this.elementFigure.setEClass(SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getEClass(), elementSpecialization);
 						SpecializationModelSection.this.elementFigure.setEnabled(true);
 					}
@@ -850,12 +857,6 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		table.setEnabled(false);
-		fd = new FormData();
-		fd.top = new FormAttachment(lblProperties, -5, SWT.TOP);
-		fd.left = new FormAttachment(lblProperties, 5);
-		fd.right = new FormAttachment(lblProperties, 430);
-		fd.bottom = new FormAttachment(lblProperties, 100, SWT.BOTTOM);
-		table.setLayoutData(fd);
 
 		TableViewerColumn col = new TableViewerColumn(this.tblProperties, SWT.NONE);
 		col.getColumn().setText("Name");
@@ -894,10 +895,13 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 			private final CellEditor editor = new TextCellEditor(SpecializationModelSection.this.tblProperties.getTable());
 
 			@Override protected void setValue(Object element, Object value) {
+				String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
+				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
+				
 				((SpecializationProperty)element).setValue((String)value);
 				SpecializationModelSection.this.tblProperties.update(element, null);
 
-				setMetadata("Update specialization property");
+				setMetadata("Update property for specialization "+selectedClass+"/"+specializationName);
 			}
 
 			@Override protected Object getValue(Object element) {
@@ -919,20 +923,22 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		this.btnNewProperty.setEnabled(false);
 		fd = new FormData();
 		fd.top = new FormAttachment(table, 0, SWT.TOP);
-		fd.left = new FormAttachment(table, 5);
-		fd.right = new FormAttachment(table, 40, SWT.RIGHT);
+		fd.right = new FormAttachment(compoElements, 0, SWT.RIGHT);
+		fd.width = 20;
+		fd.height = 20;
 		this.btnNewProperty.setLayoutData(fd);
 		this.btnNewProperty.addSelectionListener(new SelectionListener() {
 			@Override public void widgetSelected(SelectionEvent e) {
 				String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
-				ElementSpecialization type = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getText());
-				type.getProperties().add(new SpecializationProperty("new property",""));
+				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
+				ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getText());
+				elementSpecialization.getProperties().add(new SpecializationProperty("new property",""));
 				SpecializationModelSection.this.tblProperties.refresh();
 
 				SpecializationModelSection.this.tblProperties.getTable().setSelection(SpecializationModelSection.this.tblProperties.getTable().getItemCount()-1);
 				SpecializationModelSection.this.btnDeleteProperty.setEnabled(true);
 
-				setMetadata("New specialization property");
+				setMetadata("New property for specialization "+selectedClass+"/"+specializationName);
 			}
 
 			@Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
@@ -944,15 +950,17 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		this.btnDeleteProperty.setEnabled(false);
 		fd = new FormData();
 		fd.top = new FormAttachment(this.btnNewProperty, 5);
-		fd.left = new FormAttachment(table, 5);
-		fd.right = new FormAttachment(table, 40, SWT.RIGHT);
+		fd.right = new FormAttachment(this.btnNewProperty, 0, SWT.RIGHT);
+		fd.width = 20;
+		fd.height = 20;
 		this.btnDeleteProperty.setLayoutData(fd);
 		this.btnDeleteProperty.addSelectionListener(new SelectionListener() {
 			@Override public void widgetSelected(SelectionEvent e) {
 				String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
-				ElementSpecialization type = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getText());
+				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
+				ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getText());
 				int selectionIndex = SpecializationModelSection.this.tblProperties.getTable().getSelectionIndex();
-				type.getProperties().remove(selectionIndex);
+				elementSpecialization.getProperties().remove(selectionIndex);
 				SpecializationModelSection.this.tblProperties.refresh();
 
 				if ( SpecializationModelSection.this.tblProperties.getTable().getItemCount() == 0 )
@@ -964,40 +972,93 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 						SpecializationModelSection.this.tblProperties.getTable().setSelection(selectionIndex-1);
 				}
 
-				setMetadata("Delete specialization property");
+				setMetadata("Delete property for specialization "+selectedClass+"/"+specializationName);
 			}
 
 			@Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 		});
-
-		Label lblIcon = new Label(parent, SWT.NONE);
-		lblIcon.setForeground(parent.getForeground());
-		lblIcon.setBackground(parent.getBackground());
-		lblIcon.setText("Icon:");
+		
 		fd = new FormData();
-		fd.top = new FormAttachment(table, 15);
+		fd.top = new FormAttachment(lblProperties, -5, SWT.TOP);
+		fd.left = new FormAttachment(lblProperties, 5);
+		fd.right = new FormAttachment(this.btnNewProperty, -5);
+		fd.height = 100;
+		table.setLayoutData(fd);
+		
+		Label lblLabel = new Label(parent, SWT.NONE);
+		lblLabel.setForeground(parent.getForeground());
+		lblLabel.setBackground(parent.getBackground());
+		lblLabel.setText("Label:");
+		fd = new FormData();
+		fd.top = new FormAttachment(table, 10);
 		fd.left = new FormAttachment(lblSpecializationName, 0, SWT.LEFT);
-		lblIcon.setLayoutData(fd);
-
-		this.elementFigure = new ElementFigure(parent, SWT.NONE);
+		lblLabel.setLayoutData(fd);
+		
+		this.txtElementLabel = new Text(parent, SWT.BORDER);
+		this.txtElementLabel.setToolTipText("Specify the text that will be shown in the figure.\n\nYou may format your text using \\n (newline) and \\t (tab) and use variables(please refer to the online help for a complete list): \n   ${name} name of the Archimate element\n   ${property:xxx} value of the property xxx\n   ${view:name} name of the view in which the Archimate element is displayed\n   ${model:name} name of the model");
+		this.txtElementLabel.setEnabled(false);
 		fd = new FormData();
-		fd.top = new FormAttachment(lblIcon, -5, SWT.TOP);
-		fd.left = new FormAttachment(lblIcon, 10);
-		this.elementFigure.setLayoutData(fd);
-		this.elementFigure.addListener(SWT.Selection, new Listener() {
+		fd.top = new FormAttachment(lblLabel, 0, SWT.CENTER);
+		fd.left = new FormAttachment(table, 0, SWT.LEFT);
+		fd.right = new FormAttachment(table, 0, SWT.RIGHT);
+		this.txtElementLabel.setLayoutData(fd);
+		this.txtElementLabel.addListener(SWT.DefaultSelection, new Listener() {
 			@Override public void handleEvent(Event e) {
 				String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
 				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
-				ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, specializationName);
-				elementSpecialization.setFigure(((ElementFigure)e.widget).getSelectedFigure());
-				elementSpecialization.setIconName(((ElementFigure)e.widget).getIconName());
-				elementSpecialization.setIconSize(((ElementFigure)e.widget).getIconSize());
-				elementSpecialization.setIconLocation(((ElementFigure)e.widget).getIconLocation());
+				ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getText());
+				
+				elementSpecialization.setLabel(((Text)e.widget).getText());
+				
+				setMetadata("Change label for specialization "+selectedClass+"/"+specializationName);
+			}
+		});
+		this.txtElementLabel.addFocusListener(new FocusListener() {
+			String text;
+			
+			@Override public void focusGained(FocusEvent e) {
+				this.text=((Text)e.widget).getText();
+			}
+			@Override public void focusLost(FocusEvent e) {
+				if ( !((Text)e.widget).getText().equals(this.text) ) {
+					((Text)e.widget).notifyListeners(SWT.DefaultSelection, new Event());		// simulates a return or enter key
+				}
+			}
+		});
 
-				setMetadata("Change figure for specialization "+selectedClass+"/"+specializationName);
-		        
-		        // we force the figures to be redrawn
-				((ElementFigure)e.widget).resetPreviewImages();
+		Label lblFigure = new Label(parent, SWT.NONE);
+		lblFigure.setForeground(parent.getForeground());
+		lblFigure.setBackground(parent.getBackground());
+		lblFigure.setText("Figure:");
+		fd = new FormData();
+		fd.top = new FormAttachment(lblLabel, 15);
+		fd.left = new FormAttachment(lblSpecializationName, 0, SWT.LEFT);
+		lblFigure.setLayoutData(fd);
+
+		this.elementFigure = new ElementFigure(parent, SWT.NONE);
+		this.elementFigure.setEnabled(false);
+		fd = new FormData();
+		fd.top = new FormAttachment(lblFigure, -5, SWT.TOP);
+		fd.left = new FormAttachment(table, 0, SWT.LEFT);
+		fd.right = new FormAttachment(table, 0, SWT.RIGHT);
+		this.elementFigure.setLayoutData(fd);
+		this.elementFigure.addListener(SWT.Selection, new Listener() {
+			@Override public void handleEvent(Event e) {
+				ComponentLabel selectedComponentLabel = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel();
+				if ( selectedComponentLabel != null ) {
+					String selectedClass = selectedComponentLabel.getToolTipText();
+					String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
+					ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, specializationName);
+					elementSpecialization.setFigure(((ElementFigure)e.widget).getSelectedFigure());
+					elementSpecialization.setIconName(((ElementFigure)e.widget).getIconName());
+					elementSpecialization.setIconSize(((ElementFigure)e.widget).getIconSize());
+					elementSpecialization.setIconLocation(((ElementFigure)e.widget).getIconLocation());
+	
+					setMetadata("Change figure for specialization "+selectedClass+"/"+specializationName);
+			        
+			        // we force the figures to be redrawn
+					((ElementFigure)e.widget).resetPreviewImages();
+				}
 			}
 		});
 

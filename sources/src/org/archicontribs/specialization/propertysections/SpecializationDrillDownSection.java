@@ -240,7 +240,6 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
         IArchimateConcept concept = this.elementEditPart.getModel().getArchimateConcept();
         IArchimateModel model = concept.getArchimateModel();
         
-        String viewId = SpecializationPlugin.getPropertyValue(concept, ArchimateDiagramEditor.getDrilldownPropertyName());
         String selectedComboEntry = "";
         
         this.comboDrilldown.removeModifyListener(this.comboModifyListener);
@@ -257,12 +256,18 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
                 nameLength = view.getName().length();
         }
         
-        //then we fill in the combo, aligning the view IDs
+        // then we fill in the combo, aligning the view IDs
         for ( IDiagramModel view: allViews ) {
             String entry = String.format("%-"+nameLength+"s (%s)",view.getName(), view.getId());
             this.comboDrilldown.add(entry);
-            if ( viewId != null && view.getId().equals(viewId) )
-                selectedComboEntry = entry;
+            
+    		for ( IProperty property:concept.getProperties() ) {
+    			if ( ArchimateDiagramEditor.getDrilldownPropertyName().equals(property.getKey()) ) {
+    				if ( view.getId().equals(property.getValue()) )
+    					selectedComboEntry = entry;
+    				break;
+    			}
+    		}
         }
         this.comboDrilldown.setText(selectedComboEntry);
         

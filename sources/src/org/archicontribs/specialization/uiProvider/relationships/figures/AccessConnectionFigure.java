@@ -5,10 +5,7 @@ import org.archicontribs.specialization.SpecializationPlugin;
 public class AccessConnectionFigure extends com.archimatetool.editor.diagram.figures.connections.AccessConnectionFigure {
     @Override
     protected void setConnectionText() {
-        String labelName = null;
-        
-        if ( SpecializationPlugin.mustReplaceLabel(getModelConnection()) )
-            labelName = SpecializationPlugin.getLabelName(getModelConnection());
+        String labelName = SpecializationPlugin.getLabelName(getModelConnection());
         
         if ( labelName==null )
             getConnectionLabel().setText(getModelConnection().getArchimateRelationship().getName());

@@ -26,10 +26,7 @@ public class CommunicationNetworkFigure extends com.archimatetool.editor.diagram
     
     @Override
     protected void setText() {
-        String labelName = null;
-        
-        if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
-            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
+        String labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )
             super.setText();

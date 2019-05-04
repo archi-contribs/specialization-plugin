@@ -13,12 +13,14 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -63,6 +65,8 @@ public class ElementFigure extends Composite {
 	static final String ID_PREFIX = "SpecializationPlugin_";
 	static final String CANVAS_NAME = "SpecializationPluginCanvas";
 	
+	Color defaultBackgroundColor = null;
+	
 	IArchimateModel model = null;
 
 	Label lblIconSize = null;
@@ -84,10 +88,10 @@ public class ElementFigure extends Composite {
 	EClass eClass = null;
 
 	Composite selectedFigure = null;
-
+	
 	public ElementFigure(Composite parent, int type) {
 		super(parent, type);
-		setBackgroundMode(SWT.INHERIT_DEFAULT);
+		this.defaultBackgroundColor = this.getBackground();
 		setLayout(new FormLayout());
 
 		// figure 1
@@ -177,7 +181,8 @@ public class ElementFigure extends Composite {
 		fd = new FormData();
 		fd.top = new FormAttachment(this.outerCompo2, 0, SWT.TOP);
 		fd.left = new FormAttachment(this.outerCompo2, 5);
-		fd.right = new FormAttachment(this.outerCompo2, 40, SWT.RIGHT);
+		fd.width = 20;
+		fd.height = 20;
 		this.btnNewIcon.setLayoutData(fd);
 		this.btnNewIcon.addListener(SWT.MouseUp, new Listener() {
 			@Override public void handleEvent(Event event) {
@@ -251,9 +256,10 @@ public class ElementFigure extends Composite {
 		this.btnDeleteIcon.setEnabled(false);
 		this.btnDeleteIcon.setVisible(false);
 		fd = new FormData();
-		fd.top = new FormAttachment(this.btnNewIcon, 5);
-		fd.left = new FormAttachment(this.outerCompo2, 5);
-		fd.right = new FormAttachment(this.outerCompo2, 40, SWT.RIGHT);
+		fd.top = new FormAttachment(this.btnNewIcon, 0, SWT.TOP);
+		fd.left = new FormAttachment(this.btnNewIcon, 5);
+		fd.width = 20;
+		fd.height = 20;
 		this.btnDeleteIcon.setLayoutData(fd);
 		this.btnDeleteIcon.addListener(SWT.MouseUp, new Listener() {
 			@Override public void handleEvent(Event event) {
@@ -261,48 +267,15 @@ public class ElementFigure extends Composite {
 				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
 			}
 		});
-
-		this.lblIconSize = new Label(this, SWT.NONE);
-		this.lblIconSize.setForeground(this.getForeground());
-		this.lblIconSize.setBackground(this.getBackground());
-		this.lblIconSize.setText("Size:");
-		this.lblIconSize.setVisible(false);
-		fd = new FormData();
-		fd.top = new FormAttachment(0, 5);
-		fd.left = new FormAttachment(this.btnNewIcon, 5);
-		this.lblIconSize.setLayoutData(fd);
-
-		this.txtIconSize = new Text(this, SWT.BORDER);
-		this.txtIconSize.setToolTipText("Size of the icon under the form \"width x height\" or \"auto\"\n\n   if width == 0, then a ratio is done using the height\n   if height == 0, then a ratio is done using the width\n\n   auto allows to adapt the icon size to the figure size.");
-		this.txtIconSize.setVisible(false);
-		this.txtIconSize.addListener(SWT.DefaultSelection, new Listener() {
-			@Override public void handleEvent(Event e) {
-				setIconSize(((Text)e.widget).getText());
-				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
-			}
-		});
-		this.txtIconSize.addFocusListener(new FocusListener() {
-			String text;
-			
-			@Override public void focusGained(FocusEvent e) {
-				this.text=((Text)e.widget).getText();
-			}
-			@Override public void focusLost(FocusEvent e) {
-				if ( !((Text)e.widget).getText().equals(this.text) ) {
-					setIconSize(((Text)e.widget).getText());
-					ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
-				}
-			}
-		});
-
+		
 		this.lblIconLocation = new Label(this, SWT.NONE);
 		this.lblIconLocation.setForeground(this.getForeground());
 		this.lblIconLocation.setBackground(this.getBackground());
 		this.lblIconLocation.setText("Location:");
 		this.lblIconLocation.setVisible(false);
 		fd = new FormData();
-		fd.top = new FormAttachment(this.lblIconSize, 5);
-		fd.left = new FormAttachment(this.lblIconSize, 0, SWT.LEFT);
+		fd.top = new FormAttachment(this.btnNewIcon, 5);
+		fd.left = new FormAttachment(this.outerCompo2, 5);
 		this.lblIconLocation.setLayoutData(fd);
 
 		this.txtIconLocation = new Text(this, SWT.BORDER);
@@ -311,8 +284,9 @@ public class ElementFigure extends Composite {
 		fd = new FormData();
 		fd.top = new FormAttachment(this.lblIconLocation, 0, SWT.CENTER);
 		fd.left = new FormAttachment(this.lblIconLocation, 5);
-		fd.right = new FormAttachment(this.lblIconLocation, 80, SWT.RIGHT);
+		fd.right = new FormAttachment(100);
 		this.txtIconLocation.setLayoutData(fd);
+		
 		this.txtIconLocation.addListener(SWT.DefaultSelection, new Listener() {
 			@Override public void handleEvent(Event e) {
 				setIconLocation(((Text)e.widget).getText());
@@ -333,11 +307,44 @@ public class ElementFigure extends Composite {
 			}
 		});
 
+		this.lblIconSize = new Label(this, SWT.NONE);
+		this.lblIconSize.setForeground(this.getForeground());
+		this.lblIconSize.setBackground(this.getBackground());
+		this.lblIconSize.setText("Size:");
+		this.lblIconSize.setVisible(false);
+		fd = new FormData();
+		fd.top = new FormAttachment(this.lblIconLocation, 5);
+		fd.left = new FormAttachment(this.lblIconLocation, 0, SWT.LEFT);
+		this.lblIconSize.setLayoutData(fd);
+
+		this.txtIconSize = new Text(this, SWT.BORDER);
+		this.txtIconSize.setToolTipText("Size of the icon under the form \"width x height\" or \"auto\"\n\n   if width == 0, then a ratio is done using the height\n   if height == 0, then a ratio is done using the width\n\n   auto allows to adapt the icon size to the figure size.");
+		this.txtIconSize.setVisible(false);
 		fd = new FormData();
 		fd.top = new FormAttachment(this.lblIconSize, 0, SWT.CENTER);
 		fd.left = new FormAttachment(this.txtIconLocation, 0, SWT.LEFT);
 		fd.right = new FormAttachment(this.txtIconLocation, 0, SWT.RIGHT);
 		this.txtIconSize.setLayoutData(fd);
+		
+		this.txtIconSize.addListener(SWT.DefaultSelection, new Listener() {
+			@Override public void handleEvent(Event e) {
+				setIconSize(((Text)e.widget).getText());
+				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+			}
+		});
+		this.txtIconSize.addFocusListener(new FocusListener() {
+			String text;
+			
+			@Override public void focusGained(FocusEvent e) {
+				this.text=((Text)e.widget).getText();
+			}
+			@Override public void focusLost(FocusEvent e) {
+				if ( !((Text)e.widget).getText().equals(this.text) ) {
+					setIconSize(((Text)e.widget).getText());
+					ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+				}
+			}
+		});
 	}
 
 	void reset() {
@@ -363,7 +370,10 @@ public class ElementFigure extends Composite {
 		this.txtIconLocation.setVisible(false);
 	}
 
-	
+	@Override public void setEnabled(boolean enabled) throws SWTException {
+		super.setEnabled(enabled);
+		this.setBackground(enabled ? SpecializationPlugin.WHITE_COLOR : this.defaultBackgroundColor);
+	}
 	
 	void resetPreviewImages() {
 		Image oldImage = this.figure1.getBackgroundImage();
@@ -475,7 +485,7 @@ public class ElementFigure extends Composite {
 			}
 		}
 	}
-
+	
 	void select(int type) {
 		if ( type == 0 )
 			select(this.outerCompo1);
