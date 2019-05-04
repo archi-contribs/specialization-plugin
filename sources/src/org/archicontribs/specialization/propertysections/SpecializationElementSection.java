@@ -12,11 +12,13 @@ import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.commands.SpecializationPropertyCommand;
 import org.archicontribs.specialization.types.ElementSpecialization;
 import org.archicontribs.specialization.types.ElementSpecializationMap;
+import org.archicontribs.specialization.types.SpecializationProperty;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EContentAdapter;
+import org.eclipse.gef.commands.CompoundCommand;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -148,8 +150,66 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         @Override
         public void modifyText(ModifyEvent event) {
             IArchimateElement concept = SpecializationElementSection.this.elementEditPart.getModel().getArchimateConcept();
-            String value = ((Combo)event.widget).getText();
-            getCommandStack().execute(new SpecializationPropertyCommand(concept, SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY, value, SpecializationElementSection.this.eAdapter));
+            String clazz = concept.getClass().getSimpleName();
+        
+        	String oldSpecializationName = null;
+    		for ( IProperty property: concept.getProperties() ) {
+    			if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(property.getKey()) ) {
+    				oldSpecializationName = property.getValue();
+    				break;
+    			}
+    		}
+        	
+            String newSpecializationName = ((Combo)event.widget).getText();
+            
+            if ( (oldSpecializationName == null) && newSpecializationName.isEmpty() )
+            	return;		// nothing to do
+            
+            if ( newSpecializationName.equals(oldSpecializationName) )
+            	return;		// nothing to do
+            
+            // if the new specialization differs from the old one, we set the SPECIALIZATION_PROPERTY_KEY property
+            CompoundCommand commands = new CompoundCommand("Set specialization");
+            commands.add(new SpecializationPropertyCommand(concept, SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY, newSpecializationName, SpecializationElementSection.this.eAdapter));
+            
+            ElementSpecializationMap elementspecializationMap = ElementSpecializationMap.getFromArchimateModel(concept.getArchimateModel());
+            ElementSpecialization oldElementSpecialization = elementspecializationMap.getElementSpecialization(clazz, oldSpecializationName);
+            ElementSpecialization newElementSpecialization = elementspecializationMap.getElementSpecialization(clazz, newSpecializationName);
+            
+            // we remove the old concept properties
+            if ( oldElementSpecialization != null ) {
+	            for ( SpecializationProperty specializationProperty: oldElementSpecialization.getProperties() ) {
+	            	boolean mustRemoveSpecializationProperty = false;
+	            	for ( IProperty conceptProperty: concept.getProperties() ) {
+	            		if ( specializationProperty.getName().equals(conceptProperty.getKey()) ) {
+	            			if ( (conceptProperty.getValue() == null) || conceptProperty.getValue().equals(specializationProperty.getValue()) )
+	            				mustRemoveSpecializationProperty = true;
+	            			break;
+	            		}
+	            	}
+	            	if ( mustRemoveSpecializationProperty ) {
+	            		commands.add(new SpecializationPropertyCommand(concept, specializationProperty.getName(), null, SpecializationElementSection.this.eAdapter));
+	            	}
+	    		}
+            }
+            
+            // we create the new concept properties
+            if ( newElementSpecialization != null ) {
+            	for ( SpecializationProperty specializationProperty: newElementSpecialization.getProperties() ) {
+            		boolean mustCreateSpecializationProperty = true;
+	            	for ( IProperty conceptProperty: concept.getProperties() ) {
+	            		if ( specializationProperty.getName().equals(conceptProperty.getKey()) ) {
+	            			mustCreateSpecializationProperty = false;
+	            			break;
+	            		}
+	            	}
+	            	if ( mustCreateSpecializationProperty ) {
+	            		commands.add(new SpecializationPropertyCommand(concept, specializationProperty.getName(), specializationProperty.getValue(), SpecializationElementSection.this.eAdapter));
+	            	}
+	    		}
+            }
+            
+            getCommandStack().execute(commands);
         }
     };
     
@@ -234,13 +294,13 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         this.comboElement.add("");
 
         ElementSpecializationMap elementSpecializationMap = ElementSpecializationMap.getFromArchimateModel(concept.getArchimateModel());
-        List<ElementSpecialization> elementSpecializations = elementSpecializationMap.get(concept.getClass().getSimpleName().replaceAll(" ", ""));
+        List<ElementSpecialization> elementSpecializations = elementSpecializationMap.get(concept.getClass().getSimpleName());
         // TODO : remove unused properties from old specialization
         
-        String actualSpecializationProperty = null;
+        String actualSpecialization = null;
 		for ( IProperty property:concept.getProperties() ) {
 			if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(property.getKey()) ) {
-				actualSpecializationProperty = property.getValue();
+				actualSpecialization = property.getValue();
 				break;
 			}
 		}
@@ -248,10 +308,12 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         // then we fill in the combo with the existing specializations
         for ( ElementSpecialization elementSpecialization: elementSpecializations ) {
             this.comboElement.add(elementSpecialization.getSpecializationName());
-            if ( elementSpecialization.getSpecializationName().equals(actualSpecializationProperty) )
+            if ( elementSpecialization.getSpecializationName().equals(actualSpecialization) )
             	this.comboElement.setText(elementSpecialization.getSpecializationName());
         }
         
+        // We ensure the modify listener is set (but only once ...)
+        this.comboElement.removeModifyListener(this.comboModifyListener);
         this.comboElement.addModifyListener(this.comboModifyListener);
 	}
 }

@@ -111,6 +111,8 @@ public class SpecializationCombo extends Composite {
 			if (dlg.open() == Window.OK) {
 				// User clicked OK, we verify that the name does not already exists
 				String newValue = dlg.getValue();
+				SpecializationCombo.this.previousValue = "";
+				
 				boolean alreadyExists = false;
 				for ( int index = 0; index < SpecializationCombo.this.combo.getItemCount(); ++index ) {
 					if ( newValue.equals(SpecializationCombo.this.combo.getItem(index)) ) {
@@ -129,8 +131,6 @@ public class SpecializationCombo extends Composite {
 					SpecializationCombo.this.btnEdit.setEnabled(true);
 					SpecializationCombo.this.btnDelete.setEnabled(true);
 				}
-				
-				SpecializationCombo.this.previousValue = "";
 			}
 		}
 
@@ -144,6 +144,8 @@ public class SpecializationCombo extends Composite {
 			if (dlg.open() == Window.OK) {
 				// User clicked OK, we verify that the name does not already exists
 				String newValue = dlg.getValue();
+				SpecializationCombo.this.previousValue = oldValue;
+				
 				for ( int index = 0; index < SpecializationCombo.this.combo.getItemCount(); ++index ) {
 					if ( newValue.equals(SpecializationCombo.this.combo.getItem(index)) ) {
 						SpecializationPlugin.popup(Level.WARN, "The "+SpecializationCombo.this.label+" \""+newValue+"\" already exists.");
@@ -152,8 +154,6 @@ public class SpecializationCombo extends Composite {
 				}
 
 				logger.debug("Renaming "+oldValue+ " to "+newValue);
-				
-				SpecializationCombo.this.previousValue = oldValue;
 
 				// we get the index of the old value in order to delete it
 				int oldValueIndex = 0;
