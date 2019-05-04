@@ -159,7 +159,7 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
                 if ( splittedValue != null && splittedValue.length != 0 )
                     viewId = splittedValue[splittedValue.length-1];
             }
-            getCommandStack().execute(new SpecializationPropertyCommand(concept, ArchimateDiagramEditor.getDrilldownPropertyName(), viewId, SpecializationDrillDownSection.this.eAdapter));
+            getCommandStack().execute(new SpecializationPropertyCommand(concept, ArchimateDiagramEditor.DRILLDOWN_PROPERY_NAME, viewId, SpecializationDrillDownSection.this.eAdapter));
         }
     };
     
@@ -177,7 +177,7 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
         public void notifyChanged(Notification msg) {
             if ( msg.getNotifier() instanceof IProperty ) {
                 IProperty property = (IProperty)msg.getNotifier();
-                if( property.getKey().equals(ArchimateDiagramEditor.getDrilldownPropertyName()) )
+                if( property.getKey().equals(ArchimateDiagramEditor.DRILLDOWN_PROPERY_NAME) )
                     refreshControls();
             }
         }
@@ -262,7 +262,7 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
             this.comboDrilldown.add(entry);
             
     		for ( IProperty property:concept.getProperties() ) {
-    			if ( ArchimateDiagramEditor.getDrilldownPropertyName().equals(property.getKey()) ) {
+    			if ( ArchimateDiagramEditor.DRILLDOWN_PROPERY_NAME.equals(property.getKey()) ) {
     				if ( view.getId().equals(property.getValue()) )
     					selectedComboEntry = entry;
     				break;

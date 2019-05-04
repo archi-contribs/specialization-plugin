@@ -18,7 +18,7 @@ import com.archimatetool.model.IProperty;
 public class ArchimateDiagramEditor extends com.archimatetool.editor.diagram.ArchimateDiagramEditor {
     static final SpecializationLogger logger = new SpecializationLogger(ArchimateDiagramEditor.class);
     
-    static String propertyName = "drill down";
+    public static final String DRILLDOWN_PROPERY_NAME = "drill down";
     
     @Override
     protected void createRootEditPart(GraphicalViewer viewer) {
@@ -33,14 +33,14 @@ public class ArchimateDiagramEditor extends com.archimatetool.editor.diagram.Arc
     					IArchimateElement element = ((IDiagramModelArchimateObject) component).getArchimateConcept();
     					boolean propFound = false;
     					for ( IProperty prop: element.getProperties() ) {
-    						if ( prop.getKey() != null && prop.getKey().equals(propertyName) ) {
+    						if ( prop.getKey() != null && prop.getKey().equals(DRILLDOWN_PROPERY_NAME) ) {
     						    propFound = true;
     				            IArchimateModel model = element.getArchimateModel();
     							String viewId = prop.getValue();
     	                        if ( viewId == null ) {
-    	                            logger.debug("Property \""+propertyName+"\" = null");
+    	                            logger.debug("Property \""+DRILLDOWN_PROPERY_NAME+"\" = null");
     	                        } else {
-    	                            logger.debug("Property \""+propertyName+"\" = \""+viewId+"\"");
+    	                            logger.debug("Property \""+DRILLDOWN_PROPERY_NAME+"\" = \""+viewId+"\"");
         							for ( IDiagramModel view: model.getDiagramModels() ) {
         							    if ( view.getId().equals(viewId) ) {
         							        logger.debug("Opening view \""+view.getName()+"\"");
@@ -58,9 +58,5 @@ public class ArchimateDiagramEditor extends com.archimatetool.editor.diagram.Arc
 			}
     		
     	});
-    }
-    
-    public static String getDrilldownPropertyName() {
-        return propertyName;
     }
 }
