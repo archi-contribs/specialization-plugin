@@ -984,7 +984,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		ElementSpecialization elementSpecialization = ElementSpecializationMap.getElementSpecialization(concept);
 		
 		String label = null;
-		if ( elementSpecialization != null )
+		if ( (elementSpecialization != null) && !elementSpecialization.getLabel().isEmpty() )
 			label = SpecializationVariable.expand(elementSpecialization.getLabel(), obj);
 		
 		if ( label != null ) {
