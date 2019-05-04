@@ -147,7 +147,6 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
      * Called when the combo value is changed
      */
     ModifyListener comboModifyListener = new ModifyListener() {
-        @SuppressWarnings("synthetic-access")
         @Override
         public void modifyText(ModifyEvent event) {
             IArchimateElement concept = SpecializationDrillDownSection.this.elementEditPart.getModel().getArchimateConcept();
@@ -172,7 +171,7 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
      * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
      * This one is a EContentAdapter to listen to child IProperty changes
      */
-    private Adapter eAdapter = new EContentAdapter() {
+    Adapter eAdapter = new EContentAdapter() {
         @Override
         public void notifyChanged(Notification msg) {
             if ( msg.getNotifier() instanceof IProperty ) {
