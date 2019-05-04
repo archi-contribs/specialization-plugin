@@ -17,10 +17,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
@@ -96,7 +92,7 @@ public class ElementFigure extends Composite {
 
 		// figure 1
 		this.outerCompo1 = new Composite(this, SWT.NONE);
-		this.setBackground(parent.getBackground());
+		this.outerCompo1.setBackground(this.getBackground());
 		FormData fd = new FormData();
 		fd.top = new FormAttachment(0, 0);
 		fd.left = new FormAttachment(0, 0);
@@ -104,10 +100,9 @@ public class ElementFigure extends Composite {
 		fd.height = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT) + 2*figureMargin;
 		this.outerCompo1.setLayoutData(fd);
 		this.outerCompo1.setLayout(new FormLayout());
-		//this.outerCompo1.addPaintListener(this.redrawListener);
 
 		this.innerCompo1 = new Composite(this.outerCompo1, SWT.NONE);
-		this.setBackground(parent.getBackground());
+		this.innerCompo1.setBackground(this.getBackground());
 		fd = new FormData();
 		fd.top = new FormAttachment(0, figureMargin);
 		fd.left = new FormAttachment(0, figureMargin);
@@ -136,6 +131,7 @@ public class ElementFigure extends Composite {
 
 		// figure 2
 		this.outerCompo2 = new Composite(this, SWT.NONE);
+		this.outerCompo2.setBackground(this.getBackground());
 		fd = new FormData();
 		fd.top = new FormAttachment(0, 0);
 		fd.left = new FormAttachment(this.outerCompo1, 5);
@@ -143,10 +139,9 @@ public class ElementFigure extends Composite {
 		fd.height = ArchiPlugin.INSTANCE.getPreferenceStore().getInt(com.archimatetool.editor.preferences.IPreferenceConstants.DEFAULT_ARCHIMATE_FIGURE_HEIGHT) + 2*figureMargin;
 		this.outerCompo2.setLayoutData(fd);
 		this.outerCompo2.setLayout(new FormLayout());
-		//this.outerCompo2.addPaintListener(this.redrawListener);
 
 		this.innerCompo2 = new Composite(this.outerCompo2, SWT.NONE);
-		this.setBackground(parent.getBackground());
+		this.innerCompo2.setBackground(this.getBackground());
 		fd = new FormData();
 		fd.top = new FormAttachment(0, figureMargin);
 		fd.left = new FormAttachment(0, figureMargin);
@@ -461,8 +456,8 @@ public class ElementFigure extends Composite {
 		if ( this.selectedFigure != figure ) {
 			this.selectedFigure = figure;
 
-			this.outerCompo1.setBackground(figure == this.outerCompo1 ? ColorConstants.blue : this.outerCompo1.getParent().getBackground());
-			this.outerCompo2.setBackground(figure == this.outerCompo2 ? ColorConstants.blue : this.outerCompo2.getParent().getBackground());
+			this.outerCompo1.setBackground(figure == this.outerCompo1 ? ColorConstants.blue : this.getBackground());
+			this.outerCompo2.setBackground(figure == this.outerCompo2 ? ColorConstants.blue : this.getBackground());
 
 			if ( (this.selectedFigure != null) && (this.selectedFigure.getData(canChangeIconString) != null) ) {
 				boolean canChangeIcon = (boolean)this.selectedFigure.getData(canChangeIconString);
