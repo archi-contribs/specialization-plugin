@@ -138,6 +138,8 @@ import com.archimatetool.model.INameable;
  * 
  * v1.0.11      27/03/2019      fix exception when using magic connector to create new element
  * 
+ * c2.0.0.beta1	04/05/2019		allow to define specializations at the model level, and to assign a specialization to every element
+ * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
