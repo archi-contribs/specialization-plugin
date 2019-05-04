@@ -145,7 +145,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 
-	public static final String pluginVersion = "2.0.0.beta1";
+	public static final String pluginVersion = "2.0.0.alpha1";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 
