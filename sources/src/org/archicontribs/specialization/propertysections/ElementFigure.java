@@ -287,12 +287,16 @@ public class ElementFigure extends Composite {
 			}
 		});
 		this.txtIconSize.addFocusListener(new FocusListener() {
-			@Override public void focusLost(FocusEvent e) {
-				setIconSize(((Text)e.widget).getText());
-				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
-			}
+			String text;
+			
 			@Override public void focusGained(FocusEvent e) {
-				// nothing to do
+				this.text=((Text)e.widget).getText();
+			}
+			@Override public void focusLost(FocusEvent e) {
+				if ( !((Text)e.widget).getText().equals(this.text) ) {
+					setIconSize(((Text)e.widget).getText());
+					ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+				}
 			}
 		});
 
@@ -321,12 +325,16 @@ public class ElementFigure extends Composite {
 			}
 		});
 		this.txtIconLocation.addFocusListener(new FocusListener() {
-			@Override public void focusLost(FocusEvent e) {
-				setIconLocation(((Text)e.widget).getText());
-				ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
-			}
+			String text;
+			
 			@Override public void focusGained(FocusEvent e) {
-				// nothing to do
+				this.text=((Text)e.widget).getText();
+			}
+			@Override public void focusLost(FocusEvent e) {
+				if ( !((Text)e.widget).getText().equals(this.text) ) {
+					setIconLocation(((Text)e.widget).getText());
+					ElementFigure.this.notifyListeners(SWT.Selection, new Event());		// indicates that something changed in the figure
+				}
 			}
 		});
 
