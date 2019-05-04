@@ -1,4 +1,4 @@
-package org.archicontribs.specialization.propertysections;
+package org.archicontribs.specialization.types;
 
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;

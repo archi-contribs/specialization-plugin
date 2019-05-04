@@ -1,4 +1,4 @@
-package org.archicontribs.specialization.propertysections;
+package org.archicontribs.specialization.types;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.types.ElementSpecialization;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.ecore.EClass;
@@ -347,7 +346,7 @@ public class ElementFigure extends Composite {
 		});
 	}
 
-	void reset() {
+	public void reset() {
 		this.outerCompo1.setBackground(this.outerCompo1.getParent().getBackground());
 		Image oldImage = this.figure1.getBackgroundImage();
 		this.figure1.setBackgroundImage(null);
@@ -375,7 +374,7 @@ public class ElementFigure extends Composite {
 		this.setBackground(enabled ? SpecializationPlugin.WHITE_COLOR : this.defaultBackgroundColor);
 	}
 	
-	void resetPreviewImages() {
+	public void resetPreviewImages() {
 		Image oldImage = this.figure1.getBackgroundImage();
 		this.figure1.setBackgroundImage(getPreviewImage(this.eClass, 0));
 		if ( oldImage != null )
