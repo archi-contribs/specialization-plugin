@@ -9,8 +9,7 @@ import java.util.Comparator;
 
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.SpecializationPropertyCommand;
-import org.archicontribs.specialization.diagram.ArchimateDiagramEditor;
+import org.archicontribs.specialization.commands.SpecializationPropertyCommand;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
@@ -23,14 +22,12 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -39,7 +36,6 @@ import org.eclipse.ui.PlatformUI;
 import com.archimatetool.editor.diagram.editparts.ArchimateElementEditPart;
 import com.archimatetool.model.IArchimateConcept;
 import com.archimatetool.model.IArchimateElement;
-import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IProperty;
@@ -53,8 +49,6 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
 	Combo comboDrilldown;
 	
     boolean mouseOverHelpButton = false;
-    
-    static final Image    HELP_ICON          = new Image(Display.getDefault(), SpecializationPlugin.class.getResourceAsStream("/img/28x28/help.png"));
 	
 	/**
 	 * Filter to show or reject this section depending on input value
@@ -132,7 +126,7 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
             public void paintControl(PaintEvent e)
             {
                  if ( SpecializationDrillDownSection.this.mouseOverHelpButton ) e.gc.drawRoundRectangle(0, 0, 29, 29, 10, 10);
-                 e.gc.drawImage(HELP_ICON, 2, 2);
+                 e.gc.drawImage(SpecializationPlugin.HELP_ICON, 2, 2);
             }
         });
         btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });
@@ -151,7 +145,6 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
      * Called when the combo value is changed
      */
     ModifyListener comboModifyListener = new ModifyListener() {
-        @SuppressWarnings("synthetic-access")
         @Override
         public void modifyText(ModifyEvent event) {
             IArchimateElement concept = SpecializationDrillDownSection.this.elementEditPart.getModel().getArchimateConcept();
@@ -163,7 +156,7 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
                 if ( splittedValue != null && splittedValue.length != 0 )
                     viewId = splittedValue[splittedValue.length-1];
             }
-            getCommandStack().execute(new SpecializationPropertyCommand(concept, ArchimateDiagramEditor.getDrilldownPropertyName(), viewId, SpecializationDrillDownSection.this.eAdapter));
+            getCommandStack().execute(new SpecializationPropertyCommand(concept, SpecializationPlugin.DRILLDOWN_PROPERTY_KEY, viewId, SpecializationDrillDownSection.this.eAdapter));
         }
     };
     
@@ -176,12 +169,12 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
      * Adapter to listen to changes made elsewhere (including Undo/Redo commands)
      * This one is a EContentAdapter to listen to child IProperty changes
      */
-    private Adapter eAdapter = new EContentAdapter() {
+    Adapter eAdapter = new EContentAdapter() {
         @Override
         public void notifyChanged(Notification msg) {
             if ( msg.getNotifier() instanceof IProperty ) {
                 IProperty property = (IProperty)msg.getNotifier();
-                if( property.getKey().equals(ArchimateDiagramEditor.getDrilldownPropertyName()) )
+                if( SpecializationPlugin.DRILLDOWN_PROPERTY_KEY.equals(property.getKey()) )
                     refreshControls();
             }
         }
@@ -242,16 +235,12 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
 
         logger.trace("Refreshing controls");
         IArchimateConcept concept = this.elementEditPart.getModel().getArchimateConcept();
-        IArchimateModel model = concept.getArchimateModel();
-        
-        String viewId = SpecializationPlugin.getPropertyValue(concept, ArchimateDiagramEditor.getDrilldownPropertyName());
-        String selectedComboEntry = "";
         
         this.comboDrilldown.removeModifyListener(this.comboModifyListener);
         this.comboDrilldown.removeAll();
         this.comboDrilldown.add("");
 
-        EList<IDiagramModel> allViews = model.getDiagramModels();
+        EList<IDiagramModel> allViews = concept.getArchimateModel().getDiagramModels();
         allViews.sort(this.nameComparator);
         int nameLength = 0;
         
@@ -261,14 +250,21 @@ public class SpecializationDrillDownSection extends org.archicontribs.specializa
                 nameLength = view.getName().length();
         }
         
-        //then we fill in the combo, aligning the view IDs
+        String actualDrillDownProperty = null;
+		for ( IProperty property:concept.getProperties() ) {
+			if ( SpecializationPlugin.DRILLDOWN_PROPERTY_KEY.equals(property.getKey()) ) {
+				actualDrillDownProperty = property.getValue();
+				break;
+			}
+		}
+        
+        // then we fill in the combo, aligning the view IDs
         for ( IDiagramModel view: allViews ) {
             String entry = String.format("%-"+nameLength+"s (%s)",view.getName(), view.getId());
             this.comboDrilldown.add(entry);
-            if ( viewId != null && view.getId().equals(viewId) )
-                selectedComboEntry = entry;
+            if ( view.getId().equals(actualDrillDownProperty) )
+            	this.comboDrilldown.setText(actualDrillDownProperty);
         }
-        this.comboDrilldown.setText(selectedComboEntry);
         
         this.comboDrilldown.addModifyListener(this.comboModifyListener);
 	}

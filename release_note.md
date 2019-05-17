@@ -1,3 +1,7 @@
+* v1.0.11 (27/03/2019)
+   * fix exception when using magic connector to create new element
+
+
 * v1.0.10 (23/10/2018)
    * fix compatibility issue with Archi 4.2 (the plugin is now compatible with Archi 4.3 and 4.2)
 

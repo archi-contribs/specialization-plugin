@@ -316,40 +316,16 @@
                afterTab="figure.tab"
                category="appearance.category"
                id="specializeModel.tab"
-               label="Specialize model">
-         </propertyTab>
-         <propertyTab
-               afterTab="figure.tab"
-               category="appearance.category"
-               id="specializeFolder.tab"
-               label="Specialize folder">
-         </propertyTab>
-         <propertyTab
-               afterTab="figure.tab"
-               category="appearance.category"
-               id="specializeView.tab"
-               label="Specialize view">
+               label="Specialization">
          </propertyTab>
          <propertyTab
                afterTab="specialization.tab"
                category="appearance.category"
-               id="replaceIcon.tab"
-               label="Replace icon">
+               id="specializeElement.tab"
+               label="Specialization">
          </propertyTab>
          <propertyTab
-               afterTab="specialization.tab"
-               category="appearance.category"
-               id="replaceElementLabel.tab"
-               label="Replace label">
-         </propertyTab>
-         <propertyTab
-               afterTab="specialization.tab"
-               category="appearance.category"
-               id="replaceRelationshipLabel.tab"
-               label="Replace label">
-         </propertyTab>
-         <propertyTab
-               afterTab="specialization.tab"
+               afterTab="specializeElement.tab"
                category="appearance.category"
                id="drilldown.tab"
                label="Drill down">
@@ -367,34 +343,10 @@
                tab="specializeModel.tab">
          </propertySection>
          <propertySection
-               class="org.archicontribs.specialization.propertysections.SpecializationFolderSection"
-               filter="org.archicontribs.specialization.propertysections.SpecializationFolderSection$Filter"
+               class="org.archicontribs.specialization.propertysections.SpecializationElementSection"
+               filter="org.archicontribs.specialization.propertysections.SpecializationElementSection$Filter"
                id="specializationSection"
-               tab="specializeFolder.tab">
-         </propertySection>
-         <propertySection
-               class="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection"
-               filter="org.archicontribs.specialization.propertysections.SpecializationDiagramModelSection$Filter"
-               id="specializationSection"
-               tab="specializeView.tab">
-         </propertySection>
-         <propertySection
-               class="org.archicontribs.specialization.propertysections.SpecializationIconSection"
-               filter="org.archicontribs.specialization.propertysections.SpecializationIconSection$Filter"
-               id="specializationSection"
-               tab="replaceIcon.tab">
-         </propertySection>
-         <propertySection
-               class="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection"
-               filter="org.archicontribs.specialization.propertysections.SpecializationElementLabelSection$Filter"
-               id="specializationSection"
-               tab="replaceElementLabel.tab">
-         </propertySection>
-         <propertySection
-               class="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection"
-               filter="org.archicontribs.specialization.propertysections.SpecializationRelationshipLabelSection$Filter"
-               id="specializationSection"
-               tab="replaceRelationshipLabel.tab">
+               tab="specializeElement.tab">
          </propertySection>
          <propertySection
                class="org.archicontribs.specialization.propertysections.SpecializationDrillDownSection"

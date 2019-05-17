@@ -20,18 +20,13 @@ public class CollaborationFigure extends com.archimatetool.editor.diagram.figure
     
     @Override
     protected void drawIcon(Graphics graphics) {
-    	if ( SpecializationPlugin.mustReplaceIcon(getDiagramModelObject()) && (SpecializationPlugin.getPropertyValue(getDiagramModelObject(), "icon") != null) )
-    		SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds);
-    	else
-    		super.drawIcon(graphics);
+    	if ( !SpecializationPlugin.drawIcon(getDiagramModelObject(), graphics, this.bounds) )
+			super.drawIcon(graphics);
     }
     
     @Override
     protected void setText() {
-        String labelName = null;
-        
-        if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
-            labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
+        String labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )
             super.setText();
