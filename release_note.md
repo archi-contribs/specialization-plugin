@@ -1,3 +1,14 @@
+* v2.0.0alpha1 (21/05/2019)
+  * Allow to define specializations at the model level, and to assign a specialization to every element
+  * Change the JAR name to remove the unnecessary "v" before the version number
+
+* Planned in next alpha releases
+  * add characteristics in the specializations definitions (object size, color, font, alignment, opacity, ...) 
+  * add specializations for relationships
+  * add export / import functionality
+  
+-----
+
 * v1.0.11 (27/03/2019)
    * fix exception when using magic connector to create new element
 
