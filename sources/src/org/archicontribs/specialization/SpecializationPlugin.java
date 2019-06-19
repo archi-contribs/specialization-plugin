@@ -128,17 +128,18 @@ import com.archimatetool.model.INameable;
  * 
  * v1.0.7       07/08/2018      Add drill down functionality
  * 
- * v1.0.7.1     07/08/2018      fix alignment and sizing options are missing in the action bar
+ * v1.0.7.1     07/08/2018      Fix alignment and sizing options are missing in the action bar
  * 
- * v1.0.8       19/09/2018      allow access to ${view:xxx} variables from connections
+ * v1.0.8       19/09/2018      Allow access to ${view:xxx} variables from connections
  * 
- * v1.0.9       21/09/2018      fix default icon location
+ * v1.0.9       21/09/2018      Fix default icon location
  * 
- * v1.0.10      23/10/2018		fix compatibility issue with Archi 4.2
+ * v1.0.10      23/10/2018		Fix compatibility issue with Archi 4.2
  * 
- * v1.0.11      27/03/2019      fix exception when using magic connector to create new element
+ * v1.0.11      27/03/2019      Fix exception when using magic connector to create new element
  * 
- * c2.0.0.beta1	04/05/2019		allow to define specializations at the model level, and to assign a specialization to every element
+ * v2.0.0.beta1	21/05/2019		Allow to define specializations at the model level, and to assign a specialization to every element
+ *                              Change the JAR name to remove the unnecessary "v" before the version number
  * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
@@ -582,7 +583,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 					}
 
 					if ( logger.isDebugEnabled() ) logger.debug("searching for plugins jar files");
-					Pattern p = Pattern.compile(pluginsPackage+"(.*).jar") ;
+					Pattern p = Pattern.compile(pluginsPackage+"_([0-9\\.]+)\\.jar") ;
 
 					Iterator<JSONObject> iterator = result.iterator();
 					while (iterator.hasNext()) {
