@@ -5,3 +5,5 @@ The specialization plugin is designed to specialize concepts (figures, icons, et
 
 This plugin is compatible with all my other plugins and with the GitHub persistence plugin. Archi users who open a model, but don't have the specialization images or plugin will just see the standard icons.
 
+For more information about how to use the plugin and additional configuration details, please see the wiki. 
+
