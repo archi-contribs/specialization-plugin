@@ -772,7 +772,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		else if ( obj instanceof IDiagramModelArchimateObject )
 			concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
 		else {
-			logger.error("Object should be an ArchimateConcept or an ArchimateObject !");
+			logger.error(getDebugName(concept)+" should be an ArchimateConcept or an ArchimateObject !");
 			return null;
 		}
 		
@@ -987,7 +987,7 @@ public class SpecializationPlugin extends AbstractUIPlugin {
 		else if ( obj instanceof IDiagramModelArchimateObject )
 			concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
 		else {
-			logger.error("Object should be an ArchimateConcept or an ArchimateObject !");
+			logger.error(getDebugName(concept)+" should be an ArchimateConcept or an ArchimateObject !");
 			return null;
 		}
 		

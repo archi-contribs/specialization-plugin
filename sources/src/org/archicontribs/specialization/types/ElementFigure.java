@@ -53,7 +53,6 @@ import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IDiagramModelImage;
 import com.archimatetool.model.IDiagramModelObject;
-import com.archimatetool.model.util.IDAdapter;
 
 public class ElementFigure extends Composite {
 	static final SpecializationLogger logger = new SpecializationLogger(ElementFigure.class);

@@ -117,7 +117,7 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 			else if ( obj instanceof IDiagramModelArchimateObject )
 				concept = ((IDiagramModelArchimateObject)obj).getArchimateConcept();
 			else {
-				logger.error("Object should be an ArchimateConcept or an ArchimateObject !");
+				logger.error(SpecializationPlugin.getDebugName(concept)+" should be an ArchimateConcept or an ArchimateObject !");
 				return null;
 			}
 			
