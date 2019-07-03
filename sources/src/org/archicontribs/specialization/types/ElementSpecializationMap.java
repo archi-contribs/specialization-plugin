@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
+import org.archicontribs.specialization.propertysections.SpecializationModelSection;
 import org.eclipse.emf.ecore.EObject;
 
 import com.archimatetool.model.IArchimateConcept;
@@ -105,7 +106,6 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 	 */
 	public static ElementSpecialization getElementSpecialization(EObject obj) {
 		if ( obj != null ) {
-			String clazz = null;
 			String specializationName = null;
 			ElementSpecializationMap elementSpecializationMap = null;
 
@@ -124,24 +124,23 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 			if ( concept.getId() == null )
 				return null;
 
-			// no specialization for objects that are not in a model
-			if ( concept.getArchimateModel() == null )
-				return null;
-
-			for ( IProperty prop: concept.getProperties() ) {
-				if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(prop.getKey()) ) {
-					clazz = concept.getClass().getSimpleName().replaceAll(" ",  "");
-					specializationName = prop.getValue();
-					elementSpecializationMap = getFromArchimateModel(concept.getArchimateModel());
-					break;
+			// if concept is not in a model, it means it may be in the SpecializationodelSection
+			if ( concept.getArchimateModel() == null ) {
+				specializationName = SpecializationModelSection.getSelectedSpecializationName();
+				if ( SpecializationModelSection.INSTANCE != null )
+					elementSpecializationMap = getFromArchimateModel(SpecializationModelSection.INSTANCE.getCurrentModel());
+			} else {
+				for ( IProperty prop: concept.getProperties() ) {
+					if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(prop.getKey()) ) {
+						specializationName = prop.getValue();
+						break;
+					}
 				}
+				elementSpecializationMap = getFromArchimateModel(concept.getArchimateModel());
 			}
-
-			ElementSpecialization elementSpecialization = null;
+			
 			if ( elementSpecializationMap != null )
-				elementSpecialization = elementSpecializationMap.getElementSpecialization(clazz, specializationName);
-
-			return elementSpecialization;
+				return elementSpecializationMap.getElementSpecialization(concept.getClass().getSimpleName().replaceAll(" ",  ""), specializationName);
 		}
 		return null;
 	}
