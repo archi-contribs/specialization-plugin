@@ -51,10 +51,7 @@ public class SpecializationUpdateMetadataCommand extends Command {
 	}
 
 	@Override public void execute() {
-		logger.trace("Setting specialization metadata from ...");
-		logger.trace(this.oldMetadataValue);
-		logger.trace("to ...");
-		logger.trace(this.metadataValue);
+		logger.trace("Setting specialization metadata from "+this.oldMetadataValue+" to "+this.metadataValue);
 		
 		if ( this.oldMetadata == null )
 			this.model.setMetadata(this.metadata);
@@ -68,10 +65,7 @@ public class SpecializationUpdateMetadataCommand extends Command {
 	}
 
 	@Override public void undo() {
-		logger.trace("Restoring specialization metadata from ...");
-		logger.trace(this.metadataValue);
-		logger.trace("to ...");
-		logger.trace(this.oldMetadataValue);
+		logger.trace("Restoring specialization metadata from +"+this.metadataValue+" to "+this.oldMetadataValue);
 		
 		if ( this.oldMetadata == null )
 			this.model.setMetadata(null);
