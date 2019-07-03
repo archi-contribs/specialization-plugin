@@ -226,15 +226,15 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		// Passive
 		// Behavior
 		this.exclusiveComponentLabels.add(strategyBehaviorCompo, Capability.class);
-		this.exclusiveComponentLabels.add(strategyBehaviorCompo,  CourseOfAction.class);
+		this.exclusiveComponentLabels.add(strategyBehaviorCompo, CourseOfAction.class);
 		// Active
 		this.exclusiveComponentLabels.add(strategyActiveCompo, Resource.class);
 
 		// Business layer
 		// Passive
-		this.exclusiveComponentLabels.add(businessPassiveCompo, Product.class);
 		this.exclusiveComponentLabels.add(businessPassiveCompo, BusinessObject.class);
 		this.exclusiveComponentLabels.add(businessPassiveCompo, Contract.class);
+		this.exclusiveComponentLabels.add(businessPassiveCompo, Product.class);
 		this.exclusiveComponentLabels.add(businessPassiveCompo, Representation.class);
 		// Behavior
 		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessProcess.class);
@@ -244,75 +244,76 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessService.class);
 		// Active
 		this.exclusiveComponentLabels.add(businessActiveCompo, BusinessActor.class);
-		this.exclusiveComponentLabels.add(businessActiveCompo, BusinessRole.class);
 		this.exclusiveComponentLabels.add(businessActiveCompo, BusinessCollaboration.class);
 		this.exclusiveComponentLabels.add(businessActiveCompo, BusinessInterface.class);
+		this.exclusiveComponentLabels.add(businessActiveCompo, BusinessRole.class);
 
 		// Application layer
 		//Passive
 		this.exclusiveComponentLabels.add(applicationPassiveCompo, DataObject.class);
 		//Behavior
+		this.exclusiveComponentLabels.add(applicationBehaviorCompo, ApplicationEvent.class);
 		this.exclusiveComponentLabels.add(applicationBehaviorCompo, ApplicationFunction.class);
 		this.exclusiveComponentLabels.add(applicationBehaviorCompo, ApplicationInteraction.class);
-		this.exclusiveComponentLabels.add(applicationBehaviorCompo, ApplicationEvent.class);
-		this.exclusiveComponentLabels.add(applicationBehaviorCompo, ApplicationService.class);
 		this.exclusiveComponentLabels.add(applicationBehaviorCompo, ApplicationProcess.class);
-		//  Active      
-		this.exclusiveComponentLabels.add(applicationActiveCompo, ApplicationComponent.class);
+		this.exclusiveComponentLabels.add(applicationBehaviorCompo, ApplicationService.class);
+		//  Active
 		this.exclusiveComponentLabels.add(applicationActiveCompo, ApplicationCollaboration.class);
+		this.exclusiveComponentLabels.add(applicationActiveCompo, ApplicationComponent.class);
 		this.exclusiveComponentLabels.add(applicationActiveCompo, ApplicationInterface.class);
 
 		// Technology layer
 		// Passive
 		this.exclusiveComponentLabels.add(technologyPassiveCompo, Artifact.class);
 		// Behavior
-		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyFunction.class);
-		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyProcess.class);
-		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyInteraction.class);
 		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyEvent.class);
+		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyFunction.class);
+		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyInteraction.class);
+		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyProcess.class);
 		this.exclusiveComponentLabels.add(technologyBehaviorCompo, TechnologyService.class);
 		// Active
-		this.exclusiveComponentLabels.add(technologyActiveCompo, Node.class);
+		this.exclusiveComponentLabels.add(technologyActiveCompo, CommunicationNetwork.class);
 		this.exclusiveComponentLabels.add(technologyActiveCompo, Device.class);
+		this.exclusiveComponentLabels.add(technologyActiveCompo, Node.class);
+		this.exclusiveComponentLabels.add(technologyActiveCompo, Path.class);
 		this.exclusiveComponentLabels.add(technologyActiveCompo, SystemSoftware.class);
 		this.exclusiveComponentLabels.add(technologyActiveCompo, TechnologyCollaboration.class);
 		this.exclusiveComponentLabels.add(technologyActiveCompo, TechnologyInterface.class);
-		this.exclusiveComponentLabels.add(technologyActiveCompo, Path.class);
-		this.exclusiveComponentLabels.add(technologyActiveCompo, CommunicationNetwork.class);
 
 		// Physical layer
 		// Passive
 		// Behavior
 		this.exclusiveComponentLabels.add(physicalBehaviorCompo, Material.class);
 		// Active
+		this.exclusiveComponentLabels.add(physicalActiveCompo, DistributionNetwork.class);
 		this.exclusiveComponentLabels.add(physicalActiveCompo, Equipment.class);
 		this.exclusiveComponentLabels.add(physicalActiveCompo, Facility.class);
-		this.exclusiveComponentLabels.add(physicalActiveCompo, DistributionNetwork.class);
 
 		// Implementation layer
-		this.exclusiveComponentLabels.add(implementationCompo, WorkPackage.class);
 		this.exclusiveComponentLabels.add(implementationCompo, Deliverable.class);
+		this.exclusiveComponentLabels.add(implementationCompo, Gap.class);
 		this.exclusiveComponentLabels.add(implementationCompo, ImplementationEvent.class);
 		this.exclusiveComponentLabels.add(implementationCompo, Plateau.class);
-		this.exclusiveComponentLabels.add(implementationCompo, Gap.class);
+		this.exclusiveComponentLabels.add(implementationCompo, WorkPackage.class);
 
 		// Motivation layer
-		this.exclusiveComponentLabels.add(motivationCompo, Stakeholder.class);
-		this.exclusiveComponentLabels.add(motivationCompo, Driver.class);
 		this.exclusiveComponentLabels.add(motivationCompo, Assessment.class);
+		this.exclusiveComponentLabels.add(motivationCompo, Constraint.class);
+
+		this.exclusiveComponentLabels.add(motivationCompo, Driver.class);
 		this.exclusiveComponentLabels.add(motivationCompo, Goal.class);
+		this.exclusiveComponentLabels.add(motivationCompo, Meaning.class);
 		this.exclusiveComponentLabels.add(motivationCompo, Outcome.class);
 		this.exclusiveComponentLabels.add(motivationCompo, Principle.class);
 		this.exclusiveComponentLabels.add(motivationCompo, Requirement.class);
-		this.exclusiveComponentLabels.add(motivationCompo, Constraint.class);
-		this.exclusiveComponentLabels.add(motivationCompo, Meaning.class);
+		this.exclusiveComponentLabels.add(motivationCompo, Stakeholder.class);
 		this.exclusiveComponentLabels.add(motivationCompo, Value.class);
 
 		// Containers !!!
 		//
 		this.exclusiveComponentLabels.add(otherCompo, Grouping.class);
-		this.exclusiveComponentLabels.add(otherCompo, Location.class);
 		this.exclusiveComponentLabels.add(otherCompo, Junction.class);
+		this.exclusiveComponentLabels.add(otherCompo, Location.class);
 
 		// This event is fired when a componentLabel is selected
 		// it fills in the comboSpecializationNames combo
