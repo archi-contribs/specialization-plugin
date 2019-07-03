@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
+import org.archicontribs.specialization.propertysections.OldImageManagerDialog;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.ecore.EClass;
@@ -40,7 +41,6 @@ import com.archimatetool.editor.diagram.figures.IDiagramModelObjectFigure;
 import com.archimatetool.editor.diagram.figures.RectangleFigureDelegate;
 import com.archimatetool.editor.diagram.util.DiagramUtils;
 import com.archimatetool.editor.model.IArchiveManager;
-import com.archimatetool.editor.propertysections.ImageManagerDialog;
 import com.archimatetool.editor.ui.ColorFactory;
 import com.archimatetool.editor.ui.factory.IArchimateElementUIProvider;
 import com.archimatetool.editor.ui.factory.IGraphicalObjectUIProvider;
@@ -53,6 +53,7 @@ import com.archimatetool.model.IDiagramModel;
 import com.archimatetool.model.IDiagramModelArchimateObject;
 import com.archimatetool.model.IDiagramModelImage;
 import com.archimatetool.model.IDiagramModelObject;
+import com.archimatetool.model.util.UUIDFactory;
 
 public class ElementFigure extends Composite {
 	static final SpecializationLogger logger = new SpecializationLogger(ElementFigure.class);
@@ -184,7 +185,7 @@ public class ElementFigure extends Composite {
 		this.btnNewIcon.setLayoutData(fd);
 		this.btnNewIcon.addListener(SWT.MouseUp, new Listener() {
 			@Override public void handleEvent(Event event) {
-				ImageManagerDialog dialog = new ImageManagerDialog(parent.getShell(), ElementFigure.this.model, ElementFigure.this.iconName);
+				OldImageManagerDialog dialog = new OldImageManagerDialog(parent.getShell(), ElementFigure.this.model, ElementFigure.this.iconName);
 
 				if(dialog.open() == Window.OK) {
 					Object selectedObject = dialog.getSelectedObject();
@@ -210,7 +211,7 @@ public class ElementFigure extends Composite {
 			        if ( canvas == null ) {
 			        	// we create a folder
 			        	canvas = ICanvasFactory.eINSTANCE.createCanvasModel();
-			        	canvas.setId(new IDAdapter().getNewID());
+			        	canvas.setId(UUIDFactory.createID(canvas));
 			        	canvas.setName(CANVAS_NAME);
 			        	canvas.setDocumentation("This canvas is used by the Specialization Plugin to keep the images that are configured in the specializations.\n\nPlease do not modify nor delete it.");
 			        	ElementFigure.this.model.getFolder(FolderType.DIAGRAMS).getElements().add(canvas);
@@ -226,7 +227,7 @@ public class ElementFigure extends Composite {
 			        
 			        if ( diagramModelImage == null ) {
 			        	diagramModelImage = IArchimateFactory.eINSTANCE.createDiagramModelImage();
-			        	diagramModelImage.setId(new IDAdapter().getNewID());
+			        	diagramModelImage.setId(UUIDFactory.createID(diagramModelImage));
 			        	diagramModelImage.setName(ElementFigure.this.iconName);
 			        	diagramModelImage.setDocumentation("This image stores the image required by the Specialization Plugin.");
 			        	diagramModelImage.setImagePath(ElementFigure.this.iconName);
