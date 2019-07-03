@@ -23,4 +23,16 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore,
  org.eclipse.help,
  org.eclipse.gef,
- org.eclipse.osgi
+ org.eclipse.osgi,
+ com.archimatetool.widgets
+Export-Package: org.archicontribs.specialization,
+ org.archicontribs.specialization.commands,
+ org.archicontribs.specialization.diagram,
+ org.archicontribs.specialization.menu,
+ org.archicontribs.specialization.preferences,
+ org.archicontribs.specialization.propertysections,
+ org.archicontribs.specialization.types,
+ org.archicontribs.specialization.uiProvider.elements,
+ org.archicontribs.specialization.uiProvider.elements.figures,
+ org.archicontribs.specialization.uiProvider.relationships,
+ org.archicontribs.specialization.uiProvider.relationships.figures
