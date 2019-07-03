@@ -1174,7 +1174,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	}
 	
 	public static String getSelectedClass() {
-		if ( SpecializationModelSection.INSTANCE.exclusiveComponentLabels == null )
+		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.exclusiveComponentLabels == null) )
 			return null;
 		Label label = SpecializationModelSection.INSTANCE.exclusiveComponentLabels.getSelectedComponentLabel();
 		if ( (label == null) || label.isDisposed() )
@@ -1183,13 +1183,13 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	}
 	
 	public static String getSelectedSpecializationName() {
-		if ( SpecializationModelSection.INSTANCE.comboSpecializationNames == null )
+		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.comboSpecializationNames == null) )
 			return null;
 		return SpecializationModelSection.INSTANCE.comboSpecializationNames.getText();
 	}
 	
 	public static int getSelectedfigure() {
-		if ( SpecializationModelSection.INSTANCE.elementFigure == null )
+		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.elementFigure == null) )
 			return 0;
 		return SpecializationModelSection.INSTANCE.elementFigure.getSelectedFigure();
 	}

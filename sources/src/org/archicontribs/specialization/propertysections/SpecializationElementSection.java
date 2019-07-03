@@ -47,8 +47,10 @@ public class SpecializationElementSection extends org.archicontribs.specializati
 
 	ArchimateElementEditPart elementEditPart = null;
 
-    private Composite compoElement;
-	Combo comboElement;
+    Composite composite;
+    Label labelNoSpecialization;
+    Label labelSelectSpecialization;
+	Combo combo;
 	
     boolean mouseOverHelpButton = false;
 	
@@ -83,41 +85,51 @@ public class SpecializationElementSection extends org.archicontribs.specializati
 	 */
 	@Override
 	protected void createControls(Composite parent) {
-	    this.compoElement = new Composite(parent, SWT.NONE);
-        this.compoElement.setForeground(parent.getForeground());
-        this.compoElement.setBackground(parent.getBackground());
-        this.compoElement.setLayout(new FormLayout());
+	    this.composite = new Composite(parent, SWT.NONE);
+        this.composite.setForeground(parent.getForeground());
+        this.composite.setBackground(parent.getBackground());
+        this.composite.setLayout(new FormLayout());
         FormData fd = new FormData();
         fd.top = new FormAttachment(0);
         fd.left = new FormAttachment(0);
         fd.right = new FormAttachment(100);
         fd.bottom = new FormAttachment(100);
-        this.compoElement.setLayoutData(fd);
-
-		Label label = new Label(this.compoElement, SWT.NONE);
-		label.setText("Please select the element's specialization:");
-		label.setForeground(this.compoElement.getForeground());
-		label.setBackground(this.compoElement.getBackground());
+        this.composite.setLayoutData(fd);
+        
+		this.labelNoSpecialization = new Label(this.composite, SWT.NONE);
+		this.labelNoSpecialization.setText("No Specialization has been defined for this class");
+		this.labelNoSpecialization.setForeground(this.composite.getForeground());
+		this.labelNoSpecialization.setBackground(this.composite.getBackground());
         fd = new FormData();
         fd.top = new FormAttachment(0, 20);
         fd.left = new FormAttachment(0, 20);
-        label.setLayoutData(fd);
-        
-        this.comboElement = new Combo(this.compoElement, SWT.BORDER | SWT.READ_ONLY);
-        this.comboElement.setFont(new Font(this.comboElement.getDisplay(), "consolas", this.compoElement.getFont().getFontData()[0].getHeight(), SWT.NONE));
+        this.labelNoSpecialization.setLayoutData(fd);
+        this.labelNoSpecialization.setVisible(false);
+
+		this.labelSelectSpecialization = new Label(this.composite, SWT.NONE);
+		this.labelSelectSpecialization.setText("Please select the element's specialization:");
+		this.labelSelectSpecialization.setForeground(this.composite.getForeground());
+		this.labelSelectSpecialization.setBackground(this.composite.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(label, 0, SWT.CENTER);
-        fd.left = new FormAttachment(label, 20);
-        fd.right = new FormAttachment(100, -20);
-        this.comboElement.setLayoutData(fd);
-        this.comboElement.addModifyListener(this.comboModifyListener);
+        fd.top = new FormAttachment(0, 20);
+        fd.left = new FormAttachment(0, 20);
+        this.labelSelectSpecialization.setLayoutData(fd);
         
-        Label btnHelp = new Label(this.compoElement, SWT.NONE);
+        this.combo = new Combo(this.composite, SWT.BORDER | SWT.READ_ONLY);
+        this.combo.setFont(new Font(this.combo.getDisplay(), "consolas", this.composite.getFont().getFontData()[0].getHeight(), SWT.NONE));
+        fd = new FormData();
+        fd.top = new FormAttachment(this.labelSelectSpecialization, 0, SWT.CENTER);
+        fd.left = new FormAttachment(this.labelSelectSpecialization, 20);
+        fd.right = new FormAttachment(100, -20);
+        this.combo.setLayoutData(fd);
+        this.combo.addModifyListener(this.comboModifyListener);
+        
+        Label btnHelp = new Label(this.composite, SWT.NONE);
         btnHelp.setForeground(parent.getForeground());
         btnHelp.setBackground(parent.getBackground());
         fd = new FormData();
-        fd.top = new FormAttachment(label, 10);
-        fd.bottom = new FormAttachment(label, 40, SWT.BOTTOM);
+        fd.top = new FormAttachment(this.labelSelectSpecialization, 10);
+        fd.bottom = new FormAttachment(this.labelSelectSpecialization, 40, SWT.BOTTOM);
         fd.left = new FormAttachment(0, 10);
         fd.right = new FormAttachment(0, 40);
         btnHelp.setLayoutData(fd);
@@ -133,7 +145,7 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         });
         btnHelp.addListener(SWT.MouseUp, new Listener() { @Override public void handleEvent(Event event) { if ( logger.isDebugEnabled() ) logger.debug("Showing help : /"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/"+SpecializationPlugin.PLUGIN_ID+"/help/html/replaceLabel.html"); } });
         
-        Label helpLbl = new Label(this.compoElement, SWT.NONE);
+        Label helpLbl = new Label(this.composite, SWT.NONE);
         helpLbl.setText("Click here to show up online help.");
         helpLbl.setForeground(parent.getForeground());
         helpLbl.setBackground(parent.getBackground());
@@ -275,45 +287,60 @@ public class SpecializationElementSection extends org.archicontribs.specializati
 	}
 	
 	void refreshControls() {
-		if ( this.comboElement == null || this.comboElement.isDisposed() )
+		if ( this.composite == null || this.composite.isDisposed()
+				|| this.combo == null || this.combo.isDisposed() 
+				|| this.labelNoSpecialization == null || this.labelNoSpecialization.isDisposed()
+				|| this.labelSelectSpecialization == null || this.labelSelectSpecialization.isDisposed() )
 			return;
+		
+        this.combo.removeModifyListener(this.comboModifyListener);
+        this.combo.removeAll();
 		
         if ( this.elementEditPart == null ) {
             logger.trace("Not refreshing controls as elementEditPart is null");
-            this.comboElement.removeModifyListener(this.comboModifyListener);
-            this.comboElement.setText("");
-            this.comboElement.addModifyListener(this.comboModifyListener);
+            this.combo.removeAll();
             return;
         }
 
         logger.trace("Refreshing controls");
         IArchimateConcept concept = this.elementEditPart.getModel().getArchimateConcept();
-        
-        this.comboElement.removeModifyListener(this.comboModifyListener);
-        this.comboElement.removeAll();
-        this.comboElement.add("");
+        //this.combo.add("");
 
         ElementSpecializationMap elementSpecializationMap = ElementSpecializationMap.getFromArchimateModel(concept.getArchimateModel());
-        List<ElementSpecialization> elementSpecializations = elementSpecializationMap.get(concept.getClass().getSimpleName());
-        // TODO : remove unused properties from old specialization
-        
-        String actualSpecialization = null;
-		for ( IProperty property:concept.getProperties() ) {
-			if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(property.getKey()) ) {
-				actualSpecialization = property.getValue();
-				break;
+        if ( elementSpecializationMap != null ) {
+	        List<ElementSpecialization> elementSpecializations = elementSpecializationMap.get(concept.getClass().getSimpleName());
+	        
+	        String actualSpecialization = null;
+			for ( IProperty property:concept.getProperties() ) {
+				if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(property.getKey()) ) {
+					actualSpecialization = property.getValue();
+					break;
+				}
 			}
-		}
-        
-        // then we fill in the combo with the existing specializations
-        for ( ElementSpecialization elementSpecialization: elementSpecializations ) {
-            this.comboElement.add(elementSpecialization.getSpecializationName());
-            if ( elementSpecialization.getSpecializationName().equals(actualSpecialization) )
-            	this.comboElement.setText(elementSpecialization.getSpecializationName());
+	        
+	        // then we fill in the combo with the existing specializations
+	        for ( ElementSpecialization elementSpecialization: elementSpecializations ) {
+	            this.combo.add(elementSpecialization.getSpecializationName());
+	            if ( elementSpecialization.getSpecializationName().equals(actualSpecialization) )
+	            	this.combo.setText(elementSpecialization.getSpecializationName());
+	        }
         }
         
-        // We ensure the modify listener is set (but only once ...)
-        this.comboElement.removeModifyListener(this.comboModifyListener);
-        this.comboElement.addModifyListener(this.comboModifyListener);
+        if ( this.combo.getItemCount() == 0 ) {
+        	this.labelNoSpecialization.setVisible(true);
+        	this.labelNoSpecialization.setText("No specialization has been set for \""+concept.getClass().getSimpleName()+"\". You may set one through the \"Specialization\" section when the model is selected.");
+        	this.labelNoSpecialization.requestLayout();
+        	this.labelSelectSpecialization.setVisible(false);
+        	this.combo.setVisible(false);
+        } else {
+        	this.combo.add("", 0);
+        	
+        	this.labelNoSpecialization.setVisible(false);
+        	this.labelSelectSpecialization.setVisible(true);
+        	this.combo.setVisible(true);
+        	
+            // We set the modify listener is set
+            this.combo.addModifyListener(this.comboModifyListener);
+        }
 	}
 }
