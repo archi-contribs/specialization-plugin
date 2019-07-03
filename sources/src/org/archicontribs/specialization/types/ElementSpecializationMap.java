@@ -12,7 +12,6 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.archicontribs.specialization.SpecializationLogger;
 import org.archicontribs.specialization.SpecializationPlugin;
-import org.archicontribs.specialization.propertysections.SpecializationModelSection;
 import org.eclipse.emf.ecore.EObject;
 
 import com.archimatetool.model.IArchimateConcept;
@@ -30,61 +29,61 @@ import com.google.gson.JsonSyntaxException;
  */
 public class ElementSpecializationMap extends HashMap<String, List<ElementSpecialization>> {
 	static final SpecializationLogger logger = new SpecializationLogger(ElementSpecializationMap.class);
-	
-    private static final long serialVersionUID = 1L;
-    
-    public ElementSpecializationMap() {
-    	super();
-    }
-    
-    public ElementSpecialization getElementSpecialization(String clazz, String name) {
-    	if ( (clazz != null) && !clazz.isEmpty() && (name != null) && !name.isEmpty() ) {
-	    	List<ElementSpecialization> types = get(clazz);
-	    	if ( types != null ) {
-	    		for ( int index = 0 ; index < types.size() ; ++index ) {
-	    			if ( types.get(index).getSpecializationName().equals(name) )
-	    				return types.get(index);
-	    		}
-	    	}
-    	}
-    	return null;
-    }
-    
-    public void addElementSpecialization(String clazz, ElementSpecialization elementSpecialization) {
-    	if ( (clazz != null) && !clazz.isEmpty() && (elementSpecialization != null) ) {
-	    	List<ElementSpecialization> elementSpecializationList = get(clazz);
-	    	if ( elementSpecializationList == null ) {
-	    		elementSpecializationList = new ArrayList<ElementSpecialization>();
-	    		put(clazz, elementSpecializationList);
-	    	}
-	    	elementSpecializationList.add(elementSpecialization);
-    	}
-    }
-    
-    public void removeElementSpecialization(String clazz, ElementSpecialization elementSpecialization) {
-    	if ( (clazz != null) && !clazz.isEmpty() && (elementSpecialization != null) ) {
-	    	List<ElementSpecialization> elementSpecializationList = get(clazz);
-	    	if ( elementSpecializationList != null ) {
-	    		elementSpecializationList.remove(elementSpecialization);
-	    	}
-    	}
-    }
-    
-    public void removeElementSpecialization(String clazz, String elementName) {
-    	if ( (clazz != null) && !clazz.isEmpty() && (elementName != null) && !elementName.isEmpty() ) {
-	    	List<ElementSpecialization> elementSpecializationList = get(clazz);
-	    	if ( elementSpecializationList != null ) {
-	        	ElementSpecialization elementSpecialization = getElementSpecialization(clazz, elementName);
-	        	if ( elementSpecialization != null )
-	        		elementSpecializationList.remove(elementSpecialization);
-	    	}
-    	}
-    }
-    
+
+	private static final long serialVersionUID = 1L;
+
+	public ElementSpecializationMap() {
+		super();
+	}
+
+	public ElementSpecialization getElementSpecialization(String clazz, String name) {
+		if ( (clazz != null) && !clazz.isEmpty() && (name != null) && !name.isEmpty() ) {
+			List<ElementSpecialization> types = get(clazz);
+			if ( types != null ) {
+				for ( int index = 0 ; index < types.size() ; ++index ) {
+					if ( types.get(index).getSpecializationName().equals(name) )
+						return types.get(index);
+				}
+			}
+		}
+		return null;
+	}
+
+	public void addElementSpecialization(String clazz, ElementSpecialization elementSpecialization) {
+		if ( (clazz != null) && !clazz.isEmpty() && (elementSpecialization != null) ) {
+			List<ElementSpecialization> elementSpecializationList = get(clazz);
+			if ( elementSpecializationList == null ) {
+				elementSpecializationList = new ArrayList<ElementSpecialization>();
+				put(clazz, elementSpecializationList);
+			}
+			elementSpecializationList.add(elementSpecialization);
+		}
+	}
+
+	public void removeElementSpecialization(String clazz, ElementSpecialization elementSpecialization) {
+		if ( (clazz != null) && !clazz.isEmpty() && (elementSpecialization != null) ) {
+			List<ElementSpecialization> elementSpecializationList = get(clazz);
+			if ( elementSpecializationList != null ) {
+				elementSpecializationList.remove(elementSpecialization);
+			}
+		}
+	}
+
+	public void removeElementSpecialization(String clazz, String elementName) {
+		if ( (clazz != null) && !clazz.isEmpty() && (elementName != null) && !elementName.isEmpty() ) {
+			List<ElementSpecialization> elementSpecializationList = get(clazz);
+			if ( elementSpecializationList != null ) {
+				ElementSpecialization elementSpecialization = getElementSpecialization(clazz, elementName);
+				if ( elementSpecialization != null )
+					elementSpecializationList.remove(elementSpecialization);
+			}
+		}
+	}
+
 	public static ElementSpecializationMap getFromArchimateModel(IArchimateModel model) {
 		if ( model == null || model.getMetadata() == null)
 			return null;
-		
+
 		IProperty specializationsMetadata = model.getMetadata().getEntry(SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY);
 		if ( specializationsMetadata != null ) {
 			try {
@@ -96,10 +95,10 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 				//TODO: add an option to erase the specializations metadata and startup again from an empty configuration
 			}
 		}
-		
+
 		return null;
 	}
-    
+
 	/**
 	 * Retrieves the ElementSpecialization associated to the IArchimateConcept concept
 	 * @param concept the ArchimateConcept for which the ElementSpecialization must be retrieved
@@ -109,9 +108,9 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 			String clazz = null;
 			String specializationName = null;
 			ElementSpecializationMap elementSpecializationMap = null;
-			
+
 			IArchimateConcept concept = null;
-			
+
 			if ( obj instanceof IArchimateConcept )
 				concept = (IArchimateConcept)obj;
 			else if ( obj instanceof IDiagramModelArchimateObject )
@@ -120,40 +119,30 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 				logger.error(SpecializationPlugin.getDebugName(concept)+" should be an ArchimateConcept or an ArchimateObject !");
 				return null;
 			}
-			
+
 			// no specialization for objects that do not have an id
 			if ( concept.getId() == null )
 				return null;
-			
-			String traceMessage;
-			if ( concept.getArchimateModel() == null ) {
-				// if no object is provided, we return the icon name from the SpecializationModelSection page
-				traceMessage = "Getting the icon name from the SpecializationModelSection page";
-				clazz = SpecializationModelSection.getSelectedClass();
-				specializationName = SpecializationModelSection.getSelectedSpecializationName();
-				
-				if ( SpecializationModelSection.INSTANCE == null )
-					return null;
-				
-				elementSpecializationMap = getFromArchimateModel(SpecializationModelSection.INSTANCE.getCurrentModel());
-			} else {
-				traceMessage = "Getting the icon name from the concept properties";
-				for ( IProperty prop: concept.getProperties() ) {
-					if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(prop.getKey()) ) {
-						clazz = concept.getClass().getSimpleName().replaceAll(" ",  "");
-						specializationName = prop.getValue();
-						elementSpecializationMap = getFromArchimateModel(concept.getArchimateModel());
-						break;
-					}
+
+			// no specialization for objects that are not in a model
+			if ( concept.getArchimateModel() == null )
+				return null;
+
+			for ( IProperty prop: concept.getProperties() ) {
+				if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(prop.getKey()) ) {
+					clazz = concept.getClass().getSimpleName().replaceAll(" ",  "");
+					specializationName = prop.getValue();
+					elementSpecializationMap = getFromArchimateModel(concept.getArchimateModel());
+					break;
 				}
 			}
-	
+
 			ElementSpecialization elementSpecialization = null;
 			if ( elementSpecializationMap != null )
 				elementSpecialization = elementSpecializationMap.getElementSpecialization(clazz, specializationName);
-			
-			logger.trace(traceMessage+":"+(elementSpecialization == null ? "null" : elementSpecialization.getIconName()));
-			
+
+			logger.trace("Getting the icon name from the concept properties: "+(elementSpecialization == null ? "null" : elementSpecialization.getIconName()));
+
 			return elementSpecialization;
 		}
 		return null;

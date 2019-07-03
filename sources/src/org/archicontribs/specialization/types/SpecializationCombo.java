@@ -22,12 +22,14 @@ import lombok.Getter;
 
 public class SpecializationCombo extends Composite {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationCombo.class);
+	
+	public static final String NO_SPECIALIZATION_STRING = "(no specialization)";
 
 	String label = "value";
 
 	Combo combo = null;
 	Button btnNew = null;
-	Button btnEdit = null;
+	Button btnRename = null;
 	Button btnDelete = null;
 	
 	@Getter String previousValue = "";
@@ -43,18 +45,17 @@ public class SpecializationCombo extends Composite {
 		
 		this.btnNew = new Button(this, SWT.PUSH);
 		this.btnNew.setImage(SpecializationPlugin.NEW_ICON);
-		this.btnNew.setToolTipText("New "+this.label);
+		this.btnNew.setToolTipText("New specialization");
+		this.btnNew.addSelectionListener(this.newListener);
 
-		this.btnEdit = new Button(this, SWT.PUSH);
-		this.btnEdit.setImage(SpecializationPlugin.EDIT_ICON);
-		this.btnEdit.setToolTipText("Edit "+this.label);
+		this.btnRename = new Button(this, SWT.PUSH);
+		this.btnRename.setImage(SpecializationPlugin.EDIT_ICON);
+		this.btnRename.setToolTipText("Rename specialization");
+		this.btnRename.addSelectionListener(this.renameListener);
 
 		this.btnDelete = new Button(this, SWT.PUSH);
 		this.btnDelete.setImage(SpecializationPlugin.DELETE_ICON);
-		this.btnDelete.setToolTipText("Delete "+this.label);
-
-		this.btnNew.addSelectionListener(this.newListener);
-		this.btnEdit.addSelectionListener(this.editListener);
+		this.btnDelete.setToolTipText("Delete specialization");
 		this.btnDelete.addSelectionListener(this.deleteListener);
 		
 		fd = new FormData();
@@ -69,11 +70,11 @@ public class SpecializationCombo extends Composite {
 		fd.right = new FormAttachment(this.btnDelete, -5);
 		fd.height = 20;
 		fd.width = 20;
-		this.btnEdit.setLayoutData(fd);
+		this.btnRename.setLayoutData(fd);
 		
 		fd = new FormData();
 		fd.top = new FormAttachment(0);
-		fd.right = new FormAttachment(this.btnEdit, -5);
+		fd.right = new FormAttachment(this.btnRename, -5);
 		fd.height = 20;
 		fd.width = 20;
 		this.btnNew.setLayoutData(fd);
@@ -89,7 +90,7 @@ public class SpecializationCombo extends Composite {
 		this.label = label;
 		
 		this.btnNew.setToolTipText("New "+this.label);
-		this.btnEdit.setToolTipText("Edit "+this.label);
+		this.btnRename.setToolTipText("Rename "+this.label);
 		this.btnDelete.setToolTipText("Delete "+this.label);
 	}
 
@@ -128,7 +129,7 @@ public class SpecializationCombo extends Composite {
 					SpecializationCombo.this.combo.select(SpecializationCombo.this.combo.getItemCount()-1);
 					
 					// we activate the edit and new buttons
-					SpecializationCombo.this.btnEdit.setEnabled(true);
+					SpecializationCombo.this.btnRename.setEnabled(true);
 					SpecializationCombo.this.btnDelete.setEnabled(true);
 				}
 			}
@@ -137,7 +138,7 @@ public class SpecializationCombo extends Composite {
 		@Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 	};
 
-	SelectionListener editListener = new SelectionListener() {
+	SelectionListener renameListener = new SelectionListener() {
 		@Override public void widgetSelected(SelectionEvent e) {
 			String oldValue = SpecializationCombo.this.combo.getText();
 			InputDialog dlg = new InputDialog(Display.getCurrent().getActiveShell(), SpecializationPlugin.pluginTitle, "Edit "+SpecializationCombo.this.label+":", oldValue, new LengthValidator());
@@ -190,7 +191,7 @@ public class SpecializationCombo extends Composite {
 
 			// we select the previous item in the combo if it exists
 			if ( SpecializationCombo.this.combo.getItemCount() == 0 ) {
-				SpecializationCombo.this.btnEdit.setEnabled(false);
+				SpecializationCombo.this.btnRename.setEnabled(false);
 				SpecializationCombo.this.btnDelete.setEnabled(false);
 			} else {
 				if ( oldIndex == 0 )
@@ -213,6 +214,9 @@ public class SpecializationCombo extends Composite {
 			// we check that the string does not contain special chars
 			if ( newText.contains("\n") ) return "Must not contain newline";
 			if ( newText.contains("\t") ) return "Must not contain tab";
+			
+			// we check that the string is not equal to the "no specialization" reserved string
+			if ( newText.equals(NO_SPECIALIZATION_STRING) ) return "This string is reserved.";
 
 			return null;
 		}
@@ -222,7 +226,7 @@ public class SpecializationCombo extends Composite {
 	public void setEnabled(boolean enabled) {
 		this.combo.setEnabled(enabled);
 		this.btnNew.setEnabled(enabled);
-		this.btnEdit.setEnabled(enabled && (SpecializationCombo.this.combo.getItemCount()!=0));
+		this.btnRename.setEnabled(enabled && (SpecializationCombo.this.combo.getItemCount()!=0));
 		this.btnDelete.setEnabled(enabled && (SpecializationCombo.this.combo.getItemCount()!=0));
 	}
 	
@@ -241,9 +245,16 @@ public class SpecializationCombo extends Composite {
 	
 	public void add(String string) {
 		if ( string == null )
-			this.combo.add("???");	// just in case, to avoid exception
+			this.combo.add("");	// just in case, to avoid exception
 		else
 			this.combo.add(string);
+	}
+	
+	public void add(String string, int index) {
+		if ( string == null )
+			this.combo.add("", index);	// just in case, to avoid exception
+		else
+			this.combo.add(string, index);
 	}
 	
 	public void select(int index) {

@@ -12,6 +12,7 @@ import org.archicontribs.specialization.SpecializationPlugin;
 import org.archicontribs.specialization.commands.SpecializationPropertyCommand;
 import org.archicontribs.specialization.types.ElementSpecialization;
 import org.archicontribs.specialization.types.ElementSpecializationMap;
+import org.archicontribs.specialization.types.SpecializationCombo;
 import org.archicontribs.specialization.types.SpecializationProperty;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
@@ -95,6 +96,11 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         fd.right = new FormAttachment(100);
         fd.bottom = new FormAttachment(100);
         this.composite.setLayoutData(fd);
+        this.composite.addPaintListener(new PaintListener() {
+        	@Override public void paintControl(PaintEvent e) {
+				refreshControls();
+			}
+        });
         
 		this.labelNoSpecialization = new Label(this.composite, SWT.NONE);
 		this.labelNoSpecialization.setText("No Specialization has been defined for this class");
@@ -304,25 +310,27 @@ public class SpecializationElementSection extends org.archicontribs.specializati
 
         logger.trace("Refreshing controls");
         IArchimateConcept concept = this.elementEditPart.getModel().getArchimateConcept();
-        //this.combo.add("");
 
         ElementSpecializationMap elementSpecializationMap = ElementSpecializationMap.getFromArchimateModel(concept.getArchimateModel());
         if ( elementSpecializationMap != null ) {
 	        List<ElementSpecialization> elementSpecializations = elementSpecializationMap.get(concept.getClass().getSimpleName());
 	        
-	        String actualSpecialization = null;
-			for ( IProperty property:concept.getProperties() ) {
-				if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(property.getKey()) ) {
-					actualSpecialization = property.getValue();
-					break;
+	        if ( elementSpecializations != null ) {
+	        	String actualSpecialization = null;
+
+				for ( IProperty property:concept.getProperties() ) {
+					if ( SpecializationPlugin.SPECIALIZATION_PROPERTY_KEY.equals(property.getKey()) ) {
+						actualSpecialization = property.getValue();
+						break;
+					}
 				}
-			}
-	        
-	        // then we fill in the combo with the existing specializations
-	        for ( ElementSpecialization elementSpecialization: elementSpecializations ) {
-	            this.combo.add(elementSpecialization.getSpecializationName());
-	            if ( elementSpecialization.getSpecializationName().equals(actualSpecialization) )
-	            	this.combo.setText(elementSpecialization.getSpecializationName());
+		        
+		        // then we fill in the combo with the existing specializations
+		        for ( ElementSpecialization elementSpecialization: elementSpecializations ) {
+		            this.combo.add(elementSpecialization.getSpecializationName());
+		            if ( elementSpecialization.getSpecializationName().equals(actualSpecialization) )
+		            	this.combo.setText(elementSpecialization.getSpecializationName());
+		        }
 	        }
         }
         
@@ -333,7 +341,9 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         	this.labelSelectSpecialization.setVisible(false);
         	this.combo.setVisible(false);
         } else {
-        	this.combo.add("", 0);
+        	this.combo.add(SpecializationCombo.NO_SPECIALIZATION_STRING, 0);
+        	if ( this.combo.getText().isEmpty() )
+        		this.combo.select(0);
         	
         	this.labelNoSpecialization.setVisible(false);
         	this.labelSelectSpecialization.setVisible(true);
