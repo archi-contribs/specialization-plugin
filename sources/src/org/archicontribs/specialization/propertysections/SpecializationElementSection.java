@@ -86,6 +86,12 @@ public class SpecializationElementSection extends org.archicontribs.specializati
 	 */
 	@Override
 	protected void createControls(Composite parent) {
+        parent.addPaintListener(new PaintListener() {
+        	@Override public void paintControl(PaintEvent e) {
+				refreshControls();
+			}
+        });
+        
 	    this.composite = new Composite(parent, SWT.NONE);
         this.composite.setForeground(parent.getForeground());
         this.composite.setBackground(parent.getBackground());
@@ -96,11 +102,6 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         fd.right = new FormAttachment(100);
         fd.bottom = new FormAttachment(100);
         this.composite.setLayoutData(fd);
-        this.composite.addPaintListener(new PaintListener() {
-        	@Override public void paintControl(PaintEvent e) {
-				refreshControls();
-			}
-        });
         
 		this.labelNoSpecialization = new Label(this.composite, SWT.NONE);
 		this.labelNoSpecialization.setText("No Specialization has been defined for this class");
@@ -128,7 +129,6 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         fd.left = new FormAttachment(this.labelSelectSpecialization, 20);
         fd.right = new FormAttachment(100, -20);
         this.combo.setLayoutData(fd);
-        this.combo.addModifyListener(this.comboModifyListener);
         
         Label btnHelp = new Label(this.composite, SWT.NONE);
         btnHelp.setForeground(parent.getForeground());
@@ -169,6 +169,11 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         public void modifyText(ModifyEvent event) {
             IArchimateElement concept = SpecializationElementSection.this.elementEditPart.getModel().getArchimateConcept();
             String clazz = concept.getClass().getSimpleName();
+            
+            String newSpecializationName = ((Combo)event.widget).getText();
+            
+    		if ( newSpecializationName.equals(SpecializationCombo.NO_SPECIALIZATION_STRING) )
+    			newSpecializationName = "";
         
         	String oldSpecializationName = null;
     		for ( IProperty property: concept.getProperties() ) {
@@ -177,9 +182,10 @@ public class SpecializationElementSection extends org.archicontribs.specializati
     				break;
     			}
     		}
-        	
-            String newSpecializationName = ((Combo)event.widget).getText();
-            
+    		
+    		if ( (oldSpecializationName != null) && oldSpecializationName.equals(SpecializationCombo.NO_SPECIALIZATION_STRING) )
+    			oldSpecializationName = null;
+    		
             if ( (oldSpecializationName == null) && newSpecializationName.isEmpty() )
             	return;		// nothing to do
             
@@ -299,11 +305,10 @@ public class SpecializationElementSection extends org.archicontribs.specializati
 				|| this.labelSelectSpecialization == null || this.labelSelectSpecialization.isDisposed() )
 			return;
 		
-        this.combo.removeModifyListener(this.comboModifyListener);
+		this.combo.removeModifyListener(this.comboModifyListener);
         this.combo.removeAll();
 		
         if ( this.elementEditPart == null ) {
-            this.combo.removeAll();
             return;
         }
 
