@@ -188,7 +188,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd = new FormData();
 		fd.top = new FormAttachment(lblChooseClass, 5);
 		fd.left = new FormAttachment(0, 30);
-		fd.right = new FormAttachment(0, 500);
+		fd.right = new FormAttachment(0, 550);
 		fd.bottom = new FormAttachment(lblChooseClass, 200, SWT.BOTTOM);
 		compoElements.setLayoutData(fd);
 		compoElements.setLayout(new FormLayout());
@@ -233,15 +233,15 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		// Business layer
 		// Passive
 		this.exclusiveComponentLabels.add(businessPassiveCompo, Product.class);
+		this.exclusiveComponentLabels.add(businessPassiveCompo, BusinessObject.class);
+		this.exclusiveComponentLabels.add(businessPassiveCompo, Contract.class);
+		this.exclusiveComponentLabels.add(businessPassiveCompo, Representation.class);
 		// Behavior
 		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessProcess.class);
 		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessFunction.class);
 		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessInteraction.class);
 		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessEvent.class);
 		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessService.class);
-		this.exclusiveComponentLabels.add(businessBehaviorCompo, BusinessObject.class);
-		this.exclusiveComponentLabels.add(businessBehaviorCompo, Contract.class);
-		this.exclusiveComponentLabels.add(businessBehaviorCompo, Representation.class);
 		// Active
 		this.exclusiveComponentLabels.add(businessActiveCompo, BusinessActor.class);
 		this.exclusiveComponentLabels.add(businessActiveCompo, BusinessRole.class);
@@ -320,7 +320,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.top = new FormAttachment(lblChooseClass, 2);
 		fd.bottom = new FormAttachment(implementationCompo, -2, SWT.TOP);
 		fd.left = new FormAttachment(0, 70);
-		fd.right = new FormAttachment(0, 110);
+		fd.right = new FormAttachment(0, 150);
 		passiveCanvas.setLayoutData(fd);
 		passiveCanvas.addPaintListener(new PaintListener() {
 			@Override
@@ -333,7 +333,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd = new FormData();
 		fd.top = new FormAttachment(passiveCanvas, 1, SWT.TOP);
 		fd.left = new FormAttachment(0, 71);
-		fd.right = new FormAttachment(0, 109);
+		fd.right = new FormAttachment(0, 149);
 		passiveLabel.setLayoutData(fd);
 		passiveLabel.setText("Passive");
 		passiveLabel.setBackground(SpecializationPlugin.PASSIVE_COLOR);
@@ -343,7 +343,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd = new FormData();
 		fd.top = new FormAttachment(lblChooseClass, 2);
 		fd.bottom = new FormAttachment(implementationCompo, -2, SWT.TOP);
-		fd.left = new FormAttachment(0, 115);
+		fd.left = new FormAttachment(0, 155);
 		fd.right = new FormAttachment(55);
 		behaviorCanvas.setLayoutData(fd);
 		behaviorCanvas.addPaintListener(new PaintListener() {
@@ -356,7 +356,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		});
 		fd = new FormData();
 		fd.top = new FormAttachment(behaviorCanvas, 1, SWT.TOP);
-		fd.left = new FormAttachment(0, 116);
+		fd.left = new FormAttachment(0, 156);
 		fd.right = new FormAttachment(55, -1);
 		behaviorLabel.setLayoutData(fd);
 		behaviorLabel.setText("Behavior");
@@ -416,7 +416,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.top = new FormAttachment(10, 2);
 		fd.bottom = new FormAttachment(24, -2);
 		fd.left = new FormAttachment(0);
-		fd.right = new FormAttachment(100, -60);
+		fd.right = new FormAttachment(100, -65);
 		this.strategyCanvas.setLayoutData(fd);
 		this.strategyCanvas.setBackground(SpecializationPlugin.STRATEGY_COLOR);
 		fd = new FormData();
@@ -432,7 +432,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.top = new FormAttachment(25, 2);
 		fd.bottom = new FormAttachment(39, -2);
 		fd.left = new FormAttachment(0);
-		fd.right = new FormAttachment(100, -60);
+		fd.right = new FormAttachment(100, -65);
 		this.businessCanvas.setLayoutData(fd);
 		this.businessCanvas.setBackground(SpecializationPlugin.BUSINESS_COLOR);
 		fd = new FormData();
@@ -448,7 +448,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.top = new FormAttachment(40, 2);
 		fd.bottom = new FormAttachment(54, -2);
 		fd.left = new FormAttachment(0);
-		fd.right = new FormAttachment(100, -60);
+		fd.right = new FormAttachment(100, -65);
 		this.applicationCanvas.setLayoutData(fd);
 		this.applicationCanvas.setBackground(SpecializationPlugin.APPLICATION_COLOR);
 		fd = new FormData();
@@ -464,7 +464,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.top = new FormAttachment(55, 2);
 		fd.bottom = new FormAttachment(69, -2);
 		fd.left = new FormAttachment(0);
-		fd.right = new FormAttachment(100, -60);
+		fd.right = new FormAttachment(100, -65);
 		this.technologyCanvas.setLayoutData(fd);
 		this.technologyCanvas.setBackground(SpecializationPlugin.TECHNOLOGY_COLOR);
 		fd = new FormData();
@@ -480,7 +480,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.top = new FormAttachment(70, 2);
 		fd.bottom = new FormAttachment(84, -2);
 		fd.left = new FormAttachment(0);
-		fd.right = new FormAttachment(100, -60);
+		fd.right = new FormAttachment(100, -65);
 		this.physicalCanvas.setLayoutData(fd);
 		this.physicalCanvas.setBackground(SpecializationPlugin.PHYSICAL_COLOR);
 		fd = new FormData();
