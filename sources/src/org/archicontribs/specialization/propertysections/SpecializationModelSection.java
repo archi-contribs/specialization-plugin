@@ -120,7 +120,7 @@ import lombok.Getter;
 
 public class SpecializationModelSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
-	
+
 	public static SpecializationModelSection INSTANCE;
 
 	ExclusiveComponentLabels exclusiveComponentLabels = null;
@@ -313,6 +313,45 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		this.exclusiveComponentLabels.add(otherCompo, Grouping.class);
 		this.exclusiveComponentLabels.add(otherCompo, Location.class);
 		this.exclusiveComponentLabels.add(otherCompo, Junction.class);
+
+		// This event is fired when a componentLabel is selected
+		// it fills in the comboSpecializationNames combo
+		this.exclusiveComponentLabels.addListener(new Listener() {
+			@Override public void handleEvent(Event event) {
+				// we reinitialize the combo, list and figure 
+				SpecializationModelSection.this.comboSpecializationNames.removeAll();
+
+				SpecializationModelSection.this.tblProperties.setInput(null);
+				SpecializationModelSection.this.tblProperties.refresh();
+				SpecializationModelSection.this.tblProperties.getTable().setEnabled(false);
+				SpecializationModelSection.this.btnNewProperty.setEnabled(false);
+				SpecializationModelSection.this.btnDeleteProperty.setEnabled(false);
+				SpecializationModelSection.this.txtElementLabel.setText("");
+				SpecializationModelSection.this.txtElementLabel.setEnabled(false);
+				SpecializationModelSection.this.elementFigure.reset();
+				SpecializationModelSection.this.elementFigure.setEnabled(false);
+
+				if ( event.widget == null ) {
+					logger.trace("No component label selected");
+					SpecializationModelSection.this.comboSpecializationNames.setEnabled(false);
+				} else {
+					ComponentLabel componentlabel = (ComponentLabel)event.widget;
+					String componentClass = componentlabel.getToolTipText();
+					logger.trace("Component label selected: "+componentClass);
+
+					List<ElementSpecialization> specialisationList = SpecializationModelSection.this.elementSpecializationMap.get(componentClass);
+					if ( specialisationList != null ) {
+						for (ElementSpecialization elementSpecialization: SpecializationModelSection.this.elementSpecializationMap.get(componentClass))
+							SpecializationModelSection.this.comboSpecializationNames.add(elementSpecialization.getSpecializationName());
+					}
+
+					SpecializationModelSection.this.comboSpecializationNames.setEnabled(true);
+
+					if ( SpecializationModelSection.this.comboSpecializationNames.getItemCount() != 0 )
+						SpecializationModelSection.this.comboSpecializationNames.select(0);
+				}
+			}
+		});
 
 		Label passiveLabel = new Label(compoElements, SWT.TRANSPARENT | SWT.CENTER);
 		Composite passiveCanvas = new Composite(compoElements, SWT.TRANSPARENT | SWT.BORDER);
@@ -735,52 +774,12 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		this.comboSpecializationNames = new SpecializationCombo(parent, SWT.NONE | SWT.READ_ONLY);
 		this.comboSpecializationNames.setForeground(parent.getForeground());
 		this.comboSpecializationNames.setBackground(parent.getBackground());
-		this.comboSpecializationNames.setLabel("specialization");
 		this.comboSpecializationNames.setEnabled(false);
 		fd = new FormData();
 		fd.top = new FormAttachment(lblSpecializationName, 0, SWT.CENTER);
 		fd.left = new FormAttachment(lblSpecializationName, 10);
 		fd.right = new FormAttachment(compoElements, 0, SWT.RIGHT);
 		this.comboSpecializationNames.setLayoutData(fd);
-
-		// This event is fired when a componentLabel is selected
-		// it fills in the comboSpecializationNames combo
-		this.exclusiveComponentLabels.addListener(new Listener() {
-			@Override public void handleEvent(Event event) {
-				// we reinitialize the combo, list and figure 
-				SpecializationModelSection.this.comboSpecializationNames.removeAll();
-				
-				SpecializationModelSection.this.tblProperties.setInput(null);
-				SpecializationModelSection.this.tblProperties.refresh();
-				SpecializationModelSection.this.tblProperties.getTable().setEnabled(false);
-				SpecializationModelSection.this.btnNewProperty.setEnabled(false);
-				SpecializationModelSection.this.btnDeleteProperty.setEnabled(false);
-				SpecializationModelSection.this.txtElementLabel.setText("");
-				SpecializationModelSection.this.txtElementLabel.setEnabled(false);
-				SpecializationModelSection.this.elementFigure.reset();
-				SpecializationModelSection.this.elementFigure.setEnabled(false);
-
-				if ( event.widget == null ) {
-					logger.trace("No component label selected");
-					SpecializationModelSection.this.comboSpecializationNames.setEnabled(false);
-				} else {
-					ComponentLabel componentlabel = (ComponentLabel)event.widget;
-					String componentClass = componentlabel.getToolTipText();
-					logger.trace("Component label selected: "+componentClass);
-					
-					List<ElementSpecialization> specialisationList = SpecializationModelSection.this.elementSpecializationMap.get(componentClass);
-					if ( specialisationList != null ) {
-						for (ElementSpecialization elementSpecialization: SpecializationModelSection.this.elementSpecializationMap.get(componentClass))
-							SpecializationModelSection.this.comboSpecializationNames.add(elementSpecialization.getSpecializationName());
-					}
-					
-					SpecializationModelSection.this.comboSpecializationNames.setEnabled(true);
-					
-					if ( SpecializationModelSection.this.comboSpecializationNames.getItemCount() != 0 )
-						SpecializationModelSection.this.comboSpecializationNames.select(0);
-				}
-			}
-		});
 
 		// This event is fired when  a specialization is chosen in the combo list
 		this.comboSpecializationNames.addModifyListener(new ModifyListener() {
@@ -798,7 +797,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 							SpecializationModelSection.this.elementSpecializationMap.removeElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
 							setMetadata("Remove specialization "+selectedClass+"/"+SpecializationModelSection.this.comboSpecializationNames.getPreviousValue());
 						}
-						
+
 						SpecializationModelSection.this.tblProperties.setInput(null);
 						SpecializationModelSection.this.tblProperties.refresh();
 						SpecializationModelSection.this.tblProperties.getTable().setEnabled(false);
@@ -810,9 +809,9 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 						SpecializationModelSection.this.elementFigure.setEnabled(false);
 					} else {
 						ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, specializationName);
-						
+
 						logger.trace("Specialization selected: "+specializationName);
-						
+
 						if ( elementSpecialization == null ) {
 							if ( SpecializationModelSection.this.comboSpecializationNames.getPreviousValue().isEmpty() ) {
 								// new specialization
@@ -899,7 +898,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 			@Override protected void setValue(Object element, Object value) {
 				String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
 				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
-				
+
 				((SpecializationProperty)element).setValue((String)value);
 				SpecializationModelSection.this.tblProperties.update(element, null);
 
@@ -979,14 +978,14 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
 			@Override public void widgetDefaultSelected(SelectionEvent e) { widgetSelected(e); }
 		});
-		
+
 		fd = new FormData();
 		fd.top = new FormAttachment(lblProperties, -5, SWT.TOP);
 		fd.left = new FormAttachment(lblProperties, 5);
 		fd.right = new FormAttachment(this.btnNewProperty, -5);
 		fd.height = 100;
 		table.setLayoutData(fd);
-		
+
 		Label lblLabel = new Label(parent, SWT.NONE);
 		lblLabel.setForeground(parent.getForeground());
 		lblLabel.setBackground(parent.getBackground());
@@ -995,7 +994,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.top = new FormAttachment(table, 10);
 		fd.left = new FormAttachment(lblSpecializationName, 0, SWT.LEFT);
 		lblLabel.setLayoutData(fd);
-		
+
 		this.txtElementLabel = new Text(parent, SWT.BORDER);
 		this.txtElementLabel.setToolTipText("Specify the text that will be shown in the figure.\n\nYou may format your text using \\n (newline) and \\t (tab) and use variables(please refer to the online help for a complete list): \n   ${name} name of the Archimate element\n   ${property:xxx} value of the property xxx\n   ${view:name} name of the view in which the Archimate element is displayed\n   ${model:name} name of the model");
 		this.txtElementLabel.setEnabled(false);
@@ -1009,15 +1008,15 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 				String selectedClass = SpecializationModelSection.this.exclusiveComponentLabels.getSelectedComponentLabel().getToolTipText();
 				String specializationName = SpecializationModelSection.this.comboSpecializationNames.getText();
 				ElementSpecialization elementSpecialization = SpecializationModelSection.this.elementSpecializationMap.getElementSpecialization(selectedClass, SpecializationModelSection.this.comboSpecializationNames.getText());
-				
+
 				elementSpecialization.setLabel(((Text)e.widget).getText());
-				
+
 				setMetadata("Change label for specialization "+selectedClass+"/"+specializationName);
 			}
 		});
 		this.txtElementLabel.addFocusListener(new FocusListener() {
 			String text;
-			
+
 			@Override public void focusGained(FocusEvent e) {
 				this.text=((Text)e.widget).getText();
 			}
@@ -1055,10 +1054,10 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 					elementSpecialization.setIconName(((ElementFigure)e.widget).getIconName());
 					elementSpecialization.setIconSize(((ElementFigure)e.widget).getIconSize());
 					elementSpecialization.setIconLocation(((ElementFigure)e.widget).getIconLocation());
-	
+
 					setMetadata("Change figure for specialization "+selectedClass+"/"+specializationName);
-			        
-			        // we force the figures to be redrawn
+
+					// we force the figures to be redrawn
 					((ElementFigure)e.widget).resetPreviewImages();
 				}
 			}
@@ -1133,7 +1132,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	@Override
 	protected void setElement(Object element) {
 		IArchimateModel selectedModel = (IArchimateModel)new Filter().adaptObject(element);
-		
+
 		INSTANCE = this;
 
 		if(selectedModel == null) {
@@ -1144,7 +1143,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 
 			if ( this.exclusiveComponentLabels != null )
 				this.exclusiveComponentLabels.setModel(selectedModel);
-			
+
 			if ( this.elementFigure != null )
 				this.elementFigure.setModel(selectedModel);
 
@@ -1172,31 +1171,31 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 			this.currentModel = selectedModel;
 		}
 	}
-	
+
 	public static String getSelectedClass() {
-		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.exclusiveComponentLabels == null) )
+		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.exclusiveComponentLabels == null) || SpecializationModelSection.INSTANCE.exclusiveComponentLabels.isDisposed())
 			return null;
 		Label label = SpecializationModelSection.INSTANCE.exclusiveComponentLabels.getSelectedComponentLabel();
 		if ( (label == null) || label.isDisposed() )
 			return null;
 		return label.getToolTipText();
 	}
-	
+
 	public static String getSelectedSpecializationName() {
-		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.comboSpecializationNames == null) )
+		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.comboSpecializationNames == null) || SpecializationModelSection.INSTANCE.comboSpecializationNames.isDisposed() )
 			return null;
 		return SpecializationModelSection.INSTANCE.comboSpecializationNames.getText();
 	}
-	
+
 	public static int getSelectedfigure() {
-		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.elementFigure == null) )
+		if ( (SpecializationModelSection.INSTANCE == null) || (SpecializationModelSection.INSTANCE.elementFigure == null) || SpecializationModelSection.INSTANCE.elementFigure.isDisposed() )
 			return 0;
 		return SpecializationModelSection.INSTANCE.elementFigure.getSelectedFigure();
 	}
 
 	void setMetadata(String label) {
 		SpecializationUpdateMetadataCommand command = new SpecializationUpdateMetadataCommand(this.currentModel, this.elementSpecializationMap, label);
-		
+
 		if ( command.canExecute() )
 			((CommandStack)SpecializationModelSection.this.currentModel.getAdapter(CommandStack.class)).execute(command);
 
