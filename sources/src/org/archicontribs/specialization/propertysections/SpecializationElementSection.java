@@ -303,12 +303,10 @@ public class SpecializationElementSection extends org.archicontribs.specializati
         this.combo.removeAll();
 		
         if ( this.elementEditPart == null ) {
-            logger.trace("Not refreshing controls as elementEditPart is null");
             this.combo.removeAll();
             return;
         }
 
-        logger.trace("Refreshing controls");
         IArchimateConcept concept = this.elementEditPart.getModel().getArchimateConcept();
 
         ElementSpecializationMap elementSpecializationMap = ElementSpecializationMap.getFromArchimateModel(concept.getArchimateModel());

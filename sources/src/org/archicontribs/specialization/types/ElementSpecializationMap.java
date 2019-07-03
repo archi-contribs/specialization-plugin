@@ -141,8 +141,6 @@ public class ElementSpecializationMap extends HashMap<String, List<ElementSpecia
 			if ( elementSpecializationMap != null )
 				elementSpecialization = elementSpecializationMap.getElementSpecialization(clazz, specializationName);
 
-			logger.trace("Getting the icon name from the concept properties: "+(elementSpecialization == null ? "null" : elementSpecialization.getIconName()));
-
 			return elementSpecialization;
 		}
 		return null;
