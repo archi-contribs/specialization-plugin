@@ -1072,8 +1072,91 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		fd.left = new FormAttachment(0, 5);
 		fd.right = new FormAttachment(100, -5);
 		lblSeparator.setLayoutData(fd);
+		
+		Button exportButton = new Button(parent, SWT.NULL);
+		exportButton.setText("Export specializations to file ...");
+		fd = new FormData();
+		fd.top = new FormAttachment(lblSeparator, 10);
+		fd.left = new FormAttachment(0, 15);
+		exportButton.setLayoutData(fd);
+		exportButton.addSelectionListener(new SelectionListener() {
+			@Override public void widgetSelected(SelectionEvent e) {
+				SpecializationPlugin.popup(Level.INFO, "Not yet implemented.");
+	        	//TODO: develop the specialization export function (/!\ how to export images ?)
+				/*
+				if ( getCurrentModel() == null ) {
+					SpecializationPlugin.popup(Level.ERROR, "Failed to get current model !");
+					return;
+				}
+				
+				ElementSpecializationMap specializationMap = ElementSpecializationMap.getFromArchimateModel(getCurrentModel());
+				if ( (specializationMap == null) || (specializationMap.size() == 0) ) {
+					SpecializationPlugin.popup(Level.INFO, "Nothing to export. You did not define any specialization.");
+					return;
+				}
+				
+				FileDialog dialog = new FileDialog(parent.getShell(), SWT.SAVE);
+				dialog.setText("Export specializations");
+		        String[] filterExt = { "*.archispecialization", "*" };
+		        dialog.setFilterExtensions(filterExt);
+		        String exportFilename = dialog.open();
+		        if ( exportFilename != null ) {
+
+		        }
+		        */
+			}
+			
+			@Override public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+		});
+		
+		Button importButton = new Button(parent, SWT.NULL);
+		importButton.setText("Import specializations from file ...");
+		fd = new FormData();
+		fd.top = new FormAttachment(lblSeparator, 10);
+		fd.left = new FormAttachment(exportButton, 15);
+		importButton.setLayoutData(fd);
+		importButton.addSelectionListener(new SelectionListener() {
+			@Override public void widgetSelected(SelectionEvent e) {
+				SpecializationPlugin.popup(Level.INFO, "Not yet implemented.");
+	        	//TODO: develop the specialization import function (/!\ how to import images ?)
+				/*
+				if ( getCurrentModel() == null ) {
+					SpecializationPlugin.popup(Level.ERROR, "Failed to get current model !");
+					return;
+				}
+				
+				ElementSpecializationMap specializationMap = ElementSpecializationMap.getFromArchimateModel(getCurrentModel());
+				if ( (specializationMap != null) && (specializationMap.size() != 0) ) {
+					if ( SpecializationPlugin.question("You already defined specializations for this model.\n\nDo you wish to override them ?") )
+						return;
+				}
+				
+				FileDialog dialog = new FileDialog(parent.getShell(), SWT.OPEN);
+				dialog.setText("Import specializations");
+		        String[] filterExt = { "*.archispecialization", "*" };
+		        dialog.setFilterExtensions(filterExt);
+		        String importFilename = dialog.open();
+		        if ( importFilename != null ) {
+
+		        }
+		        */
+			}
+
+			@Override public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+		});
 
 		/* **************************************************** */
+		
+		lblSeparator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+		fd = new FormData();
+		fd.top = new FormAttachment(importButton, 10);
+		fd.left = new FormAttachment(0, 5);
+		fd.right = new FormAttachment(100, -5);
+		lblSeparator.setLayoutData(fd);
 
 		Label btnHelp = new Label(parent, SWT.NONE);
 		btnHelp.setForeground(parent.getForeground());
