@@ -5,6 +5,9 @@
  */
 package org.archicontribs.specialization.propertysections;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -46,12 +49,14 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
+import com.archimatetool.editor.model.IArchiveManager;
 import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IArchimatePackage;
 import com.archimatetool.model.impl.ApplicationCollaboration;
@@ -90,7 +95,6 @@ import com.archimatetool.model.impl.Gap;
 import com.archimatetool.model.impl.Goal;
 import com.archimatetool.model.impl.Grouping;
 import com.archimatetool.model.impl.ImplementationEvent;
-import com.archimatetool.model.impl.Junction;
 import com.archimatetool.model.impl.Location;
 import com.archimatetool.model.impl.Material;
 import com.archimatetool.model.impl.Meaning;
@@ -114,9 +118,13 @@ import com.archimatetool.model.impl.TechnologyProcess;
 import com.archimatetool.model.impl.TechnologyService;
 import com.archimatetool.model.impl.Value;
 import com.archimatetool.model.impl.WorkPackage;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import lombok.Getter;
 
 //TODO: use commands everywhere to allow undo/redo
+//TODO: highlight components which have a specialization
 
 public class SpecializationModelSection extends org.archicontribs.specialization.propertysections.AbstractArchimatePropertySection {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
@@ -170,7 +178,7 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 	 */
 	@Override
 	protected void createControls(Composite parent) {
-		// /!\ at this stage, this.model is not set as the setElement() method has not yet been called
+		// Beware, at this stage, the "this.model" variable is not set as the setElement() method has not yet been called
 
 		parent.setLayout(new FormLayout());
 
@@ -312,11 +320,9 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		// Containers !!!
 		//
 		this.exclusiveComponentLabels.add(otherCompo, Grouping.class);
-		this.exclusiveComponentLabels.add(otherCompo, Junction.class);
 		this.exclusiveComponentLabels.add(otherCompo, Location.class);
 
-		// This event is fired when a componentLabel is selected
-		// it fills in the comboSpecializationNames combo
+		// This event is fired when a componentLabel is selected, it fills in the comboSpecializationNames combo
 		this.exclusiveComponentLabels.addListener(new Listener() {
 			@Override public void handleEvent(Event event) {
 				// we reinitialize the combo, list and figure 
@@ -1081,9 +1087,6 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		exportButton.setLayoutData(fd);
 		exportButton.addSelectionListener(new SelectionListener() {
 			@Override public void widgetSelected(SelectionEvent e) {
-				SpecializationPlugin.popup(Level.INFO, "Not yet implemented.");
-	        	//TODO: develop the specialization export function (/!\ how to export images ?)
-				/*
 				if ( getCurrentModel() == null ) {
 					SpecializationPlugin.popup(Level.ERROR, "Failed to get current model !");
 					return;
@@ -1101,9 +1104,52 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		        dialog.setFilterExtensions(filterExt);
 		        String exportFilename = dialog.open();
 		        if ( exportFilename != null ) {
-
+		    		File f = new File(exportFilename);
+		    		if ( f.exists() && !SpecializationPlugin.question("The file \""+exportFilename+"\" already exists.\n\nAre you sure you wish to replace it ?") )
+		    			return;
+		    		
+		    		// we set the images
+		    		boolean ok = true;
+		    		getImages:
+		    		for ( String key: specializationMap.keySet() ) {
+		    			for (ElementSpecialization elementSpecialization: specializationMap.get(key) ) {
+		    				try {
+			    				elementSpecialization.setImageData(((IArchiveManager)getCurrentModel().getAdapter(IArchiveManager.class)).createImage(elementSpecialization.getIconName()).getImageData());
+		    				} catch (Exception err) {
+		    					SpecializationPlugin.popup(Level.ERROR, "Failed to get image from path \""+elementSpecialization.getIconName()+"\"", err);
+		    					ok = false;
+		    					break getImages;
+		    				}
+		    			}
+		    		}
+		    		
+		        	String json = null;
+		    		if ( ok ) {
+			    		try {
+			    			Gson gson = new GsonBuilder().create();
+			    			json = gson.toJson(specializationMap);
+			    		} catch (Exception err) {
+			    			SpecializationPlugin.popup(Level.ERROR, "Failed to create JSON from specializations.", err);
+			    		}
+		    		}
+		    		
+		    		// we remove the images as they are not needed anymore
+		    		for ( String key: specializationMap.keySet() ) {
+		    			for (ElementSpecialization elementSpecialization: specializationMap.get(key) ) {
+		    				elementSpecialization.setImageData(null);
+		    			}
+		    		}
+		    		
+		    		if ( json != null ) {
+		    			try ( FileWriter fileWriter = new FileWriter(exportFilename) ) {
+			    		    fileWriter.write(json);
+			    		    SpecializationPlugin.popup(Level.INFO, "Export successful.");
+			    		} catch (IOException err) {
+			    			SpecializationPlugin.popup(Level.ERROR, "Failed to write specializations to file \""+exportFilename+"\".", err);
+			    			return;
+			    		}
+		    		}
 		        }
-		        */
 			}
 			
 			@Override public void widgetDefaultSelected(SelectionEvent e) {
@@ -1120,7 +1166,17 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 		importButton.addSelectionListener(new SelectionListener() {
 			@Override public void widgetSelected(SelectionEvent e) {
 				SpecializationPlugin.popup(Level.INFO, "Not yet implemented.");
-	        	//TODO: develop the specialization import function (/!\ how to import images ?)
+	        	//TODO: develop the specialization import function:
+				//TODO:        remove all existing specializations
+				//TODO:            remove the corresponding object in plugin's view
+				//TODO:        refresh all displayed views to remove the shown images
+				//TODO:        remove the images from the cache
+				//TODO:        create the specializations from the json file
+				//TODO:            create the corresponding object in plugin's view
+				//TODO:        no need to refresh views
+				//TODO:        add a "merge" option to the import procedure
+				//TODO:            keep the existing ones
+				//TODO:            if a specialization exists with the same name: replaces it
 				/*
 				if ( getCurrentModel() == null ) {
 					SpecializationPlugin.popup(Level.ERROR, "Failed to get current model !");
@@ -1234,7 +1290,6 @@ public class SpecializationModelSection extends org.archicontribs.specialization
 			this.elementSpecializationMap = ElementSpecializationMap.getFromArchimateModel(selectedModel);
 		}
 
-		// TODO: the rest of the code assumes the variable is not null ! add check for null everywhere
 		if ( this.elementSpecializationMap == null )
 			this.elementSpecializationMap = new ElementSpecializationMap();
 
