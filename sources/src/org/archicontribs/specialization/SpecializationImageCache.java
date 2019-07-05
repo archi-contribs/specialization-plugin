@@ -35,6 +35,10 @@ public class SpecializationImageCache {
 		this.iconsCache.add(new Icon(name, image, false));
     }
     
+    public Image get(String name) {
+    	return get(name, 0, 0);
+    }
+    
     public Image get(String name, int width, int height) {
     	Image unresizedImage = null;
     	
@@ -86,6 +90,28 @@ public class SpecializationImageCache {
     		return null;
     	
     	return new Image(Display.getCurrent(), imageData.scaledTo(imageWidth, imageHeight));
+    }
+    
+    /*
+     * remove the resized images from the cache
+     */
+    public void cleanupResizedImages() {
+		for ( Icon icon: this.iconsCache ) {
+			if ( icon.resized ) {
+				this.iconsCache.remove(icon);
+			}
+		}
+    }
+    
+    /*
+     * remove the image from the cache
+     */
+    public void removeImage(String name) {
+		for ( Icon icon: this.iconsCache ) {
+			if ( icon.iconName.equals(name) ) {
+				this.iconsCache.remove(icon);
+			}
+		}
     }
     
     private class Icon {
