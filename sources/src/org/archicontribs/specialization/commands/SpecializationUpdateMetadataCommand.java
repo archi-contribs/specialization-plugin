@@ -10,6 +10,7 @@ import com.archimatetool.model.IArchimateModel;
 import com.archimatetool.model.IMetadata;
 import com.archimatetool.model.IProperty;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class SpecializationUpdateMetadataCommand extends Command {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationUpdateMetadataCommand.class);
@@ -41,7 +42,7 @@ public class SpecializationUpdateMetadataCommand extends Command {
 		}
 		
 		try {
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 			this.metadataValue = gson.toJson(specializationsMap);
 		} catch (Exception e) {
 			this.exception = e;
