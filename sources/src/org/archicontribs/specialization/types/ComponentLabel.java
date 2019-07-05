@@ -7,6 +7,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -20,6 +21,7 @@ public class ComponentLabel extends Label {
 	static final SpecializationLogger logger = new SpecializationLogger(SpecializationModelSection.class);
 
 	@Getter boolean selected;
+	@Getter boolean highlighted;
 
 	ComponentLabel(Composite parent, int type, @SuppressWarnings("rawtypes") Class clazz) {
 		super(parent,type);
@@ -29,7 +31,14 @@ public class ComponentLabel extends Label {
 
 		this.addPaintListener(new PaintListener() {
 			@Override public void paintControl(PaintEvent event) {
-				ComponentLabel.this.setBackground(ComponentLabel.this.selected ? SpecializationPlugin.GREY_COLOR : ArchimateIcons.getColor(getElementClassname()));
+				ComponentLabel.this.setBackground(ComponentLabel.this.highlighted ? SpecializationPlugin.GREY_COLOR : ArchimateIcons.getColor(getElementClassname()));
+				
+				if ( ComponentLabel.this.selected ) {
+					Rectangle rect = getBounds();
+					event.gc.setForeground(event.widget.getDisplay().getSystemColor(SWT.COLOR_RED));
+					event.gc.setLineWidth(3);
+					event.gc.drawRectangle(0, 0, rect.width, rect.height);
+				}
 			}
 		});
 
@@ -50,6 +59,19 @@ public class ComponentLabel extends Label {
 
 	public void setSelected(boolean selected) {
 		ComponentLabel.this.selected = selected;
+		redraw();
+	}
+	
+	public void highlight() {
+		setHighlighted(true);
+	}
+
+	public void lowlight() {
+		setHighlighted(false);
+	}
+
+	public void setHighlighted(boolean highlighted) {
+		ComponentLabel.this.highlighted = highlighted;
 		redraw();
 	}
 
