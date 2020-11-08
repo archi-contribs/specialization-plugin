@@ -24,7 +24,7 @@ public class DistributionNetworkFigure extends com.archimatetool.editor.diagram.
     }
     
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )

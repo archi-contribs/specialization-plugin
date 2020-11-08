@@ -19,7 +19,7 @@ public class ArtifactFigure extends com.archimatetool.editor.diagram.figures.ele
 	// ArtifactFigure do not have a drawIcon method
 	
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )

@@ -19,7 +19,7 @@ public class DeliverableFigure extends com.archimatetool.editor.diagram.figures.
 	// DeliverableFigure do not have a drawIcon method
 	
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = SpecializationPlugin.getLabelName(getDiagramModelObject());
         
         if ( labelName==null )
