@@ -141,12 +141,14 @@ import com.archimatetool.model.INameable;
  * v2.0.0.beta1	21/05/2019		Allow to define specializations at the model level, and to assign a specialization to every element
  *                              Change the JAR name to remove the unnecessary "v" before the version number
  * 
+ * v2.0.0.beta2 08/11/2020		adapt to new Archi Figure class 
+ * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "org.archicontribs.specialization";
 	public static SpecializationPlugin INSTANCE;
 
-	public static final String pluginVersion = "2.0.0.alpha1";
+	public static final String pluginVersion = "2.0.0.alpha2";
 	public static final String pluginName = "SpecializationPlugin";
 	public static final String pluginTitle = "Specialization plugin v" + pluginVersion;
 
