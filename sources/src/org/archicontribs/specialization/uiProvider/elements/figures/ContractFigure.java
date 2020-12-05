@@ -18,7 +18,7 @@ public class ContractFigure extends com.archimatetool.editor.diagram.figures.ele
 	// ContractFigure do not have a drawIcon method 
 	
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )

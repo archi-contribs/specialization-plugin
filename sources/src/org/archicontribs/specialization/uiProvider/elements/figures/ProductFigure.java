@@ -18,7 +18,7 @@ public class ProductFigure extends com.archimatetool.editor.diagram.figures.elem
 	// ProductFigure do not have a drawIcon method
 	
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )

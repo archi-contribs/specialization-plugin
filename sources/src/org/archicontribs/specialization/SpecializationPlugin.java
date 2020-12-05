@@ -144,6 +144,8 @@ import com.archimatetool.model.IProperty;
  * 
  * v1.0.11      27/03/2019      fix exception when using magic connector to create new element
  * 
+ * v1.0.12		05/12/2020		compile against Archi 4.7
+ * 
  */
 public class SpecializationPlugin extends AbstractUIPlugin {
     public static final String PLUGIN_ID = "org.archicontribs.specialization";

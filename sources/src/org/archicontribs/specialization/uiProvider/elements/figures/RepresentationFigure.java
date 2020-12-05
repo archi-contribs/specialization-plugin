@@ -18,7 +18,7 @@ public class RepresentationFigure extends com.archimatetool.editor.diagram.figur
 	// RepresentationFigure do not have a drawIcon method
 	
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )

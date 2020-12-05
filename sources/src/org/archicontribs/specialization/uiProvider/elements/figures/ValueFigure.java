@@ -18,7 +18,7 @@ public class ValueFigure extends com.archimatetool.editor.diagram.figures.elemen
 	// ValueFigure do not have drawIcon method !!!
 	
     @Override
-    protected void setText() {
+	public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )

@@ -27,7 +27,7 @@ public class SystemSoftwareFigure extends com.archimatetool.editor.diagram.figur
     }
     
     @Override
-    protected void setText() {
+	public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )

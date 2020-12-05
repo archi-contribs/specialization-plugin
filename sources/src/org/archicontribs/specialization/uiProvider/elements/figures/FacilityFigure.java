@@ -26,7 +26,7 @@ public class FacilityFigure extends com.archimatetool.editor.diagram.figures.ele
     }
     
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )

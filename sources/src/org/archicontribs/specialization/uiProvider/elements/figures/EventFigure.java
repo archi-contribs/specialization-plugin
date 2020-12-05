@@ -27,7 +27,7 @@ public class EventFigure extends com.archimatetool.editor.diagram.figures.elemen
     }
     
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )

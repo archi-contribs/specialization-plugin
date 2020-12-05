@@ -27,7 +27,7 @@ public class InterfaceFigure extends com.archimatetool.editor.diagram.figures.el
     }
     
     @Override
-    protected void setText() {
+    public void setText() {
         String labelName = null;
         
         if ( SpecializationPlugin.mustReplaceLabel(getDiagramModelObject()) )
