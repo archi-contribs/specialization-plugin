@@ -9,6 +9,9 @@
   
 -----
 
+* v1.0.12 (05/12/2020)
+	* compile against Archi 4.7
+
 * v1.0.11 (27/03/2019)
    * fix exception when using magic connector to create new element
 
